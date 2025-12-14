@@ -1,0 +1,196 @@
+.events {
+    padding: 120px 24px;
+    background: var(--bg-primary);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.title {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.timeline {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 24px;
+    width: 2px;
+    background: var(--glass-border);
+}
+
+.eventCard {
+    margin-bottom: 40px;
+    padding-left: 60px;
+    position: relative;
+}
+
+.eventCard::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 24px;
+    width: 12px;
+    height: 12px;
+    background: var(--bg-primary);
+    border: 2px solid var(--text-secondary);
+    border-radius: 50%;
+    z-index: 1;
+    transition: all 0.3s ease;
+}
+
+.eventCard:hover::before {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.1);
+}
+
+.cardContent {
+    background: var(--bg-secondary);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 24px;
+    transition: all 0.3s ease;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+}
+
+.eventCard:hover .cardContent {
+    transform: translateX(8px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.thumbnail {
+    width: 100%;
+    height: 100%;
+    min-height: 120px;
+    border-radius: 12px;
+    object-fit: cover;
+    background: var(--glass-bg);
+}
+
+.details {
+    display: flex;
+    flex-direction: column;
+}
+
+.dateBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.eventTitle {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.speaker {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.speakerAvatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+}
+
+.speakerName {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: auto;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.rsvpButton {
+    margin-left: auto;
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--glass-bg);
+    color: var(--text-primary);
+    border: 1px solid var(--glass-border);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.rsvpButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.urgent {
+    animation: pulse 2s infinite;
+    border-color: rgba(59, 130, 246, 0.5);
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(59, 130, 246, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+    }
+}
+
+@media (max-width: 768px) {
+    .cardContent {
+        grid-template-columns: 1fr;
+    }
+
+    .thumbnail {
+        height: 160px;
+    }
+
+    .timeline::before {
+        left: 16px;
+    }
+
+    .eventCard {
+        padding-left: 40px;
+    }
+
+    .eventCard::before {
+        left: 11px;
+    }
+}

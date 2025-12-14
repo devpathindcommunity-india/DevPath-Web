@@ -1,0 +1,132 @@
+.learningPaths {
+    padding: 120px 24px;
+    background: var(--bg-secondary);
+    overflow: hidden;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.title {
+    font-size: 48px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--text-primary);
+}
+
+.subtitle {
+    font-size: 18px;
+    color: var(--text-secondary);
+}
+
+.carousel {
+    display: flex;
+    gap: 32px;
+    overflow-x: auto;
+    padding: 20px 4px;
+    scroll-snap-type: x mandatory;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.pathCard {
+    min-width: 380px;
+    border-radius: 24px;
+    padding: 32px;
+    position: relative;
+    scroll-snap-align: center;
+    transition: transform 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.pathCard:hover {
+    transform: translateY(-8px);
+}
+
+.badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    background: rgba(0, 0, 0, 0.3);
+    color: white;
+    margin-bottom: 20px;
+    backdrop-filter: blur(4px);
+}
+
+.pathTitle {
+    font-size: 28px;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 12px;
+}
+
+.pathMeta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.highlights {
+    margin-bottom: 32px;
+    flex: 1;
+}
+
+.highlight {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.highlight::before {
+    content: '✓';
+    color: white;
+    font-weight: bold;
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+}
+
+.students {
+    display: flex;
+    align-items: center;
+    gap: -8px;
+}
+
+.studentAvatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    background: var(--glass-bg);
+}
+
+.studentCount {
+    margin-left: 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+@media (max-width: 768px) {
+    .pathCard {
+        min-width: 300px;
+    }
+}
