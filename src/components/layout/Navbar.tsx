@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Globe, Github, LogIn, Menu, X } from 'lucide-react';
+import { Globe, Github, LogIn, Menu, X, LogOut } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -21,7 +21,7 @@ const navLinks = [
 ];
 
 export default function Navbar() {
-    const { user, login } = useAuth();
+    const { user, login, logout } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -65,14 +65,16 @@ export default function Navbar() {
 
                     {user ? (
                         <Link href="/profile" className={styles.profileButton}>
-                            <div className={styles.avatar} style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary)' }} />
+                            <div className={styles.avatar} style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--primary)' }}>
+                                {user.photoURL && <Image src={user.photoURL} alt={user.name || 'User'} width={24} height={24} className="rounded-full" />}
+                            </div>
                             <span>{user.name}</span>
                         </Link>
                     ) : (
-                        <button className={styles.profileButton} onClick={login}>
+                        <Link href="/login" className={styles.profileButton}>
                             <LogIn size={16} />
                             <span>Login</span>
-                        </button>
+                        </Link>
                     )}
 
                     {/* Hamburger Menu Button (Mobile Only) */}
@@ -144,16 +146,30 @@ export default function Navbar() {
                                         className={styles.mobileProfileButton}
                                         onClick={closeMobileMenu}
                                     >
-                                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--primary)' }} />
                                         <span>{user.name}</span>
                                     </Link>
                                 ) : (
-                                    <button
+                                    <Link
+                                        href="/login"
                                         className={styles.mobileProfileButton}
-                                        onClick={() => { login(); closeMobileMenu(); }}
+                                        onClick={closeMobileMenu}
                                     >
                                         <LogIn size={20} />
                                         <span>Login</span>
+                                    </Link>
+                                )}
+                                {user && (
+                                    <button
+                                        className={styles.mobileProfileButton}
+                                        onClick={() => {
+                                            logout();
+                                            closeMobileMenu();
+                                            window.location.href = '/';
+                                        }}
+                                        style={{ color: '#ef4444', borderColor: '#ef4444' }}
+                                    >
+                                        <LogOut size={20} />
+                                        <span>Logout</span>
                                     </button>
                                 )}
                             </div>
