@@ -43,3 +43,16 @@ next-env.d.ts
 # logs
 *_log*.txt
 lint_output*.txt
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+
+# System
+Thumbs.db
+.DS_Store
+
+# Temp
+tmp/

@@ -1,14 +1,17 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, doc, updateDoc, setDoc } from "firebase/firestore";
 
+import * as dotenv from 'dotenv';
+dotenv.config({ path: '.env.local' });
+
 const firebaseConfig = {
-    apiKey: "AIzaSyALGINp8VYQS17ODls_lcOHPeh4HSBVG6A",
-    authDomain: "devpath-website.firebaseapp.com",
-    projectId: "devpath-website",
-    storageBucket: "devpath-website.firebasestorage.app",
-    messagingSenderId: "1045735850932",
-    appId: "1:1045735850932:web:305a30d27b23d8e8c468e1",
-    measurementId: "G-6CW7LMVKJ4"
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
 const app = initializeApp(firebaseConfig);
