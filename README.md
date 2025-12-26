@@ -39,8 +39,8 @@ Ensure you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Aditya948351/DevPath-Community-Website.git
-   cd DevPath-Community-Website
+   git clone https://github.com/devpathindcommunity-india/DevPath-Web.git
+   cd DevPath-Web
    ```
 
 2. **Install dependencies:**
@@ -52,7 +52,13 @@ Ensure you have the following installed:
    pnpm install
    ```
 
-3. **Run the development server:**
+3. **Set up Environment Variables:**
+   Copy `.env.example` to `.env.local` and fill in your Firebase credentials.
+   ```bash
+   cp .env.example .env.local
+   ```
+
+4. **Run the development server:**
    ```bash
    npm run dev
    # or
@@ -61,7 +67,7 @@ Ensure you have the following installed:
    pnpm dev
    ```
 
-4. **Open your browser:**
+5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application running.
 
 ## 📜 Scripts
@@ -73,13 +79,11 @@ Ensure you have the following installed:
 
 ## 🤝 Contributing
 
-We welcome contributions from the community! Whether it's fixing a bug, adding a feature, or improving documentation, your help is appreciated.
+We welcome contributions from the community! Please read our [Contributing Guidelines](CONTRIBUTING.md) for details on how to get started.
 
-1. Fork the repository.
-2. Create a new branch (`git checkout -b feature/YourFeature`).
-3. Commit your changes (`git commit -m 'Add some feature'`).
-4. Push to the branch (`git push origin feature/YourFeature`).
-5. Open a Pull Request.
+## 💖 Code of Conduct
+
+We are committed to providing a friendly, safe, and welcoming environment for all. Please read and follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
 ## 📄 License
 
