@@ -26,7 +26,13 @@ Thank you for your interest in contributing to the DevPath Community Website! We
     - Get your Firebase configuration keys from Project Settings and fill them in `.env.local`.
     - (Optional) Deploy `firestore.rules` and `storage.rules` to your Firebase project to ensure correct permissions.
 
-5.  **Run the development server**:
+5.  **Run the setup script**:
+    This will help you set up your local database permissions and seed initial data.
+    ```bash
+    npm run setup
+    ```
+
+6.  **Run the development server**:
     ```bash
     npm run dev
     # or

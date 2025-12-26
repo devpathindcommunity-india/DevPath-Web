@@ -3,13 +3,22 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Helper function to check if user is super admin
     function isSuperAdmin() {
-      return request.auth != null && request.auth.token.email == 'devpathind.community@gmail.com';
+      return request.auth != null && (
+        request.auth.token.email == 'devpathind.community@gmail.com' ||
+        exists(/databases/$(database)/documents/super_admins/$(request.auth.token.email))
+      );
     }
 
     // Admins collection
     match /admins/{adminId} {
       allow read: if true; // Public read
       allow write: if isSuperAdmin() || (request.auth != null && request.auth.token.email == adminId);
+    }
+
+    // Super Admins collection (for dynamic super admin management)
+    match /super_admins/{email} {
+      allow read: if isSuperAdmin();
+      allow write: if isSuperAdmin();
     }
 
     // Members collection
