@@ -22,6 +22,7 @@ const navLinks = [
     { href: '/community', label: 'Community' },
     { href: '/resources', label: 'Resources' },
     { href: '/events', label: 'Events' },
+    { href: '/opensource', label: 'Open Source' },
     { href: '/team', label: 'Team' },
 ];
 

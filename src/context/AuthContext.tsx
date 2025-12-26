@@ -20,6 +20,7 @@ interface User {
     city?: string;
     district?: string;
     coverPhotoURL?: string;
+    communityRole?: string;
     displayRole?: string;
     roleId?: string;
     roleTasks?: string[];
@@ -76,6 +77,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeSnapshot = useRef<(() => void) | null>(null);
 
 
+    const SUPER_ADMIN_EMAIL = 'devpathind.community@gmail.com';
+
     useEffect(() => {
         // Ensure persistence is set to local
         setPersistence(auth, browserLocalPersistence).catch((error) => {
@@ -91,6 +94,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (firebaseUser) {
                 try {
+                    // SUPER ADMIN BYPASS
+                    if (firebaseUser.email === SUPER_ADMIN_EMAIL) {
+                        const superAdminUser: User = {
+                            uid: firebaseUser.uid,
+                            email: firebaseUser.email,
+                            name: "Super Admin",
+                            photoURL: firebaseUser.photoURL,
+                            role: 'admin',
+                            // Minimal required fields to prevent crashes
+                            privacySettings: {
+                                showMobile: false,
+                                showLocation: false,
+                                showEmail: false,
+                                showProjects: false,
+                                showRewards: false,
+                                isPublic: false,
+                                showInCommunity: false
+                            }
+                        };
+                        setUser(superAdminUser);
+                        setIsLoading(false);
+                        return;
+                    }
+
                     let role: 'admin' | 'member' = 'member';
                     let userData: any = {
                         uid: firebaseUser.uid,
@@ -201,16 +228,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 return;
                             }
 
-                            // If we have a local session ID but Firestore doesn't (migration or error), update Firestore?
-                            // Or if we are just logging in, login() handles it. 
-                            // If we are auto-logged in and Firestore has no session ID, we might want to set one?
-                            // For now, let's enforce strictness: If mismatch, logout. If match, good.
-
-                            // Super Admin Override
-                            if (firebaseUser.email === 'devpathind.community@gmail.com') {
-                                updatedUser.role = 'admin';
-                            }
-
                             setUser(updatedUser as User);
                         }
                         setIsLoading(false);
@@ -277,31 +294,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                         setDoc(doc(db, collectionName, docId), firestoreUpdate, { merge: true }).catch(err => console.error("Error updating user data:", err));
                     }
-
-                    // Fetch Role Details if roleId exists (This is static data, can be merged into user state when listener fires? 
-                    // Or we can just fetch it here and update user state? 
-                    // Since listener is the source of truth, we should probably fetch this inside the listener or just let it be.
-                    // For now, let's leave it out of the initial setUser since the listener will handle the main user object.
-                    // If role details are needed, they should probably be fetched inside the listener or as a separate effect.
-                    // However, to minimize disruption, I will keep the logic but NOT call setUser here. 
-                    // Instead, we rely on the listener. 
-                    // WAIT: Role details are NOT in the user document, they are in 'roles' collection.
-                    // The listener only listens to the user document.
-                    // So we DO need to fetch role details and merge them.
-                    // But we can't merge them into the listener's update easily without making the listener async or complex.
-                    // A better approach: Fetch role details and store them in a separate state or ref, 
-                    // OR just accept that role details might pop in a bit later.
-                    // Actually, the original code fetched it and merged it.
-                    // Let's just fetch it here. The listener will overwrite 'user' with the doc data.
-                    // We need the listener to ALSO include role details if we want them to persist.
-                    // This implies the listener callback needs to fetch role details too?
-                    // Or we can just update the user object in the listener with the role details if we have them.
-
-                    // SIMPLIFICATION: The fluctuation is the main issue. Role details are static.
-                    // I will remove the manual setUser. The listener will fire.
-                    // If role details are missing, that's a separate issue (but they were only fetched if roleId existed).
-                    // Let's just let the listener handle the main user data. 
-                    // If we need role details, we should probably fetch them in a separate useEffect dependent on user.roleId.
 
                 } catch (error) {
                     console.error("Error fetching user data:", error);
@@ -372,6 +364,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const updateUserProfile = async (data: Partial<User>) => {
         if (!user || !auth.currentUser) return;
+        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
 
         try {
             // 1. Update Firestore
@@ -418,6 +411,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const followUser = async (targetUserId: string) => {
         if (!user) return;
+        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
         if (user.uid === targetUserId) return; // Prevent self-follow
         if (user.following?.includes(targetUserId)) return; // Prevent double follow
 
@@ -461,6 +455,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unfollowUser = async (targetUserId: string) => {
         if (!user) return;
+        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
         try {
             const batch = (await import('firebase/firestore')).writeBatch(db);
             const arrayRemove = (await import('firebase/firestore')).arrayRemove;
@@ -494,6 +489,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const followCommunity = async () => {
         if (!user) return;
+        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
         // Check if already followed (using a flag or badge)
         if (user.achievements?.includes('community_follower')) return;
 

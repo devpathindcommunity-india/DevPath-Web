@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, LogOut, Camera, Save, X, Github, Instagram, Linkedin, CheckCircle, Share2, Shield, Copy, Check, Plus, Edit3, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { teamMembers } from '@/data/team';
+import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, LogOut, Camera, Save, X, Github, Instagram, Linkedin, CheckCircle, Share2, Shield, Copy, Check, Plus, Edit3, Users, Globe } from 'lucide-react';
 import styles from './Profile.module.css';
 import ProjectUploadModal from '@/components/projects/ProjectUploadModal';
 import ProjectCard from '@/components/projects/ProjectCard';
@@ -16,9 +18,18 @@ import remarkGfm from 'remark-gfm';
 import { collection, query, where, orderBy, getDocs, doc, updateDoc, arrayUnion, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { calculateLevel } from '@/lib/points';
+import { getEmbedUrl } from '@/lib/utils';
 
 export default function UserProfile() {
     const { user, logout, updateUserProfile } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (user?.email === 'devpathind.community@gmail.com') {
+            router.push('/ap');
+        }
+    }, [user, router]);
+
     const [isEditingPhoto, setIsEditingPhoto] = useState(false);
     const [newPhotoURL, setNewPhotoURL] = useState('');
     const [isSaving, setIsSaving] = useState(false);
@@ -30,6 +41,7 @@ export default function UserProfile() {
     const [projects, setProjects] = useState<any[]>([]);
     const [loadingProjects, setLoadingProjects] = useState(false);
     const [projectToEdit, setProjectToEdit] = useState<any>(null);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
 
     // About / Tech Stack State
     const [isEditingAbout, setIsEditingAbout] = useState(false);
@@ -219,7 +231,7 @@ export default function UserProfile() {
     }
 
     return (
-        <div className="min-h-screen bg-background text-foreground pt-24 pb-8 px-4 md:px-8">
+        <div className="min-h-screen bg-background text-foreground pt-12 pb-8 px-4 md:px-8">
             <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
 
                 {/* LEFT SIDEBAR */}
@@ -260,13 +272,19 @@ export default function UserProfile() {
                         )}
 
                         <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
-                        {user.role === 'admin' && (
-                            <div className="mb-2">
+                        <div className="mb-2 flex flex-wrap gap-2">
+                            {user.role === 'admin' && (
                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-xs font-bold border border-red-500/20">
                                     <Shield size={12} /> Community Admin
                                 </span>
-                            </div>
-                        )}
+                            )}
+
+                            {(user.communityRole || (user.role === 'admin' && teamMembers.find(m => m.name === user.name))) && (
+                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-bold border border-blue-500/20">
+                                    <Shield size={12} /> {user.communityRole || teamMembers.find(m => m.name === user.name)?.role}
+                                </span>
+                            )}
+                        </div>
                         <p className="text-muted-foreground text-lg mb-4">@{user.email?.split('@')[0]}</p>
 
                         <div className="w-full mb-6">
@@ -373,7 +391,30 @@ export default function UserProfile() {
                     </div>
 
                     {/* Login Heatmap */}
-                    <LoginHeatmap loginDates={user.loginDates} />
+                    <div className="space-y-6">
+                        <LoginHeatmap loginDates={user.loginDates} />
+
+                        {/* Activity Line Chart (Simple SVG Implementation) */}
+                        <div className="p-6 bg-card border border-border rounded-xl">
+                            <h3 className="text-lg font-semibold mb-4">Activity Trends</h3>
+                            <div className="h-40 flex items-end justify-between gap-2 px-2">
+                                {[...Array(14)].map((_, i) => {
+                                    const height = Math.floor(Math.random() * 80) + 20; // Mock data for now
+                                    return (
+                                        <div key={i} className="w-full bg-primary/20 hover:bg-primary/40 rounded-t-sm transition-all relative group" style={{ height: `${height}%` }}>
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 text-xs bg-popover text-popover-foreground px-2 py-1 rounded shadow-md transition-opacity">
+                                                {height} XP
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="flex justify-between mt-2 text-xs text-muted-foreground px-2">
+                                <span>14 days ago</span>
+                                <span>Today</span>
+                            </div>
+                        </div>
+                    </div>
 
                     {/* About Me & Tech Stack */}
                     <div className="bg-card border border-border rounded-xl p-6">
@@ -508,6 +549,7 @@ export default function UserProfile() {
                                         project={project}
                                         isOwner={true}
                                         onEdit={handleEditProject}
+                                        onReadMore={setSelectedProject}
                                     />
                                 ))}
                             </div>
@@ -594,6 +636,76 @@ export default function UserProfile() {
                                     </div>
                                 ))
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Project Details Modal */}
+            {selectedProject && (
+                <div
+                    className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
+                    onClick={() => setSelectedProject(null)}
+                >
+                    <div
+                        className="bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
+                            <h2 className="text-xl font-bold truncate pr-4">{selectedProject.title}</h2>
+                            <button
+                                onClick={() => setSelectedProject(null)}
+                                className="p-2 hover:bg-muted rounded-full transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Media */}
+                            {selectedProject.videoUrl ? (
+                                <div className="aspect-video rounded-xl overflow-hidden bg-black">
+                                    <iframe
+                                        src={getEmbedUrl(selectedProject.videoUrl)}
+                                        className="w-full h-full"
+                                        allowFullScreen
+                                    />
+                                </div>
+                            ) : selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
+                                <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+                                    <img
+                                        src={selectedProject.screenshots[0]}
+                                        alt={selectedProject.title}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            <div className="prose dark:prose-invert max-w-none">
+                                <div dangerouslySetInnerHTML={{ __html: selectedProject.description }} />
+                            </div>
+
+                            {/* Links & Skills */}
+                            <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
+                                {selectedProject.websiteUrl && (
+                                    <a
+                                        href={selectedProject.websiteUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                                    >
+                                        <Globe size={16} /> Visit Website
+                                    </a>
+                                )}
+                                <div className="flex flex-wrap gap-2 ml-auto">
+                                    {selectedProject.skills?.map((skill: string) => (
+                                        <span key={skill} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

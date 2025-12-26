@@ -34,9 +34,7 @@ export default function Footer() {
                             <Link href="/wiki" className={styles.link}>
                                 <Book size={16} /> Wiki & Docs
                             </Link>
-                            <Link href="/backups" className={styles.link}>
-                                <Cloud size={16} /> Backups
-                            </Link>
+
                             <Link href="/flags" className={styles.link}>
                                 <Flag size={16} /> Feature Flags
                             </Link>

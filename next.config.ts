@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
     // @ts-ignore - appIsrStatus is valid but missing in type definition
     appIsrStatus: false,
   },
-  reactCompiler: true,
+  reactCompiler: false,
 
   images: {
     unoptimized: true,

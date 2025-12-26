@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Barlow_Condensed } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
+import FooterWrapper from "@/components/layout/FooterWrapper";
 import { AuthProvider } from "@/context/AuthContext";
 import { GamificationProvider } from "@/context/GamificationContext";
 import { RealTimeProvider } from "@/context/RealTimeContext";
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 
 import BackgroundMesh from '@/components/layout/BackgroundMesh';
+import PageWrapper from '@/components/layout/PageWrapper';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
@@ -47,10 +48,10 @@ export default function RootLayout({
                 <AnimatedBackground />
                 {/* <BackgroundMesh /> */}
                 <Navbar />
-                <main style={{ position: 'relative', zIndex: 1 }}>
+                <PageWrapper>
                   {children}
-                </main>
-                <Footer />
+                </PageWrapper>
+                <FooterWrapper />
               </RealTimeProvider>
             </GamificationProvider>
           </AuthProvider>

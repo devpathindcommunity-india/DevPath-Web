@@ -99,6 +99,7 @@ export default function SignupPage() {
                 // The 'admins' collection is already seeded. We might want to add the UID to it.
                 await setDoc(doc(db, 'admins', email), {
                     uid: user.uid, // Link Auth UID to Admin Doc
+                    name, // Ensure name is saved
                     mobile: `${countryCode} ${mobile}`,
                     state,
                     city,

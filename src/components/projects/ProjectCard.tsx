@@ -28,12 +28,19 @@ interface ProjectCardProps {
     project: Project;
     isOwner?: boolean;
     onEdit?: (project: Project) => void;
+    onReadMore?: (project: Project) => void;
 }
 
-export default function ProjectCard({ project, isOwner, onEdit }: ProjectCardProps) {
+export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: ProjectCardProps) {
     const { user } = useAuth();
     const [showFullDescription, setShowFullDescription] = useState(false);
     const [isStarring, setIsStarring] = useState(false);
+
+    // Helper to strip HTML for preview
+    const stripHtml = (html: string) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>?/gm, '');
+    };
 
     // Optimistic UI state
     const [stars, setStars] = useState<string[]>(project.stars || []);
@@ -209,20 +216,18 @@ export default function ProjectCard({ project, isOwner, onEdit }: ProjectCardPro
                 )}
 
                 {/* Description */}
-                <div className={`text-sm text-muted-foreground prose prose-invert prose-sm max-w-none mb-4 ${!showFullDescription ? 'line-clamp-3' : ''}`}>
-                    <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
-                        {project.description}
-                    </ReactMarkdown>
+                <div className="text-sm text-muted-foreground mb-4">
+                    <p className="line-clamp-3">
+                        {stripHtml(project.description)}
+                    </p>
                 </div>
 
-                {project.description.length > 150 && (
-                    <button
-                        onClick={() => setShowFullDescription(!showFullDescription)}
-                        className="text-xs text-primary hover:underline mt-auto self-start"
-                    >
-                        {showFullDescription ? 'Show Less' : 'Read More'}
-                    </button>
-                )}
+                <button
+                    onClick={() => onReadMore ? onReadMore(project) : setShowFullDescription(!showFullDescription)}
+                    className="text-xs text-primary hover:underline mt-auto self-start"
+                >
+                    Read More
+                </button>
             </div>
         </div>
     );

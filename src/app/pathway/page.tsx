@@ -18,10 +18,52 @@ export default function PathwayPage() {
             try {
                 const q = query(collection(db, 'leaderboard'), orderBy('points', 'desc'), limit(50));
                 const snapshot = await getDocs(q);
-                const data = snapshot.docs
+                let data = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
-                    .filter((user: any) => user.id !== 'devpathind.community@gmail.com' && user.email !== 'devpathind.community@gmail.com');
-                setLeaderboard(data);
+                    .filter((user: any) =>
+                        user.id !== 'devpathind.community@gmail.com' &&
+                        user.email !== 'devpathind.community@gmail.com' &&
+                        user.name !== 'Super Admin'
+                    );
+
+                // Fix missing names (e.g. Admins)
+                const { doc, getDoc, updateDoc, where } = await import('firebase/firestore');
+
+                const updatedData = await Promise.all(data.map(async (entry: any) => {
+                    if (!entry.name || entry.name.trim() === '') {
+                        try {
+                            // 1. Try Members (UID)
+                            const memberRef = doc(db, 'members', entry.id);
+                            const memberSnap = await getDoc(memberRef);
+
+                            if (memberSnap.exists() && memberSnap.data().name) {
+                                const newData = { name: memberSnap.data().name, photoURL: memberSnap.data().photoURL };
+                                // Update Leaderboard Doc permanently
+                                updateDoc(doc(db, 'leaderboard', entry.id), newData).catch(console.error);
+                                return { ...entry, ...newData };
+                            }
+
+                            // 2. Try Admins (Query by UID)
+                            const adminsQuery = query(collection(db, 'admins'), where('uid', '==', entry.id));
+                            const adminsSnap = await getDocs(adminsQuery);
+
+                            if (!adminsSnap.empty) {
+                                const adminData = adminsSnap.docs[0].data();
+                                if (adminData.name) {
+                                    const newData = { name: adminData.name, photoURL: adminData.photoURL || adminData.image };
+                                    // Update Leaderboard Doc permanently
+                                    updateDoc(doc(db, 'leaderboard', entry.id), newData).catch(console.error);
+                                    return { ...entry, ...newData };
+                                }
+                            }
+                        } catch (err) {
+                            console.error(`Error fixing user ${entry.id}:`, err);
+                        }
+                    }
+                    return entry;
+                }));
+
+                setLeaderboard(updatedData);
             } catch (error) {
                 console.error("Error fetching leaderboard:", error);
             } finally {

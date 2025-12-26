@@ -4,7 +4,9 @@
 import { useEffect, useState } from 'react';
 import { doc, getDoc, collection, query, where, getDocs, orderBy, updateDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, Github, Instagram, Linkedin, CheckCircle, User as UserIcon, Heart, Share2, Video, Image as ImageIcon, Globe, Check, Users, Shield } from 'lucide-react';
+import { getEmbedUrl } from '@/lib/utils';
+import { teamMembers } from '@/data/team';
+import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, Github, Instagram, Linkedin, CheckCircle, User as UserIcon, Heart, Share2, Video, Image as ImageIcon, Globe, Check, Users, Shield, X } from 'lucide-react';
 import styles from '@/components/profile/Profile.module.css';
 import Rewards from '@/components/profile/Rewards';
 import FollowButton from '@/components/profile/FollowButton';
@@ -16,6 +18,7 @@ interface PublicUser {
     photoURL?: string;
     bio?: string;
     role?: string;
+    communityRoles?: string[];
     displayRole?: string;
     roleTasks?: string[];
     city?: string;
@@ -69,6 +72,13 @@ export default function ProfileClient() {
     const [error, setError] = useState('');
     const [activeTab, setActiveTab] = useState('Overview');
     const [copied, setCopied] = useState(false);
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+    // Helper to strip HTML for preview
+    const stripHtml = (html: string) => {
+        if (!html) return '';
+        return html.replace(/<[^>]*>?/gm, '');
+    };
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
@@ -129,10 +139,60 @@ export default function ProfileClient() {
                     }
 
                     // Check if user is an admin (if not already marked)
-                    if (userData.role !== 'admin' && userData.email) {
-                        const adminCheck = await getDoc(doc(db, 'admins', userData.email));
-                        if (adminCheck.exists()) {
-                            userData.role = 'admin';
+                    // Check if user is an admin (if not already marked)
+                    if (userData.role !== 'admin') {
+                        // 1. Try by Email (if available)
+                        if (userData.email) {
+                            const adminCheck = await getDoc(doc(db, 'admins', userData.email));
+                            if (adminCheck.exists()) {
+                                userData.role = 'admin';
+                            }
+                        }
+                        // 2. Try by UID field in admins collection (fallback)
+                        if (userData.role !== 'admin') {
+                            const q = query(collection(db, 'admins'), where('uid', '==', uid));
+                            const querySnapshot = await getDocs(q);
+                            if (!querySnapshot.empty) {
+                                userData.role = 'admin';
+                            }
+                        }
+                    }
+
+                    // Check Team Members for Community Role (Robust Matching)
+                    const normalize = (s: string | undefined) => s?.toLowerCase().trim() || '';
+
+                    // 1. Try Strict Matching by Socials first (High Confidence)
+                    let teamMatches = teamMembers.filter(m =>
+                        (m.socials?.github && userData?.github && normalize(m.socials.github) === normalize(userData.github)) ||
+                        (m.socials?.linkedin && userData?.linkedin && normalize(m.socials.linkedin) === normalize(userData.linkedin))
+                    );
+
+                    const isHighConfidence = teamMatches.length > 0;
+
+                    // 2. Fallback to Name Matching ONLY if no social match found
+                    if (teamMatches.length === 0) {
+                        // For name-only matches, we filter out sensitive roles (Owner, Core Admin) to prevent impersonation
+                        teamMatches = teamMembers.filter(m =>
+                            normalize(m.name) === normalize(userData?.name) &&
+                            !['Owner', 'Core Admin'].includes(m.category)
+                        );
+                    }
+
+                    if (teamMatches.length > 0) {
+                        const roles = teamMatches.map(m => m.subRole ? `${m.role} - ${m.subRole}` : m.role);
+                        // Deduplicate
+                        const uniqueRoles = Array.from(new Set(roles));
+
+                        userData = {
+                            ...userData,
+                            communityRoles: uniqueRoles
+                        };
+
+                        // Force Admin role ONLY if matched via Socials (High Confidence) AND category is Owner/Core Admin
+                        if (isHighConfidence) {
+                            if (teamMatches.some(m => ['Owner', 'Core Admin'].includes(m.category))) {
+                                userData.role = 'admin';
+                            }
                         }
                     }
 
@@ -303,13 +363,19 @@ export default function ProfileClient() {
 
                         <div className={styles.details}>
                             <h1 className={styles.name}>{user.name || 'User'}</h1>
-                            {user.role === 'admin' && (
-                                <div className="mb-2">
-                                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-xs font-bold border border-red-500/20">
+                            <div className="mb-2 flex flex-wrap gap-2">
+                                {(user.role === 'admin' || (user.communityRoles && user.communityRoles.some(r => r.includes('Owner') || r.includes('Core Admin')))) && (
+                                    <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 text-xs font-bold border border-red-200 dark:border-red-800">
                                         <Shield size={12} /> Community Admin
                                     </span>
-                                </div>
-                            )}
+                                )}
+
+                                {user.communityRoles && user.communityRoles.map((role, index) => (
+                                    <span key={index} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 text-xs font-bold border border-blue-200 dark:border-blue-800">
+                                        <Shield size={12} /> {role}
+                                    </span>
+                                ))}
+                            </div>
 
                             <p className={styles.bio}>
                                 <span className="text-primary font-bold">{(user.displayRole || user.role || 'MEMBER').toUpperCase()}</span>
@@ -447,6 +513,27 @@ export default function ProfileClient() {
                             <h2 className={styles.sectionTitle}>Contribution Activity</h2>
                             <LoginHeatmap loginDates={user.loginDates} />
                         </div>
+
+                        {/* Activity Line Chart (Simple SVG Implementation) */}
+                        <div className="p-6 bg-card border border-border rounded-xl">
+                            <h3 className="text-lg font-semibold mb-4">Activity Trends</h3>
+                            <div className="h-40 flex items-end justify-between gap-2 px-2">
+                                {[...Array(14)].map((_, i) => {
+                                    const height = Math.floor(Math.random() * 80) + 20; // Mock data for now
+                                    return (
+                                        <div key={i} className="w-full bg-primary/20 hover:bg-primary/40 rounded-t-sm transition-all relative group" style={{ height: `${height}%` }}>
+                                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 opacity-0 group-hover:opacity-100 text-xs bg-popover text-popover-foreground px-2 py-1 rounded shadow-md transition-opacity">
+                                                {height} XP
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                            <div className="flex justify-between mt-2 text-xs text-muted-foreground px-2">
+                                <span>14 days ago</span>
+                                <span>Today</span>
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -516,9 +603,15 @@ export default function ProfileClient() {
                                             </div>
                                         </div>
 
-                                        <p className="text-sm text-muted-foreground line-clamp-2 mb-3 h-10">
-                                            {project.description}
-                                        </p>
+                                        <div className="text-sm text-muted-foreground mb-3">
+                                            <p className="line-clamp-2">{stripHtml(project.description)}</p>
+                                            <button
+                                                onClick={() => setSelectedProject(project)}
+                                                className="text-primary text-xs font-medium hover:underline mt-1"
+                                            >
+                                                Read More
+                                            </button>
+                                        </div>
 
                                         {project.skills && project.skills.length > 0 && (
                                             <div className="flex flex-wrap gap-1 mb-4 h-6 overflow-hidden">
@@ -592,6 +685,79 @@ export default function ProfileClient() {
                     </div>
                 )}
             </div >
+
+
+            {/* Project Details Modal */}
+            {
+                selectedProject && (
+                    <div
+                        className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
+                        onClick={() => setSelectedProject(null)}
+                    >
+                        <div
+                            className="bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95"
+                            onClick={(e) => e.stopPropagation()}
+                        >
+                            <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
+                                <h2 className="text-xl font-bold truncate pr-4">{selectedProject.title}</h2>
+                                <button
+                                    onClick={() => setSelectedProject(null)}
+                                    className="p-2 hover:bg-muted rounded-full transition-colors"
+                                >
+                                    <X size={20} />
+                                </button>
+                            </div>
+
+                            <div className="p-6 space-y-6">
+                                {/* Media */}
+                                {selectedProject.videoUrl ? (
+                                    <div className="aspect-video rounded-xl overflow-hidden bg-black">
+                                        <iframe
+                                            src={getEmbedUrl(selectedProject.videoUrl)}
+                                            className="w-full h-full"
+                                            allowFullScreen
+                                        />
+                                    </div>
+                                ) : selectedProject.screenshots.length > 0 && (
+                                    <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+                                        <img
+                                            src={selectedProject.screenshots[0]}
+                                            alt={selectedProject.title}
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Description */}
+                                <div className="prose dark:prose-invert max-w-none">
+                                    <div dangerouslySetInnerHTML={{ __html: selectedProject.description }} />
+                                </div>
+
+                                {/* Links & Skills */}
+                                <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
+                                    {selectedProject.websiteUrl && (
+                                        <a
+                                            href={selectedProject.websiteUrl}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                                        >
+                                            <Globe size={16} /> Visit Website
+                                        </a>
+                                    )}
+                                    <div className="flex flex-wrap gap-2 ml-auto">
+                                        {selectedProject.skills?.map(skill => (
+                                            <span key={skill} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm">
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )
+            }
         </section >
     );
 }

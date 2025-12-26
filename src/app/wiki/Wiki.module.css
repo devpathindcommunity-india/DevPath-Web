@@ -1,5 +1,5 @@
 .container {
-    padding-top: 80px;
+    padding-top: 96px;
     min-height: 100vh;
     background: var(--bg-primary);
     display: flex;
@@ -11,7 +11,7 @@
     border-right: 1px solid var(--glass-border);
     padding: 24px;
     position: fixed;
-    top: 80px;
+    top: 96px;
     bottom: 0;
     overflow-y: auto;
     backdrop-filter: blur(10px);

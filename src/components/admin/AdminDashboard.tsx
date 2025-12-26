@@ -3,12 +3,13 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
+import { teamMembers } from '@/data/team';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import {
     Shield, Users, FileText, Settings, Search,
     MoreVertical, Trash2, Eye, Award, Database,
-    MessageSquare, Bell, Calendar, Plus, X, Link as LinkIcon, MapPin, Key
+    MessageSquare, Bell, Calendar, Plus, X, Link as LinkIcon, MapPin, Key, Edit
 } from 'lucide-react';
 import {
     collection, query, where, getDocs, doc, updateDoc,
@@ -61,6 +62,11 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     const [viewUser, setViewUser] = useState<any>(null); // For Profile Card Modal
     const [badgeUser, setBadgeUser] = useState<any>(null); // For Badge Management Modal
 
+    // Filter & Sort State
+    const [filterRole, setFilterRole] = useState('all');
+    const [filterCommunityRole, setFilterCommunityRole] = useState('all');
+    const [sortBy, setSortBy] = useState('name');
+
     // Notifications State
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loadingNotifications, setLoadingNotifications] = useState(false);
@@ -103,15 +109,39 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
         setSearching(true);
         console.log("Fetching users...");
         try {
+            // Fetch Members
             const usersRef = collection(db, 'members');
             const snapshot = await getDocs(usersRef);
-            console.log(`Found ${snapshot.size} user documents.`);
-            const usersList: any[] = snapshot.docs.map(doc => ({
+            const membersList: any[] = snapshot.docs.map(doc => ({
                 uid: doc.id,
                 ...doc.data()
             }));
-            console.log("Users list:", usersList);
-            setUsers(usersList);
+
+            // Fetch Admins
+            const adminsRef = collection(db, 'admins');
+            const adminsSnap = await getDocs(adminsRef);
+            const adminsList: any[] = adminsSnap.docs.map(doc => ({
+                uid: doc.id,
+                ...doc.data(),
+                role: 'admin' // Ensure role is set
+            }));
+
+            // Merge Lists (Prioritize Admins if duplicates exist by email)
+            const allUsers = [...membersList];
+            adminsList.forEach(admin => {
+                // Check if admin already exists in members list (by UID or Email)
+                const existingIndex = allUsers.findIndex(u => u.email === admin.email || u.uid === admin.uid);
+                if (existingIndex !== -1) {
+                    // Update existing entry with admin data
+                    allUsers[existingIndex] = { ...allUsers[existingIndex], ...admin };
+                } else {
+                    // Add new admin entry
+                    allUsers.push(admin);
+                }
+            });
+
+            console.log(`Found ${allUsers.length} total users.`);
+            setUsers(allUsers);
         } catch (error) {
             console.error("Error fetching users:", error);
         } finally {
@@ -203,25 +233,41 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     const fetchAdmins = async () => {
         setLoadingAdmins(true);
         try {
+            // 1. Fetch from 'members' where role is 'admin'
             const q = query(collection(db, 'members'), where('role', '==', 'admin'));
             const snapshot = await getDocs(q);
-            const adminsList: any[] = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
+            const membersAdmins: any[] = snapshot.docs.map(doc => ({ uid: doc.id, ...doc.data() }));
 
-            // Also fetch from 'admins' collection if separated, but we seem to use 'members' with role='admin' mostly
-            // However, AuthContext checks 'admins' collection first. 
-            // Let's fetch from 'admins' collection too.
+            // 2. Fetch from 'admins' collection
             const adminsColRef = collection(db, 'admins');
             const adminsColSnap = await getDocs(adminsColRef);
-            const adminsColList: any[] = adminsColSnap.docs.map(doc => ({ uid: doc.id, ...doc.data(), role: 'admin' }));
+            const adminsColList: any[] = adminsColSnap.docs.map(doc => {
+                const data = doc.data();
+                return {
+                    uid: data.uid || doc.id, // Use actual UID if present, else Email (doc.id)
+                    email: doc.id.includes('@') ? doc.id : data.email, // Ensure email is set from ID if it looks like one
+                    name: data.name || data.displayName, // Fallback for name
+                    ...data,
+                    role: 'admin'
+                };
+            });
 
-            // Merge unique admins
-            const allAdmins = [...adminsList];
-            adminsColList.forEach(admin => {
-                if (!allAdmins.find(a => a.email === admin.email)) {
-                    allAdmins.push(admin);
+            // 3. Merge Lists (Prioritize 'admins' collection data)
+            const allAdmins = [...adminsColList];
+
+            membersAdmins.forEach(memberAdmin => {
+                // Check if already present (by Email or UID)
+                const exists = allAdmins.find(a =>
+                    (a.email && a.email === memberAdmin.email) ||
+                    (a.uid && a.uid === memberAdmin.uid)
+                );
+
+                if (!exists) {
+                    allAdmins.push(memberAdmin);
                 }
             });
 
+            console.log("Fetched Admins:", allAdmins);
             setAdmins(allAdmins);
         } catch (error) {
             console.error("Error fetching admins:", error);
@@ -300,7 +346,10 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
         if (!confirm("Are you sure you want to delete this user? This action cannot be undone.")) return;
 
         try {
-            await deleteDoc(doc(db, 'members', userId));
+            const targetUser = users.find(u => u.uid === userId);
+            const collectionName = targetUser?.role === 'admin' ? 'admins' : 'members';
+
+            await deleteDoc(doc(db, collectionName, userId));
             setUsers(prev => prev.filter(u => u.uid !== userId));
             if (selectedUser?.uid === userId) setSelectedUser(null);
             alert("User deleted successfully.");
@@ -312,9 +361,100 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
     const handleUpdateUser = async (userId: string, data: any) => {
         try {
-            await updateDoc(doc(db, 'members', userId), data);
-            setUsers((prev: any[]) => prev.map(u => u.uid === userId ? { ...u, ...data } : u));
-            setSelectedUser((prev: any) => ({ ...prev, ...data }));
+            // Sanitize data
+            const sanitizedData = { ...data };
+            Object.keys(sanitizedData).forEach(key => {
+                if (sanitizedData[key] === undefined) delete sanitizedData[key];
+            });
+            if (data.communityRole === undefined) delete sanitizedData.communityRole;
+            // Determine collection and ID
+            // Check both users (members) and admins lists to find the target user
+            let targetUser = users.find(u => u.uid === userId);
+            if (!targetUser) {
+                targetUser = admins.find(a => a.uid === userId || a.email === userId);
+            }
+
+            // Ensure we have the latest data from the other list if possible to find email
+            if (targetUser && !targetUser.email) {
+                const otherRecord = admins.find(a => a.uid === targetUser?.uid) || users.find(u => u.uid === targetUser?.uid);
+                if (otherRecord && otherRecord.email) {
+                    targetUser.email = otherRecord.email;
+                }
+            }
+
+            if (!targetUser) {
+                console.error("User not found in local state for update:", userId);
+                // Fallback: If userId looks like an email, assume admin
+                if (userId.includes('@')) {
+                    // Try exact email
+                    const exactRef = doc(db, 'admins', userId);
+                    if ((await getDoc(exactRef)).exists()) {
+                        await updateDoc(exactRef, sanitizedData);
+                        console.log("Updated admin using exact email:", userId);
+                    } else {
+                        // Try lowercase
+                        const lowerRef = doc(db, 'admins', userId.toLowerCase());
+                        if ((await getDoc(lowerRef)).exists()) {
+                            await updateDoc(lowerRef, sanitizedData);
+                            console.log("Updated admin using lowercase email:", userId.toLowerCase());
+                        } else {
+                            throw new Error(`Admin document not found for email: ${userId}`);
+                        }
+                    }
+                } else {
+                    await updateDoc(doc(db, 'members', userId), sanitizedData);
+                }
+            } else {
+                if (targetUser.role === 'admin') {
+                    // Robust Admin ID Check
+                    const candidates = [
+                        targetUser.email,
+                        targetUser.email?.toLowerCase(),
+                        userId.includes('@') ? userId : null,
+                        userId.includes('@') ? userId.toLowerCase() : null,
+                        targetUser.uid
+                    ].filter(Boolean) as string[];
+
+                    // Remove duplicates
+                    const uniqueCandidates = Array.from(new Set(candidates));
+
+                    let updated = false;
+                    for (const id of uniqueCandidates) {
+                        const docRef = doc(db, 'admins', id);
+                        const docSnap = await getDoc(docRef);
+                        if (docSnap.exists()) {
+                            await updateDoc(docRef, sanitizedData);
+                            console.log(`Updated admin using ID: ${id}`);
+                            updated = true;
+                            break;
+                        }
+                    }
+                    if (!updated) {
+                        // If we can't find the admin doc, but we have the email, maybe we should create it?
+                        // Or maybe the user is only in 'members' but marked as admin?
+                        // Let's try updating 'members' as a fallback if 'admins' update failed but 'members' exists
+                        const memberRef = doc(db, 'members', targetUser.uid || userId);
+                        const memberSnap = await getDoc(memberRef);
+                        if (memberSnap.exists()) {
+                            console.warn("Admin doc not found, updating Member doc instead.");
+                            await updateDoc(memberRef, sanitizedData);
+                            updated = true;
+                        } else {
+                            throw new Error(`Could not find admin document. Tried: ${uniqueCandidates.join(', ')}`);
+                        }
+                    }
+
+                } else {
+                    // Member update (UID)
+                    await updateDoc(doc(db, 'members', userId), sanitizedData);
+                }
+            }
+
+            // Update local state in both lists
+            setUsers((prev: any[]) => prev.map(u => u.uid === userId ? { ...u, ...sanitizedData } : u));
+            setAdmins((prev: any[]) => prev.map(a => (a.uid === userId || a.email === userId) ? { ...a, ...sanitizedData } : a));
+
+            setSelectedUser((prev: any) => ({ ...prev, ...sanitizedData }));
             alert("User updated successfully.");
         } catch (error) {
             console.error("Error updating user:", error);
@@ -381,7 +521,10 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     const handleResetFollowers = async (userId: string) => {
         if (!confirm("Are you sure you want to remove all followers for this user?")) return;
         try {
-            await updateDoc(doc(db, 'members', userId), {
+            const targetUser = users.find(u => u.uid === userId);
+            const collectionName = targetUser?.role === 'admin' ? 'admins' : 'members';
+
+            await updateDoc(doc(db, collectionName, userId), {
                 followers: []
             });
             setUsers(prev => prev.map(u => u.uid === userId ? { ...u, followers: [] } : u));
@@ -397,14 +540,40 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
         if (!targetUser) return;
 
         const hasBadge = targetUser.achievements?.includes(badgeId);
-        const userRef = doc(db, 'members', targetUser.uid);
+
+        // Determine correct collection and ID
+        const collectionName = targetUser.role === 'admin' ? 'admins' : 'members';
+        const docId = targetUser.uid; // In fetchUsers, we set uid = doc.id (which is email for admins)
+
+        const userRef = doc(db, collectionName, docId);
+
+        // For Leaderboard, we use the Auth UID. 
+        // Wait, for Admins, targetUser.uid from fetchUsers is the EMAIL (doc.id).
+        // But the Leaderboard uses the Auth UID.
+        // We need the Auth UID for the leaderboard update.
+        // In fetchUsers for admins, we did: { uid: doc.id, ...doc.data() } -> uid became email.
+        // But the admin doc data usually contains the real 'uid' field too!
+        // Let's check if we have the real uid in the data.
+        // If not, we might have an issue updating leaderboard correctly if leaderboard uses Auth UID.
+        // Assuming 'uid' field exists in the document data and overrides the 'uid' property we set from doc.id?
+        // No, `...doc.data()` comes AFTER `uid: doc.id`. So if data has `uid`, it overrides!
+        // Let's verify fetchUsers logic.
+        // `uid: doc.id, ...doc.data()` -> if data has uid, it wins.
+        // Admin docs DO have `uid` field (seen in screenshot).
+        // So targetUser.uid IS the Auth UID.
+        // BUT `docId` for `admins` collection MUST be the Email.
+        // So we need to use `targetUser.email` for the `admins` collection doc ID.
+
+        const userDocId = targetUser.role === 'admin' ? targetUser.email : targetUser.uid;
+        const userRefCorrect = doc(db, collectionName, userDocId);
+
         const badgeRef = doc(db, 'earned_badges', `${targetUser.uid}_${badgeId}`);
         const leaderboardRef = doc(db, 'leaderboard', targetUser.uid);
 
         try {
             if (hasBadge) {
                 // Revoke
-                await updateDoc(userRef, {
+                await updateDoc(userRefCorrect, {
                     achievements: arrayRemove(badgeId),
                     points: increment(-points)
                 });
@@ -427,7 +596,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
             } else {
                 // Award
-                await updateDoc(userRef, {
+                await updateDoc(userRefCorrect, {
                     achievements: arrayUnion(badgeId),
                     points: increment(points)
                 });
@@ -518,42 +687,77 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     };
 
     const handleRecalculateAll = async () => {
-        if (!confirm("Are you sure you want to RECALCULATE ALL BADGES & POINTS for ALL USERS? This disregards the 24h limit.")) return;
+        if (!confirm("Are you sure you want to RECALCULATE ALL BADGES & POINTS for ALL USERS (Members & Admins)? This disregards the 24h limit.")) return;
 
         setMigrating(true);
         setMigrationLog(['Starting Full Recalculation...']);
 
         try {
-            const membersRef = collection(db, 'members');
-            const snapshot = await getDocs(membersRef);
             const batch = (await import('firebase/firestore')).writeBatch(db);
             let count = 0;
             let batchCount = 0;
 
-            setMigrationLog((prev: string[]) => [...prev, `Found ${snapshot.size} members.`]);
+            // 1. Fetch Members
+            const membersRef = collection(db, 'members');
+            const membersSnapshot = await getDocs(membersRef);
+            setMigrationLog((prev: string[]) => [...prev, `Found ${membersSnapshot.size} members.`]);
 
-            for (const memberDoc of snapshot.docs) {
-                const data = memberDoc.data();
-                const uid = memberDoc.id;
+            // 2. Fetch Admins
+            const adminsRef = collection(db, 'admins');
+            const adminsSnapshot = await getDocs(adminsRef);
+            setMigrationLog((prev: string[]) => [...prev, `Found ${adminsSnapshot.size} admins.`]);
 
-                // Fetch Projects for this user
-                const projectsRef = collection(db, 'members', uid, 'projects');
+            // Combine for processing
+            const allDocs = [
+                ...membersSnapshot.docs.map(d => ({ ...d.data(), id: d.id, collection: 'members', isAuthUid: true })),
+                ...adminsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, collection: 'admins', isAuthUid: false }))
+                // Note: Admin ID is email. We need to find their Auth UID from data if possible, or use email if that's how we track.
+                // Leaderboard uses Auth UID. Admin docs SHOULD have 'uid' field.
+            ];
+
+            for (const userDoc of allDocs) {
+                const data = userDoc as any;
+                const docId = userDoc.id; // UID for members, Email for admins
+                const collectionName = userDoc.collection;
+
+                // For Leaderboard, we need the Auth UID.
+                // Members: docId is Auth UID.
+                // Admins: data.uid should be Auth UID.
+                const authUid = collectionName === 'members' ? docId : data.uid;
+
+                if (!authUid) {
+                    setMigrationLog((prev: string[]) => [...prev, `Skipping ${docId}: No Auth UID found.`]);
+                    continue;
+                }
+
+                // Fetch Projects for this user (Projects are always under 'members/{uid}/projects' ?? 
+                // Wait, if we moved projects to subcollections, where are Admin projects?
+                // If Admins are in 'admins' collection, maybe their projects are in 'admins/{email}/projects'?
+                // OR 'members/{uid}/projects'?
+                // The migration script moved projects to `members/${userId}/projects`.
+                // If an Admin has projects, they might be under `members/${uid}` even if the user profile is in `admins`?
+                // OR we should check both or assume `members` path for projects for consistency if we use UID?
+                // Let's assume projects are stored under `members/{uid}/projects` because `userId` in projects was likely UID.
+                // But if we are writing to `admins` collection, we should probably check if we need to read projects from there too?
+                // For now, let's assume projects are under `members/{uid}/projects` as per migration script.
+
+                const projectsRef = collection(db, 'members', authUid, 'projects');
                 const projectsSnap = await getDocs(projectsRef);
                 const userProjects = projectsSnap.docs.map(doc => doc.data());
 
                 // Calculate using shared logic
-                const result = calculateUserPointsAndBadges({ uid, ...data }, userProjects);
+                const result = calculateUserPointsAndBadges({ uid: authUid, ...data }, userProjects);
 
-                // Update Member
-                const memberRef = doc(db, 'members', uid);
-                batch.update(memberRef, {
+                // Update User Doc (in correct collection)
+                const userRef = doc(db, collectionName, docId);
+                batch.update(userRef, {
                     points: result.points,
                     achievements: result.achievements,
                     lastBadgeScan: Date.now() // Reset scan time
                 });
 
-                // Update Leaderboard
-                const leaderboardRef = doc(db, 'leaderboard', uid);
+                // Update Leaderboard (Always uses Auth UID)
+                const leaderboardRef = doc(db, 'leaderboard', authUid);
                 batch.set(leaderboardRef, { points: result.points }, { merge: true });
 
                 count++;
@@ -726,10 +930,24 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
         );
     }
 
-    const filteredUsers = users.filter((u: any) =>
-        u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        u.email?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const filteredUsers = users.filter((u: any) => {
+        const matchesSearch = u.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            u.email?.toLowerCase().includes(searchTerm.toLowerCase());
+
+        const matchesRole = filterRole === 'all' ? true :
+            filterRole === 'admin' ? u.role === 'admin' : u.role !== 'admin';
+
+        const matchesCommunityRole = filterCommunityRole === 'all' ? true :
+            u.communityRole === filterCommunityRole;
+
+        return matchesSearch && matchesRole && matchesCommunityRole;
+    }).sort((a, b) => {
+        if (sortBy === 'name') return (a.name || '').localeCompare(b.name || '');
+        if (sortBy === 'points') return (b.points || 0) - (a.points || 0);
+        if (sortBy === 'state') return (a.state || '').localeCompare(b.state || '');
+        if (sortBy === 'joined') return (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0);
+        return 0;
+    });
 
     return (
         <div className="min-h-screen bg-background text-foreground pt-24 px-4 md:px-8 relative">
@@ -823,7 +1041,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                 {/* User Management Tab */}
                 {activeTab === 'users' && (
                     <div className="space-y-6">
-                        <div className="flex gap-4">
+                        <div className="flex flex-col md:flex-row gap-4">
                             <div className="relative flex-1 max-w-md">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
                                 <input
@@ -834,8 +1052,45 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                     className="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
                                 />
                             </div>
-                            <div className="text-sm text-muted-foreground flex items-center">
-                                Total Users: {users.length}
+
+                            {/* Filters & Sort */}
+                            <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+                                <select
+                                    value={filterRole}
+                                    onChange={(e) => setFilterRole(e.target.value)}
+                                    className="bg-card border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    <option value="all">All Roles</option>
+                                    <option value="admin">Admins</option>
+                                    <option value="member">Members</option>
+                                </select>
+
+                                <select
+                                    value={filterCommunityRole}
+                                    onChange={(e) => setFilterCommunityRole(e.target.value)}
+                                    className="bg-card border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    <option value="all">All Community Roles</option>
+                                    <option value="Campus Lead">Campus Lead</option>
+                                    <option value="City Lead">City Lead</option>
+                                    <option value="State Lead">State Lead</option>
+                                    <option value="Member">Member</option>
+                                </select>
+
+                                <select
+                                    value={sortBy}
+                                    onChange={(e) => setSortBy(e.target.value)}
+                                    className="bg-card border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                                >
+                                    <option value="name">Sort by Name</option>
+                                    <option value="points">Sort by Points</option>
+                                    <option value="state">Sort by State</option>
+                                    <option value="joined">Sort by Joined</option>
+                                </select>
+                            </div>
+
+                            <div className="text-sm text-muted-foreground flex items-center whitespace-nowrap">
+                                Total: {filteredUsers.length}
                             </div>
                         </div>
 
@@ -848,8 +1103,10 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                         <tr>
                                             <th className="p-4 font-medium">User</th>
                                             <th className="p-4 font-medium">Role</th>
+                                            <th className="p-4 font-medium">Community Role</th>
+                                            <th className="p-4 font-medium">State</th>
+                                            <th className="p-4 font-medium">Contact</th>
                                             <th className="p-4 font-medium">Points</th>
-                                            <th className="p-4 font-medium">Joined</th>
                                             <th className="p-4 font-medium text-right">Actions</th>
                                         </tr>
                                     </thead>
@@ -879,10 +1136,17 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                                         {u.email === SUPER_ADMIN_EMAIL ? 'Super Admin' : u.role === 'admin' ? 'Admin' : 'Member'}
                                                     </span>
                                                 </td>
-                                                <td className="p-4 font-mono">{u.points || 0}</td>
-                                                <td className="p-4 text-muted-foreground">
-                                                    {u.createdAt?.seconds ? new Date(u.createdAt.seconds * 1000).toLocaleDateString() : 'N/A'}
+                                                <td className="p-4 text-sm">
+                                                    {u.communityRole || 'Member'}
                                                 </td>
+                                                <td className="p-4 text-sm">
+                                                    {u.state || 'N/A'}
+                                                </td>
+                                                <td className="p-4 text-xs text-muted-foreground">
+                                                    <div>{u.phoneNumber || 'No Phone'}</div>
+                                                    <div className="opacity-75">{u.email}</div>
+                                                </td>
+                                                <td className="p-4 font-mono">{u.points || 0}</td>
                                                 <td className="p-4 text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <button
@@ -1083,6 +1347,57 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                     </div>
 
                                     <div className="p-4 border border-border rounded bg-muted/20">
+                                        <h4 className="font-semibold mb-2">Fix Admin Names</h4>
+                                        <p className="text-sm text-muted-foreground mb-4">
+                                            Update missing names for Admins by fetching from Members or Auth Profile.
+                                        </p>
+                                        <button
+                                            onClick={async () => {
+                                                if (!confirm("Start Admin Name Fix?")) return;
+                                                setMigrating(true);
+                                                setMigrationLog([]);
+                                                try {
+                                                    const adminsRef = collection(db, 'admins');
+                                                    const snapshot = await getDocs(adminsRef);
+                                                    const logs: string[] = [];
+
+                                                    for (const docSnap of snapshot.docs) {
+                                                        const data = docSnap.data();
+                                                        if (!data.name) {
+                                                            let newName = '';
+                                                            // Try to find in members
+                                                            if (data.uid) {
+                                                                const memberDoc = await getDoc(doc(db, 'members', data.uid));
+                                                                if (memberDoc.exists() && memberDoc.data().name) {
+                                                                    newName = memberDoc.data().name;
+                                                                }
+                                                            }
+
+                                                            if (newName) {
+                                                                await updateDoc(doc(db, 'admins', docSnap.id), { name: newName });
+                                                                logs.push(`Updated ${docSnap.id} with name: ${newName}`);
+                                                            } else {
+                                                                logs.push(`Could not find name for ${docSnap.id}`);
+                                                            }
+                                                        }
+                                                    }
+                                                    setMigrationLog(logs);
+                                                    alert("Admin Name Fix Completed.");
+                                                    fetchAdmins();
+                                                } catch (error) {
+                                                    console.error("Error fixing admin names:", error);
+                                                    alert("Failed to fix admin names.");
+                                                } finally {
+                                                    setMigrating(false);
+                                                }
+                                            }}
+                                            className="bg-primary text-primary-foreground px-4 py-2 rounded-md font-medium"
+                                        >
+                                            Fix Admin Names
+                                        </button>
+                                    </div>
+
+                                    <div className="p-4 border border-border rounded bg-muted/20">
                                         <h4 className="font-semibold mb-2">Full Recalculation (Super Admin)</h4>
                                         <p className="text-sm text-muted-foreground mb-4">
                                             Recalculate points and badges for ALL users. <br />
@@ -1131,17 +1446,38 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                     <tbody className="divide-y divide-border">
                                         {admins.map(admin => (
                                             <tr key={admin.uid || admin.email} className="hover:bg-muted/50">
-                                                <td className="p-4 font-medium">{admin.name}</td>
+                                                <td className="p-4 font-medium text-foreground">
+                                                    {admin.name || admin.email || <span className="text-muted-foreground italic">Unknown Name</span>}
+                                                </td>
                                                 <td className="p-4 text-muted-foreground">{admin.email}</td>
                                                 <td className="p-4 text-right">
                                                     {admin.email !== SUPER_ADMIN_EMAIL && (
-                                                        <button
-                                                            onClick={() => handleDemoteToMember(admin)}
-                                                            className="text-red-500 hover:bg-red-500/10 p-2 rounded-md transition-colors"
-                                                            title="Demote to Member"
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
+                                                        <div className="flex justify-end gap-2">
+                                                            <button
+                                                                onClick={() => openUserModal(admin)}
+                                                                className="text-blue-500 hover:bg-blue-500/10 p-2 rounded-md transition-colors"
+                                                                title="View Details"
+                                                            >
+                                                                <Eye size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => {
+                                                                    setSelectedUser(admin);
+                                                                    fetchUserProjects(admin.uid);
+                                                                }}
+                                                                className="text-yellow-500 hover:bg-yellow-500/10 p-2 rounded-md transition-colors"
+                                                                title="Edit Role"
+                                                            >
+                                                                <Edit size={16} />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => handleDemoteToMember(admin)}
+                                                                className="text-red-500 hover:bg-red-500/10 p-2 rounded-md transition-colors"
+                                                                title="Demote to Member"
+                                                            >
+                                                                <Trash2 size={16} />
+                                                            </button>
+                                                        </div>
                                                     )}
                                                 </td>
                                             </tr>
@@ -1299,7 +1635,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-sm font-medium mb-1">Role</label>
+                                        <label className="block text-sm font-medium mb-1">System Role</label>
                                         <select
                                             value={selectedUser.role || 'member'}
                                             onChange={e => setSelectedUser({ ...selectedUser, role: e.target.value })}
@@ -1320,6 +1656,54 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                     </div>
                                 </div>
 
+                                {/* Community Role / Title */}
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Community Role (Title)</label>
+                                    {selectedUser.role === 'admin' ? (
+                                        <select
+                                            value={selectedUser.communityRole || ''}
+                                            onChange={e => setSelectedUser({ ...selectedUser, communityRole: e.target.value })}
+                                            className="w-full p-2 bg-muted border border-border rounded-md"
+                                        >
+                                            <option value="">Select Role...</option>
+                                            {Array.from(new Set(teamMembers.map(m => m.role))).map(role => (
+                                                <option key={role} value={role}>{role}</option>
+                                            ))}
+                                            {Array.from(new Set(teamMembers.map(m => m.subRole).filter(Boolean))).map(subRole => (
+                                                <option key={subRole} value={subRole}>{subRole}</option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <div className="space-y-2">
+                                            <select
+                                                value={['Member', 'City Lead'].includes(selectedUser.communityRole) ? selectedUser.communityRole : 'Custom'}
+                                                onChange={e => {
+                                                    const val = e.target.value;
+                                                    if (val === 'Custom') {
+                                                        setSelectedUser({ ...selectedUser, communityRole: '' }); // Clear for typing
+                                                    } else {
+                                                        setSelectedUser({ ...selectedUser, communityRole: val });
+                                                    }
+                                                }}
+                                                className="w-full p-2 bg-muted border border-border rounded-md"
+                                            >
+                                                <option value="Member">Member</option>
+                                                <option value="City Lead">City Lead</option>
+                                                <option value="Custom">Custom</option>
+                                            </select>
+                                            {(!['Member', 'City Lead'].includes(selectedUser.communityRole) || selectedUser.communityRole === '') && (
+                                                <input
+                                                    type="text"
+                                                    placeholder="Enter custom role..."
+                                                    value={selectedUser.communityRole || ''}
+                                                    onChange={e => setSelectedUser({ ...selectedUser, communityRole: e.target.value })}
+                                                    className="w-full p-2 bg-muted border border-border rounded-md"
+                                                />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
                                 <div className="pt-4 flex justify-end gap-2">
                                     <button
                                         onClick={() => setSelectedUser(null)}
@@ -1331,7 +1715,8 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                                         onClick={() => handleUpdateUser(selectedUser.uid, {
                                             name: selectedUser.name,
                                             role: selectedUser.role,
-                                            points: selectedUser.points
+                                            points: selectedUser.points,
+                                            communityRole: selectedUser.communityRole
                                         })}
                                         className="px-4 py-2 bg-primary text-primary-foreground rounded-md font-medium"
                                     >

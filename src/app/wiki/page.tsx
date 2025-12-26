@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from 'react';
-import { Search, ChevronRight, Book, Code, FileText, HelpCircle, ThumbsUp, ThumbsDown, Github } from 'lucide-react';
+import { Search, ChevronRight, Book, Code, FileText, HelpCircle, ThumbsUp, ThumbsDown, Github, Users, MapPin, MessageCircle, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import styles from './Wiki.module.css';
+
+import { wikiContent } from '@/data/wikiContent';
 
 const categories = [
     {
@@ -24,8 +26,14 @@ const categories = [
     {
         title: "Community",
         items: [
+            { id: "community-offerings", title: "What Community Offers", icon: <Users size={16} /> },
+            { id: "city-leads", title: "City Leads", icon: <MapPin size={16} /> },
+            { id: "technical-heads", title: "Technical Heads", icon: <Code size={16} /> },
+            { id: "wp-community", title: "WhatsApp Community", icon: <MessageCircle size={16} /> },
+            { id: "hackfiesta", title: "HackFiesta", icon: <Calendar size={16} /> },
             { id: "guidelines", title: "Code of Conduct", icon: <FileText size={16} /> },
-            { id: "contributing", title: "How to Contribute", icon: <Github size={16} /> }
+            { id: "contributing", title: "How to Contribute", icon: <Github size={16} /> },
+            { id: "open-source", title: "Open Source", icon: <Github size={16} /> }
         ]
     }
 ];
@@ -71,57 +79,22 @@ export default function WikiPage() {
                 <div className={styles.breadcrumb}>
                     <span>Docs</span>
                     <ChevronRight size={14} />
-                    <span>Getting Started</span>
+                    <span>{categories.find(c => c.items.some(i => i.id === activeArticle))?.title}</span>
                     <ChevronRight size={14} />
-                    <span>Introduction to DevPath</span>
+                    <span>{wikiContent[activeArticle]?.title}</span>
                 </div>
 
                 <article>
                     <div className={styles.articleHeader}>
-                        <h1 className={styles.title}>Introduction to DevPath</h1>
+                        <h1 className={styles.title}>{wikiContent[activeArticle]?.title}</h1>
                         <div className={styles.meta}>
-                            <span>Last updated: Dec 14, 2025</span>
-                            <span>Reading time: 5 min</span>
+                            <span>Last updated: {wikiContent[activeArticle]?.lastUpdated}</span>
+                            <span>Reading time: {wikiContent[activeArticle]?.readingTime}</span>
                         </div>
                     </div>
 
                     <div className={styles.articleBody}>
-                        <p>
-                            Welcome to DevPath, the ultimate developer community designed to accelerate your growth through structured learning paths, real-world projects, and peer collaboration.
-                        </p>
-
-                        <h2>What is DevPath?</h2>
-                        <p>
-                            DevPath is more than just a learning platform. It&apos;s an ecosystem where you can:
-                        </p>
-                        <ul>
-                            <li>Follow expert-curated <strong>Learning Paths</strong> to master new stacks.</li>
-                            <li>Build and showcase <strong>Projects</strong> to build your portfolio.</li>
-                            <li>Earn <strong>XP and Badges</strong> to track your progress and compete.</li>
-                            <li>Connect with other developers in real-time.</li>
-                        </ul>
-
-                        <h2>Getting Started</h2>
-                        <p>
-                            To begin your journey, we recommend setting up your profile and choosing your first learning path.
-                        </p>
-
-                        <div className={styles.codeBlock}>
-                            <button className={styles.copyButton}>Copy</button>
-                            <pre>
-                                <code>
-                                    {`// Example: Starting your first path
-const user = new User("DevNewbie");
-await user.joinPath("Full Stack React");
-console.log("Journey started! 🚀");`}
-                                </code>
-                            </pre>
-                        </div>
-
-                        <h3>Community Guidelines</h3>
-                        <p>
-                            We believe in a supportive and inclusive environment. Please review our Code of Conduct before participating in discussions.
-                        </p>
+                        {wikiContent[activeArticle]?.content || <p>Content coming soon...</p>}
                     </div>
 
                     <div className={styles.feedback}>
