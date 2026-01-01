@@ -11,6 +11,9 @@ import { MagneticText } from '../ui/magnetic-text';
 
 import LatestEventsHighlight from './LatestEventsHighlight';
 import InternshipCalendarCard from './InternshipCalendarCard';
+import dynamic from 'next/dynamic';
+
+const HeaderScene = dynamic(() => import('@/components/3d/HeaderScene'), { ssr: false });
 
 export default function Hero() {
     const scrollToSection = (id: string) => {
@@ -23,6 +26,10 @@ export default function Hero() {
     return (
         <section className={styles.hero}>
             <InteractiveBackground />
+            {/* Background 3D Model */}
+            <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+                <HeaderScene />
+            </div>
 
             <div className={`${styles.content} relative z-10`}>
                 <div className="flex flex-col items-center gap-6 mb-8">

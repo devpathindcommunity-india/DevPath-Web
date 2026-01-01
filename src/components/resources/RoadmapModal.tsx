@@ -18,12 +18,22 @@ interface RoadmapModalProps {
     } | null;
 }
 
-export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
-    if (!isOpen || !roadmap) return null;
+import { createPortal } from 'react-dom';
+import { useState, useEffect } from 'react';
 
-    return (
+export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
+
+    if (!isOpen || !roadmap || !mounted) return null;
+
+    return createPortal(
         <AnimatePresence>
-            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+            <div className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -103,7 +113,8 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                     </div>
                 </motion.div>
             </div>
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }
 

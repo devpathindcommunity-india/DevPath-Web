@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { collection, query, orderBy, getDocs, limit, collectionGroup } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { MessageSquare, Target, Plus, Search, Filter } from 'lucide-react';
+import { MessageSquare, Target, Plus, Search, Filter, X, Globe } from 'lucide-react';
+import { getEmbedUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import CreateDiscussionModal from '@/components/community/CreateDiscussionModal';
 import ProjectCard from '@/components/projects/ProjectCard';
@@ -18,6 +19,7 @@ export default function CommunityPage() {
     const [discussions, setDiscussions] = useState<any[]>([]);
     const [projects, setProjects] = useState<any[]>([]);
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [selectedProject, setSelectedProject] = useState<any>(null);
 
     const fetchData = async () => {
         setLoading(true);
@@ -189,6 +191,7 @@ export default function CommunityPage() {
                                         <ProjectCard
                                             key={project.id}
                                             project={project}
+                                            onReadMore={setSelectedProject}
                                         />
                                     ))
                                 )}
@@ -209,6 +212,76 @@ export default function CommunityPage() {
                         alert("Discussion created successfully!");
                     }}
                 />
+            )}
+
+            {/* Project Details Modal */}
+            {selectedProject && (
+                <div
+                    className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
+                    onClick={() => setSelectedProject(null)}
+                >
+                    <div
+                        className="bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
+                            <h2 className="text-xl font-bold truncate pr-4">{selectedProject.title}</h2>
+                            <button
+                                onClick={() => setSelectedProject(null)}
+                                className="p-2 hover:bg-muted rounded-full transition-colors"
+                            >
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        <div className="p-6 space-y-6">
+                            {/* Media */}
+                            {selectedProject.videoUrl ? (
+                                <div className="aspect-video rounded-xl overflow-hidden bg-black">
+                                    <iframe
+                                        src={getEmbedUrl(selectedProject.videoUrl)}
+                                        className="w-full h-full"
+                                        allowFullScreen
+                                    />
+                                </div>
+                            ) : selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
+                                <div className="aspect-video rounded-xl overflow-hidden bg-muted">
+                                    <img
+                                        src={selectedProject.screenshots[0]}
+                                        alt={selectedProject.title}
+                                        className="w-full h-full object-contain"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Description */}
+                            <div className="prose dark:prose-invert max-w-none">
+                                <div dangerouslySetInnerHTML={{ __html: selectedProject.description }} />
+                            </div>
+
+                            {/* Links & Skills */}
+                            <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
+                                {selectedProject.websiteUrl && (
+                                    <a
+                                        href={selectedProject.websiteUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                                    >
+                                        <Globe size={16} /> Visit Website
+                                    </a>
+                                )}
+                                <div className="flex flex-wrap gap-2 ml-auto">
+                                    {selectedProject.skills?.map((skill: string) => (
+                                        <span key={skill} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm">
+                                            {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

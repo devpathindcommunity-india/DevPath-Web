@@ -25,7 +25,8 @@
     "react-dom": "19.2.1",
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "three": "^0.182.0"
   },
   "devDependencies": {
     "@types/node": "^20",

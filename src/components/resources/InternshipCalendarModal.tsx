@@ -12,6 +12,8 @@ interface InternshipCalendarModalProps {
     onClose: () => void;
 }
 
+import { createPortal } from 'react-dom';
+
 export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarModalProps) {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'summer' | 'winter'>('summer');
@@ -19,6 +21,12 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
     const [starCount, setStarCount] = useState(0);
     const [hasStarred, setHasStarred] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+        return () => setMounted(false);
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -92,9 +100,9 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
         }
     };
 
-    if (!isOpen) return null;
+    if (!isOpen || !mounted) return null;
 
-    return (
+    return createPortal(
         <AnimatePresence>
             {isOpen && (
                 <>
@@ -104,7 +112,7 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
+                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[2000]"
                     />
 
                     {/* Modal */}
@@ -112,7 +120,7 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
+                        className="fixed inset-0 z-[2000] flex items-center justify-center p-4 pointer-events-none"
                     >
                         <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden">
                             {/* Header */}
@@ -126,8 +134,8 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                                         <button
                                             onClick={handleStar}
                                             className={`flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium transition-all ${hasStarred
-                                                    ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
-                                                    : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
+                                                ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'
+                                                : 'bg-white/5 text-white/70 border border-white/10 hover:bg-white/10'
                                                 }`}
                                         >
                                             <Star size={16} fill={hasStarred ? 'currentColor' : 'none'} />
@@ -151,8 +159,8 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                                 <button
                                     onClick={() => setActiveTab('summer')}
                                     className={`px-4 py-2 rounded-t-lg font-medium transition-all ${activeTab === 'summer'
-                                            ? 'bg-primary text-white'
-                                            : 'text-white/60 hover:text-white hover:bg-white/5'
+                                        ? 'bg-primary text-white'
+                                        : 'text-white/60 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     Summer Internships (May–July 2026)
@@ -160,8 +168,8 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                                 <button
                                     onClick={() => setActiveTab('winter')}
                                     className={`px-4 py-2 rounded-t-lg font-medium transition-all ${activeTab === 'winter'
-                                            ? 'bg-primary text-white'
-                                            : 'text-white/60 hover:text-white hover:bg-white/5'
+                                        ? 'bg-primary text-white'
+                                        : 'text-white/60 hover:text-white hover:bg-white/5'
                                         }`}
                                 >
                                     Winter Internships (Jan–April 2026)
@@ -243,6 +251,7 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                     </motion.div>
                 </>
             )}
-        </AnimatePresence>
+        </AnimatePresence>,
+        document.body
     );
 }

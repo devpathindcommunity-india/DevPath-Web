@@ -53,7 +53,7 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-card w-full max-w-2xl rounded-xl border border-border shadow-xl animate-in fade-in zoom-in-95 duration-200">
                 <div className="flex justify-between items-center p-6 border-b border-border">
                     <h2 className="text-xl font-bold">Start a Discussion</h2>

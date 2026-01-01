@@ -1,48 +1,81 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Bell } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { useAuth } from "@/context/AuthContext"
+import { db } from "@/lib/firebase"
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, writeBatch, limit } from "firebase/firestore"
+import Link from "next/link"
 
 interface Notification {
     id: string
     title: string
     message: string
-    time: string
+    image?: string
+    createdAt: any
     read: boolean
     type: 'achievement' | 'message' | 'event' | 'system'
 }
 
 export function NotificationDropdown() {
+    const { user } = useAuth()
     const [isOpen, setIsOpen] = useState(false)
-    const [notifications, setNotifications] = useState<Notification[]>([
-        {
-            id: '1',
-            title: 'New Achievement Unlocked!',
-            message: 'You earned the "Early Adopter" badge',
-            time: '2 min ago',
-            read: false,
-            type: 'achievement'
-        },
-        {
-            id: '2',
-            title: 'Upcoming Event',
-            message: 'Global Hackathon 2025 starts in 3 days',
-            time: '1 hour ago',
-            read: false,
-            type: 'event'
-        }
-    ])
+    const [notifications, setNotifications] = useState<Notification[]>([])
+
+    useEffect(() => {
+        if (!user) return;
+
+        const q = query(
+            collection(db, 'members', user.uid, 'notifications'),
+            orderBy('createdAt', 'desc'),
+            limit(10)
+        );
+
+        const unsubscribe = onSnapshot(q,
+            (snapshot) => {
+                setNotifications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification)));
+            },
+            (error) => {
+                console.error("Notification subscription error:", error);
+                // Gracefully handle permission errors (e.g. rules not yet deployed)
+            }
+        );
+
+        return () => unsubscribe();
+    }, [user]);
 
     const unreadCount = notifications.filter(n => !n.read).length
 
-    const markAsRead = (id: string) => {
-        setNotifications(prev =>
-            prev.map(n => n.id === id ? { ...n, read: true } : n)
-        )
+    const markAsRead = async (id: string) => {
+        if (!user) return;
+        // Optimistic update
+        setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+        try {
+            await updateDoc(doc(db, 'members', user.uid, 'notifications', id), {
+                read: true
+            });
+        } catch (error) {
+            console.error("Error marking as read:", error);
+        }
     }
 
-    const markAllAsRead = () => {
-        setNotifications(prev => prev.map(n => ({ ...n, read: true })))
+    const markAllAsRead = async () => {
+        if (!user) return;
+        // Optimistic update
+        setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+        try {
+            const batch = writeBatch(db);
+            const unread = notifications.filter(n => !n.read);
+            if (unread.length === 0) return;
+
+            unread.forEach(n => {
+                const ref = doc(db, 'members', user.uid, 'notifications', n.id);
+                batch.update(ref, { read: true });
+            });
+            await batch.commit();
+        } catch (error) {
+            console.error("Error marking all as read:", error);
+        }
     }
 
     return (
@@ -116,14 +149,16 @@ export function NotificationDropdown() {
                                                     {notif.type === 'achievement' && '🏆'}
                                                     {notif.type === 'event' && '📅'}
                                                     {notif.type === 'message' && '💬'}
-                                                    {notif.type === 'system' && '🔔'}
+                                                    {(!notif.type || notif.type === 'system') && '🔔'}
                                                 </div>
 
                                                 {/* Content */}
                                                 <div className="flex-1 min-w-0">
                                                     <p className="font-semibold text-sm text-gray-900 dark:text-white">{notif.title}</p>
-                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">{notif.message}</p>
-                                                    <p className="text-xs text-gray-500 mt-2">{notif.time}</p>
+                                                    <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">{notif.message}</p>
+                                                    <p className="text-xs text-gray-500 mt-2">
+                                                        {notif.createdAt?.seconds ? new Date(notif.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
+                                                    </p>
                                                 </div>
 
                                                 {/* Unread Indicator */}
@@ -138,9 +173,13 @@ export function NotificationDropdown() {
 
                             {/* Footer */}
                             <div className="p-3 border-t border-black/5 dark:border-white/10 text-center">
-                                <button className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors">
+                                <Link
+                                    href="/notifications"
+                                    onClick={() => setIsOpen(false)}
+                                    className="text-sm text-cyan-600 dark:text-cyan-400 hover:text-cyan-500 dark:hover:text-cyan-300 transition-colors block w-full"
+                                >
                                     View All Notifications
-                                </button>
+                                </Link>
                             </div>
                         </motion.div>
                     </>

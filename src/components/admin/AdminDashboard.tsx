@@ -14,7 +14,7 @@ import {
 import {
     collection, query, where, getDocs, doc, updateDoc,
     deleteDoc, getDoc, setDoc, serverTimestamp,
-    increment, arrayUnion, arrayRemove, orderBy, limit, addDoc
+    increment, arrayUnion, arrayRemove, orderBy, limit, addDoc, onSnapshot
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
@@ -68,9 +68,165 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     const [filterGithub, setFilterGithub] = useState('all');
     const [sortBy, setSortBy] = useState('name');
 
-    // Notifications State
+    // Notification Form State
+    const [notificationForm, setNotificationForm] = useState({
+        title: '',
+        message: '',
+        image: '',
+        targetType: 'all', // all, admin, member, github, individual
+        targetValue: ''
+    });
+    const [sendingNotification, setSendingNotification] = useState(false);
+
+    // Notifications History State
     const [notifications, setNotifications] = useState<any[]>([]);
     const [loadingNotifications, setLoadingNotifications] = useState(false);
+
+    // Fetch Notifications for History
+    useEffect(() => {
+        if (activeTab === 'notifications') {
+            setLoadingNotifications(true);
+            const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(50));
+            const unsubscribe = onSnapshot(q,
+                (snapshot) => {
+                    setNotifications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                    setLoadingNotifications(false);
+                },
+                (error) => {
+                    console.error("Admin notifications subscription error:", error);
+                    setLoadingNotifications(false);
+                }
+            );
+            return () => unsubscribe();
+        }
+    }, [activeTab]);
+
+    // ... existing useEffects ...
+
+    const handleSendNotification = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!confirm("Send this notification? This action cannot be undone.")) return;
+
+        setSendingNotification(true);
+        try {
+            const batch = (await import('firebase/firestore')).writeBatch(db);
+            let targetUserIds: string[] = [];
+
+            // 1. Identify Target Users
+            if (notificationForm.targetType === 'all') {
+                // Fetch all members and admins
+                // We already have 'users' state which combines both
+                // But let's be safe and use the 'users' state which is populated when activeTab is 'users'
+                // If activeTab is NOT 'users', we might need to fetch them or rely on cached data?
+                // Better to fetch fresh list of UIDs for mass send to ensure accuracy
+                const membersRef = collection(db, 'members');
+                const membersSnap = await getDocs(membersRef);
+                targetUserIds = membersSnap.docs.map(d => d.id);
+
+                // Also get admins who might not be in members (rare but possible)
+                const adminsRef = collection(db, 'admins');
+                const adminsSnap = await getDocs(adminsRef);
+                // For admins, we need to resolve to UID. If doc.id is email, we need to find UID.
+                // If data.uid exists, use it.
+                adminsSnap.docs.forEach(d => {
+                    const data = d.data();
+                    const uid = data.uid || (d.id.includes('@') ? null : d.id);
+                    if (uid && !targetUserIds.includes(uid)) {
+                        targetUserIds.push(uid);
+                    }
+                });
+
+            } else if (notificationForm.targetType === 'admin') {
+                // Fetch admins
+                const adminsRef = collection(db, 'admins');
+                const adminsSnap = await getDocs(adminsRef);
+                adminsSnap.docs.forEach(d => {
+                    const data = d.data();
+                    const uid = data.uid || (d.id.includes('@') ? null : d.id);
+                    if (uid) targetUserIds.push(uid);
+                });
+
+                // Also check members with role 'admin'
+                const q = query(collection(db, 'members'), where('role', '==', 'admin'));
+                const membersSnap = await getDocs(q);
+                membersSnap.docs.forEach(d => {
+                    if (!targetUserIds.includes(d.id)) targetUserIds.push(d.id);
+                });
+
+            } else if (notificationForm.targetType === 'member') {
+                const q = query(collection(db, 'members'), where('role', '==', 'member'));
+                const snap = await getDocs(q);
+                targetUserIds = snap.docs.map(d => d.id);
+
+            } else if (notificationForm.targetType === 'github') {
+                // Users with githubId
+                const membersRef = collection(db, 'members');
+                const snap = await getDocs(membersRef);
+                targetUserIds = snap.docs.filter(d => d.data().githubId).map(d => d.id);
+
+            } else if (notificationForm.targetType === 'individual') {
+                if (notificationForm.targetValue) {
+                    targetUserIds = [notificationForm.targetValue];
+                }
+            }
+
+            console.log(`Sending notification to ${targetUserIds.length} users...`);
+
+            // 2. Create Campaign Record
+            const campaignRef = await addDoc(collection(db, 'notifications'), {
+                ...notificationForm,
+                createdAt: serverTimestamp(),
+                createdBy: user?.uid,
+                recipientCount: targetUserIds.length
+            });
+
+            // 3. Batch Write to User Subcollections
+            // Firestore batch limit is 500. We need to chunk.
+            const chunks = [];
+            for (let i = 0; i < targetUserIds.length; i += 400) {
+                chunks.push(targetUserIds.slice(i, i + 400));
+            }
+
+            let sentCount = 0;
+            for (const chunk of chunks) {
+                const newBatch = (await import('firebase/firestore')).writeBatch(db);
+                chunk.forEach(uid => {
+                    const ref = doc(collection(db, 'members', uid, 'notifications'));
+                    newBatch.set(ref, {
+                        campaignId: campaignRef.id,
+                        title: notificationForm.title,
+                        message: notificationForm.message,
+                        image: notificationForm.image,
+                        type: 'system', // Default type
+                        read: false,
+                        createdAt: serverTimestamp()
+                    });
+                });
+                await newBatch.commit();
+                sentCount += chunk.length;
+                console.log(`Sent batch of ${chunk.length}, total: ${sentCount}`);
+            }
+
+            alert(`Notification sent to ${sentCount} users!`);
+            setNotificationForm({ title: '', message: '', image: '', targetType: 'all', targetValue: '' });
+
+        } catch (error) {
+            console.error("Error sending notification:", error);
+            alert("Failed to send notification.");
+        } finally {
+            setSendingNotification(false);
+        }
+    };
+
+    // ... existing render ...
+
+    // Inside the render, add the Notifications Tab Content
+    // Replace the existing 'notifications' tab content or add to it
+
+    // ...
+
+
+
 
     // Event Modal State
     const [showEventModal, setShowEventModal] = useState(false);
@@ -155,7 +311,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                         targetUid = matchingMember.uid;
                     } else {
                         // If no matching member, use the admin's ID (which might be email) as UID
-                        targetUid = admin.uid || admin.email || doc.id;
+                        targetUid = admin.uid || admin.email;
                     }
                 }
 
@@ -1049,29 +1205,136 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                 {/* Notifications Tab */}
                 {activeTab === 'notifications' && (
                     <div className="space-y-6">
-                        <h2 className="text-xl font-semibold flex items-center gap-2">
-                            <Bell size={20} /> System Notifications
-                        </h2>
-                        {loadingNotifications ? (
-                            <div>Loading...</div>
-                        ) : (
-                            <div className="space-y-2">
-                                {notifications.map(n => (
-                                    <div key={n.id} className="p-4 bg-card border border-border rounded-lg flex items-start gap-3">
-                                        <div className="mt-1">
-                                            {n.type === 'security' ? <Shield size={16} className="text-blue-500" /> : <Bell size={16} />}
-                                        </div>
-                                        <div>
-                                            <p className="text-sm">{n.message}</p>
-                                            <p className="text-xs text-muted-foreground mt-1">
-                                                {n.createdAt?.seconds ? new Date(n.createdAt.seconds * 1000).toLocaleString() : 'Just now'}
-                                            </p>
-                                        </div>
+                        {/* Send Notification Card */}
+                        <div className="bg-card border border-border rounded-xl p-6 shadow-sm">
+                            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+                                <Bell className="text-primary" />
+                                Send Notification
+                            </h2>
+                            <form onSubmit={handleSendNotification} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Title</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={notificationForm.title}
+                                            onChange={e => setNotificationForm({ ...notificationForm, title: e.target.value })}
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/50 outline-none"
+                                            placeholder="Notification Title"
+                                        />
                                     </div>
-                                ))}
-                                {notifications.length === 0 && <div className="text-muted-foreground">No notifications.</div>}
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">Target Audience</label>
+                                        <select
+                                            value={notificationForm.targetType}
+                                            onChange={e => setNotificationForm({ ...notificationForm, targetType: e.target.value })}
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/50 outline-none"
+                                        >
+                                            <option value="all">All Users (Members & Admins)</option>
+                                            <option value="admin">All Admins</option>
+                                            <option value="member">All Members</option>
+                                            <option value="github">GitHub Connected Users</option>
+                                            <option value="individual">Individual User (UID)</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {notificationForm.targetType === 'individual' && (
+                                    <div>
+                                        <label className="block text-sm font-medium mb-1">User UID</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            value={notificationForm.targetValue}
+                                            onChange={e => setNotificationForm({ ...notificationForm, targetValue: e.target.value })}
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/50 outline-none"
+                                            placeholder="Enter User UID"
+                                        />
+                                    </div>
+                                )}
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Message</label>
+                                    <textarea
+                                        required
+                                        value={notificationForm.message}
+                                        onChange={e => setNotificationForm({ ...notificationForm, message: e.target.value })}
+                                        className="w-full bg-background border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/50 outline-none min-h-[100px]"
+                                        placeholder="Notification content..."
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-1">Image URL (Optional)</label>
+                                    <div className="flex gap-2">
+                                        <input
+                                            type="url"
+                                            value={notificationForm.image}
+                                            onChange={e => setNotificationForm({ ...notificationForm, image: e.target.value })}
+                                            className="w-full bg-background border border-border rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary/50 outline-none"
+                                            placeholder="https://..."
+                                        />
+                                        {notificationForm.image && (
+                                            <div className="w-10 h-10 rounded-lg overflow-hidden border border-border shrink-0">
+                                                <img src={notificationForm.image} alt="Preview" className="w-full h-full object-cover" />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex justify-end">
+                                    <button
+                                        type="submit"
+                                        disabled={sendingNotification}
+                                        className="bg-primary hover:bg-primary/90 text-white px-6 py-2 rounded-lg font-medium transition-colors flex items-center gap-2 disabled:opacity-50"
+                                    >
+                                        {sendingNotification ? (
+                                            <>
+                                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                                                Sending...
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Bell size={18} />
+                                                Send Notification
+                                            </>
+                                        )}
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        {/* Existing Admin Notifications List (History) */}
+                        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
+                            <div className="p-6 border-b border-border">
+                                <h3 className="font-bold text-lg">System Notifications History</h3>
                             </div>
-                        )}
+                            <div className="divide-y divide-border">
+                                {loadingNotifications ? (
+                                    <div className="p-8 text-center text-muted-foreground">Loading history...</div>
+                                ) : notifications.length === 0 ? (
+                                    <div className="p-8 text-center text-muted-foreground">No history found.</div>
+                                ) : (
+                                    notifications.map((notif) => (
+                                        <div key={notif.id} className="p-4 hover:bg-muted/50 transition-colors">
+                                            <div className="flex justify-between items-start mb-1">
+                                                <span className={`px-2 py-0.5 rounded text-xs font-medium ${notif.type === 'event' ? 'bg-blue-500/10 text-blue-500' :
+                                                    notif.type === 'alert' ? 'bg-red-500/10 text-red-500' :
+                                                        'bg-gray-500/10 text-gray-500'
+                                                    }`}>
+                                                    {notif.type?.toUpperCase() || 'SYSTEM'}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {notif.createdAt?.toDate?.().toLocaleString()}
+                                                </span>
+                                            </div>
+                                            <p className="text-foreground font-medium">{notif.message}</p>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        </div>
                     </div>
                 )}
 
@@ -1622,7 +1885,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                 {/* View User Modal (Profile Card) */}
                 {viewUser && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4">
                         <div className="bg-card border border-border rounded-xl p-6 max-w-sm w-full shadow-2xl animate-in fade-in zoom-in relative overflow-hidden">
                             <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-r from-primary/20 to-purple-500/20" />
                             <button onClick={() => setViewUser(null)} className="absolute top-4 right-4 text-muted-foreground hover:text-foreground z-10">
@@ -1666,7 +1929,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                 {/* Edit User Modal */}
                 {selectedUser && !viewUser && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4">
                         <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-bold">Edit User</h2>
@@ -1826,7 +2089,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                 {/* Badge Management Modal */}
                 {badgeUser && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4">
                         <div className="bg-card border border-border rounded-xl p-6 max-w-md w-full shadow-2xl animate-in fade-in zoom-in">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-bold flex items-center gap-2">
@@ -1876,7 +2139,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                 {/* New Key Modal */}
                 {newKey && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4">
                         <div className="bg-card border border-border rounded-xl p-8 max-w-md w-full shadow-2xl animate-in fade-in zoom-in">
                             <div className="text-center mb-6">
                                 <div className="w-16 h-16 bg-green-500/10 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -1904,7 +2167,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
 
                 {/* Create Event Modal */}
                 {showEventModal && (
-                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+                    <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-[2000] p-4">
                         <div className="bg-card border border-border rounded-xl p-6 max-w-lg w-full shadow-2xl animate-in fade-in zoom-in max-h-[90vh] overflow-y-auto">
                             <div className="flex justify-between items-center mb-6">
                                 <h2 className="text-xl font-bold">Create New Event</h2>

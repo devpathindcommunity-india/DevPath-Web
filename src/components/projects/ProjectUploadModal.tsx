@@ -169,7 +169,7 @@ export default function ProjectUploadModal({ isOpen, onClose, userId, userEmail,
     };
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
             <div className="bg-card w-full max-w-2xl rounded-xl border border-border shadow-xl overflow-hidden flex flex-col max-h-[90vh]">
                 <div className="flex items-center justify-between p-4 border-b border-border">
                     <h2 className="text-xl font-bold">{initialData ? 'Edit Project' : 'Add New Project'}</h2>

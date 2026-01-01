@@ -96,6 +96,15 @@ service cloud.firestore {
         allow read: if true;
         allow write: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
       }
+
+      // User Notifications Subcollection
+      match /notifications/{notificationId} {
+        allow read: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
+        // Allow admins to create notifications for users
+        allow create: if isSuperAdmin() || isAdmin();
+        // Allow users to update (mark as read) and delete their own notifications
+        allow update, delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
+      }
     }
 
     // Earned Badges collection
@@ -190,7 +199,13 @@ service cloud.firestore {
       allow write: if isSuperAdmin() || isAdmin();
     }
 
-    // Admin Notifications collection
+    // Admin Notifications collection (System History)
+    match /notifications/{notificationId} {
+      allow read: if isSuperAdmin() || isAdmin();
+      allow create: if isSuperAdmin() || isAdmin();
+    }
+
+    // Admin Notifications collection (Legacy - keep if needed or remove if unused)
     match /admin_notifications/{notificationId} {
       allow read, write: if isSuperAdmin() || isAdmin();
     }

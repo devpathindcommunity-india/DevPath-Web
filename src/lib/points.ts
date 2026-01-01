@@ -1,6 +1,6 @@
 export const POINTS = {
-    DAILY_LOGIN: 0, // Base login is 0, streak adds 1
-    WEEKLY_STREAK_BONUS: 50,
+    DAILY_LOGIN: 1, // Base login is 1
+    WEEKLY_STREAK_BONUS: 20,
     FOLLOW_COMMUNITY: 500,
     BADGE_EARNED: 20, // Standard badge
     SOCIAL_BADGE_EARNED: 50, // GitHub, LinkedIn, Instagram

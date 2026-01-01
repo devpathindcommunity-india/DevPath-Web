@@ -281,8 +281,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         if (currentStreak > (userData.streak || 0)) {
                             pointsDelta += POINTS.DAILY_LOGIN;
 
-                            // Add Streak Bonus (1 point per day of streak)
-                            pointsDelta += (currentStreak * POINTS.STREAK_BONUS_PER_DAY);
+                            // Streak Bonus logic simplified: 1 point per day (via DAILY_LOGIN)
+                            // pointsDelta += (currentStreak * POINTS.STREAK_BONUS_PER_DAY); // Removed multiplier
 
                             // 7-Day Streak Bonus
                             if (currentStreak % 7 === 0 && currentStreak > 0) {

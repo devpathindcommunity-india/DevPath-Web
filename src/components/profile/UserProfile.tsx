@@ -714,7 +714,7 @@ export default function UserProfile() {
             />
 
             {showPrivacyModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
                     <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
                         <div className="flex justify-between items-center mb-6">
                             <h3 className="text-xl font-bold">Privacy Settings</h3>
@@ -741,7 +741,7 @@ export default function UserProfile() {
 
             {/* Followers/Following Modal */}
             {(showFollowersModal || showFollowingModal) && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
                     <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col">
                         <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
                             <h3 className="text-xl font-bold">{showFollowersModal ? 'Followers' : 'Following'}</h3>

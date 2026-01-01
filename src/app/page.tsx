@@ -7,6 +7,7 @@ import Sponsors from '@/components/home/Sponsors';
 
 import Mission from '@/components/home/Mission';
 import CodingNews from '@/components/home/CodingNews';
+import PastCollaborations from '@/components/home/PastCollaborations';
 
 export default function Home() {
   return (
@@ -40,6 +41,10 @@ export default function Home() {
 
       <SectionEntrance delay={0.2}>
         <Mission />
+      </SectionEntrance>
+
+      <SectionEntrance delay={0.2}>
+        <PastCollaborations />
       </SectionEntrance>
     </main>
   );
