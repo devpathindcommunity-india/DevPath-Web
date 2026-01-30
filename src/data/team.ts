@@ -69,7 +69,6 @@ export const teamMembers: TeamMember[] = [
         id: 6,
         name: "Sakshi Rote",
         role: "Management Head",
-        image: "https://res.cloudinary.com/dsj0vaews/image/upload/v1766775568/pwhvez0jzi8frqq10sia.jpg",
         category: "Head"
     },
     {
