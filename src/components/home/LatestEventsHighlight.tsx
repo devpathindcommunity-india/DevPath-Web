@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { Calendar, MapPin, ExternalLink, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { db } from '@/lib/firebase';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, where } from 'firebase/firestore';
 import Link from 'next/link';
 
 export default function LatestEventsHighlight({ className }: { className?: string }) {
@@ -18,6 +18,7 @@ export default function LatestEventsHighlight({ className }: { className?: strin
                 // Query for events sorted by date ascending to get the nearest upcoming one
                 const q = query(
                     collection(db, 'events'),
+                    where('completed', '==', false),
                     orderBy('date', 'asc'),
                     limit(1)
                 );

@@ -2,7 +2,7 @@ import Hero from '@/components/home/Hero';
 import { SectionDivider } from '@/components/SectionDivider';
 import { SectionEntrance } from '@/components/ui/SectionEntrance';
 import { FloatingParticles } from '@/components/FloatingParticles';
-import Events from '@/components/home/Events';
+
 import Sponsors from '@/components/home/Sponsors';
 
 import Mission from '@/components/home/Mission';
@@ -23,11 +23,7 @@ export default function Home() {
 
 
 
-      <div id="events-section">
-        <SectionEntrance delay={0.2}>
-          <Events />
-        </SectionEntrance>
-      </div>
+
 
       <SectionEntrance>
         <SectionDivider />
@@ -40,11 +36,11 @@ export default function Home() {
       </div>
 
       <SectionEntrance delay={0.2}>
-        <Mission />
+        <PastCollaborations />
       </SectionEntrance>
 
       <SectionEntrance delay={0.2}>
-        <PastCollaborations />
+        <Mission />
       </SectionEntrance>
     </main>
   );

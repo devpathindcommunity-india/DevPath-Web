@@ -15,7 +15,7 @@ export default function PageWrapper({
             style={{
                 position: "relative",
                 // zIndex: 1, // Removed to prevent stacking context issue with modals
-                paddingTop: isHome ? 0 : "100px",
+                paddingTop: isHome ? 0 : "150px",
             }}
         >
             {children}

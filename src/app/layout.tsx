@@ -7,6 +7,7 @@ import { GamificationProvider } from "@/context/GamificationContext";
 import { RealTimeProvider } from "@/context/RealTimeContext";
 import { AnimatedBackground } from '@/components/AnimatedBackground';
 
+import MaintenanceBanner from '@/components/layout/MaintenanceBanner';
 import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { ThemeProvider } from "@/components/providers/theme-provider";
@@ -39,7 +40,7 @@ export default function RootLayout({
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"
-          enableSystem
+          enableSystem={false}
           disableTransitionOnChange
         >
           <AuthProvider>
@@ -47,6 +48,7 @@ export default function RootLayout({
               <RealTimeProvider>
                 <AnimatedBackground />
                 {/* <BackgroundMesh /> */}
+                <MaintenanceBanner />
                 <Navbar />
                 <PageWrapper>
                   {children}

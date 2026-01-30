@@ -81,3 +81,33 @@
         max-width: 240px;
     }
 }
+
+/* Light Mode Overrides */
+:global(html:not(.dark)) .title {
+    background: linear-gradient(to right, #1e293b, #4f46e5);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+:global(html:not(.dark)) .subtitle {
+    color: #475569;
+}
+
+:global(html:not(.dark)) .sponsorCard {
+    background: rgba(0, 0, 0, 0.03);
+    border-color: rgba(0, 0, 0, 0.1);
+}
+
+:global(html:not(.dark)) .sponsorCard:hover {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--primary);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+}
+
+:global(html:not(.dark)) .imageWrapper {
+    filter: grayscale(100%) brightness(0%); /* Make logos black */
+}
+
+:global(html:not(.dark)) .sponsorCard:hover .imageWrapper {
+    filter: grayscale(0%) brightness(100%); /* Restore color on hover */
+}

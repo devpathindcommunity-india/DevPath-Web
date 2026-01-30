@@ -8,7 +8,8 @@ import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import styles from './Events.module.css';
 
 export default function Events() {
-    const [events, setEvents] = useState<any[]>([]);
+    const [upcomingEvents, setUpcomingEvents] = useState<any[]>([]);
+    const [completedEvents, setCompletedEvents] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -16,7 +17,10 @@ export default function Events() {
             try {
                 const q = query(collection(db, 'events'), orderBy('date', 'asc'));
                 const snapshot = await getDocs(q);
-                setEvents(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+                const allEvents = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+                setUpcomingEvents(allEvents.filter((e: any) => e.completed !== true));
+                setCompletedEvents(allEvents.filter((e: any) => e.completed === true));
             } catch (error) {
                 console.error("Error fetching events:", error);
             } finally {
@@ -43,20 +47,39 @@ export default function Events() {
                 <div className={styles.timeline}>
                     {loading ? (
                         <div className="text-center py-12 text-muted-foreground w-full">Loading events...</div>
-                    ) : events.length === 0 ? (
+                    ) : upcomingEvents.length === 0 ? (
                         <div className="text-center py-12 text-muted-foreground w-full">No upcoming events scheduled.</div>
                     ) : (
-                        events.map((event, index) => (
+                        upcomingEvents.map((event, index) => (
                             <EventCard key={event.id} event={event} index={index} />
                         ))
                     )}
                 </div>
             </div>
+
+            {completedEvents.length > 0 && (
+                <>
+                    <div className={styles.header} style={{ marginTop: '4rem' }}>
+                        <h2 className={styles.title}>Completed Events</h2>
+                        <p className={styles.subtitle}>
+                            Check out our past events and claim your certificates.
+                        </p>
+                    </div>
+
+                    <div className={styles.scrollContainer}>
+                        <div className={styles.timeline}>
+                            {completedEvents.map((event, index) => (
+                                <EventCard key={event.id} event={event} index={index} isCompleted={true} />
+                            ))}
+                        </div>
+                    </div>
+                </>
+            )}
         </section>
     );
 }
 
-function EventCard({ event, index }: { event: any, index: number }) {
+function EventCard({ event, index, isCompleted = false }: { event: any, index: number, isCompleted?: boolean }) {
     return (
         <motion.div
             className={styles.eventCard}
@@ -98,15 +121,25 @@ function EventCard({ event, index }: { event: any, index: number }) {
                         <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                             <MapPin size={14} /> {event.location || 'Online'}
                         </span>
-                        {event.registerLink && (
+
+                        {isCompleted ? (
                             <a
-                                href={event.registerLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:bg-primary/90 transition-colors ml-auto"
+                                href="/certificate"
+                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-xs font-bold hover:bg-green-700 transition-colors ml-auto"
                             >
-                                Register <ExternalLink size={12} />
+                                Get Certificate <ExternalLink size={12} />
                             </a>
+                        ) : (
+                            event.registerLink && (
+                                <a
+                                    href={event.registerLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-full text-xs font-bold hover:bg-primary/90 transition-colors ml-auto"
+                                >
+                                    Register <ExternalLink size={12} />
+                                </a>
+                            )
                         )}
                     </div>
                 </div>
