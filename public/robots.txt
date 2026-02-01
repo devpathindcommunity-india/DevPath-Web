@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+
+Sitemap: https://devpath-website.web.app/sitemap.xml
