@@ -1,19 +1,19 @@
-"use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Github, LogIn, Menu, X, LogOut } from 'lucide-react';
+import { Flame, Github, LogIn, Menu, X, LogOut, Lock } from 'lucide-react';
 import logo from '@/assets/logo.png';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import styles from './Navbar.module.css';
 import { calculateStreak } from '@/lib/streakUtils';
-import { useMemo } from 'react';
 import { useScroll, useSpring } from 'framer-motion';
+import { useMaintenance } from '@/hooks/useMaintenance';
+
 
 const navLinks = [
     { href: '/', label: 'Home' },
@@ -29,12 +29,18 @@ const navLinks = [
 export default function Navbar() {
     const { user, login, logout } = useAuth();
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const { isMaintenanceMode } = useMaintenance();
 
-    const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+    const toggleMobileMenu = () => {
+        if (!isMaintenanceMode) {
+            setMobileMenuOpen(!mobileMenuOpen);
+        }
+    };
     const closeMobileMenu = () => setMobileMenuOpen(false);
 
     const { currentStreak } = useMemo(() => calculateStreak(user?.loginDates), [user?.loginDates]);
     const pathname = usePathname();
+
 
     const { scrollYProgress } = useScroll();
     const scaleX = useSpring(scrollYProgress, {
@@ -60,16 +66,29 @@ export default function Navbar() {
                     <div className={styles.navPill}>
                         <div className={styles.navLinks}>
                             {navLinks.map((link) => (
-                                <Link
-                                    key={link.href}
-                                    href={link.href}
-                                    className={`${styles.navLink} ${link.label === 'Courses' ? 'text-xs' : ''}`}
-                                    style={{ fontSize: link.label === 'Courses' ? '0.75rem' : undefined }}
-                                >
-                                    {link.label}
-                                </Link>
+                                isMaintenanceMode ? (
+                                    <span
+                                        key={link.href}
+                                        className={`${styles.navLink} text-muted-foreground cursor-not-allowed opacity-50 ${link.label === 'Courses' ? 'text-xs' : ''}`}
+                                        style={{ fontSize: link.label === 'Courses' ? '0.75rem' : undefined }}
+                                        title="Maintenance Mode Active"
+                                    >
+                                        {link.label === 'Community' && <Lock size={12} className="inline mr-1" />}
+                                        {link.label}
+                                    </span>
+                                ) : (
+                                    <Link
+                                        key={link.href}
+                                        href={link.href}
+                                        className={`${styles.navLink} ${link.label === 'Courses' ? 'text-xs' : ''}`}
+                                        style={{ fontSize: link.label === 'Courses' ? '0.75rem' : undefined }}
+                                    >
+                                        {link.label}
+                                    </Link>
+                                )
                             ))}
                         </div>
+
 
                         {/* Scroll Progress Line attached to Pill */}
                         <motion.div
@@ -116,7 +135,10 @@ export default function Navbar() {
                                 )}
                             </Link>
                         ) : (
-                            <Link href="/login" className={styles.profileButton}>
+                            <Link
+                                href={isMaintenanceMode ? "#" : "/login"}
+                                className={`${styles.profileButton} ${isMaintenanceMode ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                            >
                                 <LogIn size={16} />
                                 <span className="hidden sm:inline">Login</span>
                             </Link>
@@ -132,97 +154,100 @@ export default function Navbar() {
                             {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
                         </button>
                     </div>
-                </nav>
-            </div>
+                </nav >
+            </div >
 
             {/* Mobile Menu Drawer */}
             <AnimatePresence>
-                {mobileMenuOpen && (
-                    <>
-                        {/* Backdrop */}
-                        <motion.div
-                            className={styles.mobileBackdrop}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
-                            onClick={closeMobileMenu}
-                        />
+                {
+                    mobileMenuOpen && (
+                        <>
+                            {/* Backdrop */}
+                            <motion.div
+                                className={styles.mobileBackdrop}
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                onClick={closeMobileMenu}
+                            />
 
-                        {/* Drawer */}
-                        <motion.div
-                            className={styles.mobileMenu}
-                            initial={{ x: '100%' }}
-                            animate={{ x: 0 }}
-                            exit={{ x: '100%' }}
-                            transition={{ type: 'tween', duration: 0.3 }}
-                        >
-                            <div className={styles.mobileHeader}>
-                                <span className={styles.mobileTitle}>Menu</span>
-                                <button
-                                    className={styles.mobileClose}
-                                    onClick={closeMobileMenu}
-                                    aria-label="Close menu"
-                                >
-                                    <X size={24} />
-                                </button>
-                            </div>
-
-                            <nav className={styles.mobileNav}>
-                                {navLinks.map((link) => (
-                                    <Link
-                                        key={link.href}
-                                        href={link.href}
-                                        className={styles.mobileLink}
+                            {/* Drawer */}
+                            <motion.div
+                                className={styles.mobileMenu}
+                                initial={{ x: '100%' }}
+                                animate={{ x: 0 }}
+                                exit={{ x: '100%' }}
+                                transition={{ type: 'tween', duration: 0.3 }}
+                            >
+                                <div className={styles.mobileHeader}>
+                                    <span className={styles.mobileTitle}>Menu</span>
+                                    <button
+                                        className={styles.mobileClose}
                                         onClick={closeMobileMenu}
+                                        aria-label="Close menu"
                                     >
-                                        {link.label}
-                                    </Link>
-                                ))}
-                            </nav>
-
-                            <div className={styles.mobileActions}>
-                                <div className={styles.mobileActionRow}>
-                                    <ThemeToggle />
-                                    <span>Toggle Theme</span>
+                                        <X size={24} />
+                                    </button>
                                 </div>
 
-                                {user ? (
-                                    <Link
-                                        href="/profile"
-                                        className={styles.mobileProfileButton}
-                                        onClick={closeMobileMenu}
-                                    >
-                                        <span>{user.name}</span>
-                                    </Link>
-                                ) : (
-                                    <Link
-                                        href="/login"
-                                        className={styles.mobileProfileButton}
-                                        onClick={closeMobileMenu}
-                                    >
-                                        <LogIn size={20} />
-                                        <span>Login</span>
-                                    </Link>
-                                )}
-                                {user && (
-                                    <button
-                                        className={styles.mobileProfileButton}
-                                        onClick={() => {
-                                            logout();
-                                            closeMobileMenu();
-                                            window.location.href = '/';
-                                        }}
-                                        style={{ color: '#ef4444', borderColor: '#ef4444' }}
-                                    >
-                                        <LogOut size={20} />
-                                        <span>Logout</span>
-                                    </button>
-                                )}
-                            </div>
-                        </motion.div>
-                    </>
-                )}
-            </AnimatePresence>
+                                <nav className={styles.mobileNav}>
+                                    {navLinks.map((link) => (
+                                        <Link
+                                            key={link.href}
+                                            href={isMaintenanceMode ? "#" : link.href}
+                                            className={`${styles.mobileLink} ${isMaintenanceMode ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}
+                                            onClick={isMaintenanceMode ? undefined : closeMobileMenu}
+                                        >
+                                            {link.label}
+                                        </Link>
+
+                                    ))}
+                                </nav>
+
+                                <div className={styles.mobileActions}>
+                                    <div className={styles.mobileActionRow}>
+                                        <ThemeToggle />
+                                        <span>Toggle Theme</span>
+                                    </div>
+
+                                    {user ? (
+                                        <Link
+                                            href="/profile"
+                                            className={styles.mobileProfileButton}
+                                            onClick={closeMobileMenu}
+                                        >
+                                            <span>{user.name}</span>
+                                        </Link>
+                                    ) : (
+                                        <Link
+                                            href="/login"
+                                            className={styles.mobileProfileButton}
+                                            onClick={closeMobileMenu}
+                                        >
+                                            <LogIn size={20} />
+                                            <span>Login</span>
+                                        </Link>
+                                    )}
+                                    {user && (
+                                        <button
+                                            className={styles.mobileProfileButton}
+                                            onClick={() => {
+                                                logout();
+                                                closeMobileMenu();
+                                                window.location.href = '/';
+                                            }}
+                                            style={{ color: '#ef4444', borderColor: '#ef4444' }}
+                                        >
+                                            <LogOut size={20} />
+                                            <span>Logout</span>
+                                        </button>
+                                    )}
+                                </div>
+                            </motion.div>
+                        </>
+                    )
+                }
+            </AnimatePresence >
         </>
     );
 }

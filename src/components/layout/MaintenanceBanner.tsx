@@ -4,10 +4,12 @@ import { motion } from 'framer-motion';
 import { AlertTriangle, X } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-export default function MaintenanceBanner() {
-    const [isVisible, setIsVisible] = useState(true);
+import { useMaintenance } from '@/hooks/useMaintenance';
 
-    if (!isVisible) return null;
+export default function MaintenanceBanner() {
+    const { isMaintenanceMode, maintenanceMessage } = useMaintenance();
+
+    if (!isMaintenanceMode) return null;
 
     return (
         <motion.div
@@ -18,7 +20,7 @@ export default function MaintenanceBanner() {
             <div className="flex items-center gap-3 text-sm md:text-base font-medium text-center">
                 <AlertTriangle size={18} className="text-white fill-white/20" />
                 <span>
-                    <span className="font-bold">Scheduled Maintenance:</span> The website will be fully closed on <span className="underline decoration-white/50 underline-offset-4">February 2nd and 3rd</span>.
+                    <span className="font-bold">Scheduled Maintenance:</span> {maintenanceMessage}
                 </span>
             </div>
             {/* Dismiss button - optional, keeping it strictly sticky for now as per "closed fully" urgency */}
