@@ -123,12 +123,17 @@ function EventCard({ event, index, isCompleted = false }: { event: any, index: n
                         </span>
 
                         {isCompleted ? (
-                            <a
-                                href="/certificate"
-                                className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-full text-xs font-bold hover:bg-green-700 transition-colors ml-auto"
-                            >
-                                Get Certificate <ExternalLink size={12} />
-                            </a>
+                            <div className="flex items-center gap-3 ml-auto">
+                                <span className="text-xs font-bold text-slate-400 bg-slate-800 px-3 py-1.5 rounded-full">
+                                    Completed
+                                </span>
+                                <a
+                                    href={event.rankingsLink || "#"}
+                                    className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-full text-xs font-bold hover:bg-blue-700 transition-colors"
+                                >
+                                    View Rankings <ExternalLink size={12} />
+                                </a>
+                            </div>
                         ) : (
                             event.registerLink && (
                                 <a
