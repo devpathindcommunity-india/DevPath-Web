@@ -1,6 +1,8 @@
 # DevPath India Community Website
 
-![DevPath Logo](public/logo.png)
+<p align="center">
+  <img src="public/logo.png" alt="DevPath Logo" width="250"/>
+</p>
 
 Welcome to the official repository for the **DevPath India Community Website**. This platform is designed to foster collaboration, share resources, manage events, and connect developers within the DevPath India community. Built with the latest web technologies, it offers a modern, responsive, and interactive user experience.
 
