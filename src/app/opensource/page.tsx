@@ -1,13 +1,14 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Github, GitMerge, Globe, BookOpen, Code2, Users, ExternalLink, Star, Link as LinkIcon, Check, LayoutDashboard } from 'lucide-react';
+import { Github, GitMerge, Globe, BookOpen, Code2, Users, ExternalLink, Star, Check, LayoutDashboard, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import { GithubAuthProvider, linkWithPopup } from 'firebase/auth';
 import { auth, db } from '@/lib/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 import GitHubDashboard from '@/components/opensource/GitHubDashboard';
+import { siteConfig } from '@/config/siteConfig';
 
 export default function OpenSourcePage() {
     const { user, updateUserProfile } = useAuth();
@@ -208,92 +209,77 @@ export default function OpenSourcePage() {
                         <Star className="text-yellow-500" /> Featured Repositories
                     </h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {/* Repo 1 */}
-                        <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-all">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                        <BookOpen size={20} />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold">DevPath Website</h3>
-                                        <p className="text-xs text-muted-foreground">Official Community Website</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-1 text-xs font-medium bg-muted px-2 py-1 rounded">
-                                    <Star size={12} className="text-yellow-500" /> 120+
-                                </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                The official website for the DevPath community, built with Next.js, Tailwind CSS, and Firebase.
-                            </p>
-                            <div className="flex items-center justify-between mt-auto">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span> TypeScript
-                                </div>
-                                <Link href="https://github.com/Aditya948351/DevPath-Community-Website" target="_blank" className="text-sm font-medium hover:underline flex items-center gap-1">
-                                    View Code <ExternalLink size={14} />
-                                </Link>
-                            </div>
-                        </div>
+                        {siteConfig.featuredRepos.map((repo) => {
+                            const IconComponent =
+                                repo.icon === 'BookOpen' ? BookOpen
+                                : repo.icon === 'Code2'   ? Code2
+                                : Globe;
 
-                        {/* Repo 2 */}
-                        <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-all">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                        <Code2 size={20} />
+                            return (
+                                <div
+                                    key={repo.name}
+                                    className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-all flex flex-col"
+                                >
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                                <IconComponent size={20} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold">{repo.name}</h3>
+                                                <p className="text-xs text-muted-foreground">{repo.description}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-1 text-xs font-medium bg-muted px-2 py-1 rounded shrink-0">
+                                            <Star size={12} className="text-yellow-500" /> {repo.stars}
+                                        </div>
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold">DevPath CLI</h3>
-                                        <p className="text-xs text-muted-foreground">Command Line Tool</p>
-                                    </div>
-                                </div>
-                                <div className="flex items-center gap-1 text-xs font-medium bg-muted px-2 py-1 rounded">
-                                    <Star size={12} className="text-yellow-500" /> 45+
-                                </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                A powerful CLI tool to help developers navigate their learning paths and access resources directly from the terminal.
-                            </p>
-                            <div className="flex items-center justify-between mt-auto">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className="w-2 h-2 rounded-full bg-yellow-400"></span> JavaScript
-                                </div>
-                                <Link href="#" className="text-sm font-medium hover:underline flex items-center gap-1">
-                                    View Code <ExternalLink size={14} />
-                                </Link>
-                            </div>
-                        </div>
 
-                        {/* Repo 3 */}
-                        <div className="bg-card border border-border rounded-xl p-6 hover:border-primary/50 transition-all">
-                            <div className="flex items-start justify-between mb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                        <Globe size={20} />
+                                    <p className="text-sm text-muted-foreground mb-4 line-clamp-2 flex-1">
+                                        {repo.longDescription}
+                                    </p>
+
+                                    <div className="flex items-center justify-between mt-auto">
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <span className={`w-2 h-2 rounded-full ${repo.languageColor}`}></span>
+                                            {repo.language}
+                                        </div>
+
+                                        {repo.isPublic && repo.url ? (
+                                            <Link
+                                                href={repo.url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm font-medium hover:underline flex items-center gap-1"
+                                                aria-label={`View code for ${repo.name}`}
+                                            >
+                                                View Code <ExternalLink size={14} />
+                                            </Link>
+                                        ) : (
+                                            /* Disabled state for repos not yet public */
+                                            <div className="relative group/tooltip">
+                                                <button
+                                                    disabled
+                                                    aria-disabled="true"
+                                                    aria-label={`${repo.name} coming soon`}
+                                                    className="flex items-center gap-1.5 text-sm font-medium text-muted-foreground/50 cursor-not-allowed select-none"
+                                                >
+                                                    <Clock size={14} />
+                                                    Coming Soon
+                                                </button>
+                                                {/* Tooltip */}
+                                                <div
+                                                    role="tooltip"
+                                                    className="pointer-events-none absolute bottom-full right-0 mb-2 w-max max-w-[180px] rounded-md bg-popover border border-border px-3 py-1.5 text-xs text-popover-foreground shadow-md opacity-0 group-hover/tooltip:opacity-100 transition-opacity duration-200"
+                                                >
+                                                    This repository is not yet public. Check back soon!
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold">Learning Resources</h3>
-                                        <p className="text-xs text-muted-foreground">Curated Lists</p>
-                                    </div>
                                 </div>
-                                <div className="flex items-center gap-1 text-xs font-medium bg-muted px-2 py-1 rounded">
-                                    <Star size={12} className="text-yellow-500" /> 80+
-                                </div>
-                            </div>
-                            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                                A comprehensive collection of free learning resources, roadmaps, and guides for developers of all levels.
-                            </p>
-                            <div className="flex items-center justify-between mt-auto">
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                    <span className="w-2 h-2 rounded-full bg-purple-500"></span> Markdown
-                                </div>
-                                <Link href="#" className="text-sm font-medium hover:underline flex items-center gap-1">
-                                    View Code <ExternalLink size={14} />
-                                </Link>
-                            </div>
-                        </div>
+                            );
+                        })}
                     </div>
                 </div>
 
