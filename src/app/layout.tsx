@@ -10,6 +10,7 @@ import { AnimatedBackground } from '@/components/AnimatedBackground';
 import MaintenanceBanner from '@/components/layout/MaintenanceBanner';
 import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import PageWrapper from '@/components/layout/PageWrapper';
+import ScrollToTop from '@/components/layout/ScrollToTop';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import "./globals.css";
 
@@ -115,6 +116,7 @@ export default function RootLayout({
                   {children}
                 </PageWrapper>
                 <FooterWrapper />
+                <ScrollToTop />
               </RealTimeProvider>
             </GamificationProvider>
           </AuthProvider>
