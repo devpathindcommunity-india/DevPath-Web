@@ -105,6 +105,8 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                                                     : 'bg-muted text-muted-foreground border border-border'
                                             }`}
                                             title={phase.title}
+                                            aria-label={`Step ${idx + 1}: ${phase.title}`}
+                                            aria-current={idx === currentPhaseIndex ? 'step' : undefined}
                                         >
                                             {idx < currentPhaseIndex ? <Check size={14} /> : idx + 1}
                                         </button>
