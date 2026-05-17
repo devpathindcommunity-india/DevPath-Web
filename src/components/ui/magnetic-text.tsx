@@ -72,7 +72,7 @@ export function MagneticText({ text = "CREATIVE", hoverText = "EXPLORE", classNa
         const y = e.clientY - rect.top
         mousePos.current = { x, y }
         currentPos.current = { x, y }
-        targetRadius.current = 75 // 150px diameter
+        targetRadius.current = 75 // default, but could be adjusted if needed
 
     }, [])
 
@@ -122,8 +122,7 @@ export function MagneticText({ text = "CREATIVE", hoverText = "EXPLORE", classNa
                 className
             )}
         >
-            {/* Base text layer */}
-            <span className="text-5xl font-bold tracking-tighter text-foreground tracking-wide">{text}</span>
+            <span className="font-bold tracking-tighter text-foreground tracking-wide text-inherit">{text}</span>
 
             {/* Overlay layer with clip-path */}
             <div
@@ -134,7 +133,7 @@ export function MagneticText({ text = "CREATIVE", hoverText = "EXPLORE", classNa
                     clipPath: "circle(0px at 50% 50%)"
                 }}
             >
-                <span className="text-5xl font-bold tracking-tighter text-background whitespace-nowrap tracking-wide">
+                <span className="font-bold tracking-tighter text-background whitespace-nowrap tracking-wide text-inherit">
                     {hoverText}
                 </span>
             </div>

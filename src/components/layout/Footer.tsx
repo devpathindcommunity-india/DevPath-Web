@@ -4,7 +4,6 @@ import { Github, Twitter, Send, Book, Cloud, Flag, Users, RefreshCw, Code, Globe
 import logo from '@/assets/logo.png';
 import styles from './Footer.module.css';
 
-import { MagneticText } from '../ui/magnetic-text';
 
 export default function Footer() {
     return (
@@ -23,13 +22,7 @@ export default function Footer() {
                     </div>
 
                     <div className={styles.column}>
-                        <div className="mb-6">
-                            <MagneticText
-                                text="RESOURCES"
-                                hoverText="EXPLORE"
-                                className="text-xl font-bold"
-                            />
-                        </div>
+                        <h4 className="text-sm font-semibold text-gray-400 mb-4">RESOURCES</h4>
                         <div className={styles.links}>
                             <Link href="/wiki" className={styles.link}>
                                 <Book size={16} /> Wiki & Docs
@@ -45,13 +38,7 @@ export default function Footer() {
                     </div>
 
                     <div className={styles.column}>
-                        <div className="mb-6">
-                            <MagneticText
-                                text="LINKS"
-                                hoverText="VISIT"
-                                className="text-xl font-bold"
-                            />
-                        </div>
+                        <h4 className="text-sm font-semibold text-gray-400 mb-4">LINKS</h4>
                         <div className={styles.links}>
                             <Link href="/complaints" className={styles.link}>
                                 <MessageSquare size={16} /> Community Complaint
