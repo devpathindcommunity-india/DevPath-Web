@@ -81,7 +81,7 @@ const jsonLd = {
   "sameAs": [
     "https://twitter.com/DevPath_Community",
     "https://www.linkedin.com/company/devpath-community",
-    "https://github.com/DevPath-Community-Website"
+    "https://github.com/devpathindcommunity-india/DevPath-Web"
   ],
   "description": "A community of 50,000+ developers accelerating their coding skills through structured paths and real projects."
 };

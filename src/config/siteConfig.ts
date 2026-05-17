@@ -34,7 +34,7 @@ export const siteConfig = {
       languageColor: "bg-blue-500",
       stars: "120+",
       icon: "BookOpen" as const,
-      url: "https://github.com/Aditya948351/DevPath-Community-Website",
+      url: "https://github.com/devpathindcommunity-india/DevPath-Web",
       isPublic: true,
     },
     {
