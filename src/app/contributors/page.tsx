@@ -35,11 +35,16 @@ const contributors: Contributor[] = [
 
 export default function ContributorsPage() {
     const [topContributors, setTopContributors] = useState<TopContributor[]>([]);
+    const [stats, setStats] = useState({
+        totalContributors: 1240,
+        totalContributions: 15400,
+        activeThisMonth: 128,
+    });
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        async function fetchTopContributors() {
+        async function fetchContributorsData() {
             try {
                 const res = await fetch('https://api.github.com/repos/devpathindcommunity-india/DevPath-Web/contributors');
                 if (!res.ok) {
@@ -60,22 +65,58 @@ export default function ContributorsPage() {
                 }));
 
                 setTopContributors(mappedTop);
+
+                // Calculate stats
+                const totalContributorsCount = sorted.length;
+                const totalContributionsCount = sorted.reduce((sum: number, c: any) => sum + c.contributions, 0);
+
+                let activeCount = Math.ceil(totalContributorsCount * 0.4); // Fallback: ~40% active
+
+                try {
+                    // Fetch recent commits (last 30 days) to calculate active contributors count
+                    const thirtyDaysAgo = new Date();
+                    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+                    const commitsRes = await fetch(`https://api.github.com/repos/devpathindcommunity-india/DevPath-Web/commits?since=${thirtyDaysAgo.toISOString()}`);
+                    if (commitsRes.ok) {
+                        const commits = await commitsRes.json();
+                        const uniqueAuthors = new Set(
+                            commits.map((commit: any) => commit.author?.login || commit.commit?.author?.name).filter(Boolean)
+                        );
+                        activeCount = uniqueAuthors.size;
+                    }
+                } catch (commitsErr) {
+                    console.error("Error fetching commits for active stats:", commitsErr);
+                }
+
+                setStats({
+                    totalContributors: totalContributorsCount,
+                    totalContributions: totalContributionsCount,
+                    activeThisMonth: activeCount || 1,
+                });
             } catch (err: any) {
-                console.error("Error fetching contributors for podium:", err);
-                setError(err.message || "Failed to load podium data");
+                console.error("Error fetching contributors data:", err);
+                setError(err.message || "Failed to load contributors data");
                 setTopContributors(FALLBACK_TOP);
             } finally {
                 setLoading(false);
             }
         }
 
-        fetchTopContributors();
+        fetchContributorsData();
     }, []);
 
     // Standard physical podium arrangement: [2nd, 1st, 3rd]
     const arrangePodium = (list: TopContributor[]) => {
         if (list.length < 3) return list;
         return [list[1], list[0], list[2]];
+    };
+
+    // Helper to format large numbers (e.g. 15400 -> 15.4k)
+    const formatNumber = (num: number): string => {
+        if (num >= 1000) {
+            return (num / 1000).toFixed(1).replace(/\.0$/, '') + 'k';
+        }
+        return num.toString();
     };
 
     return (
@@ -87,15 +128,21 @@ export default function ContributorsPage() {
                 </p>
                 <div className={styles.stats}>
                     <div className={styles.statItem}>
-                        <span className={styles.statValue}>1,240</span>
+                        <span className={styles.statValue}>
+                            {loading ? "..." : stats.totalContributors.toLocaleString()}
+                        </span>
                         <span className={styles.statLabel}>Total Contributors</span>
                     </div>
                     <div className={styles.statItem}>
-                        <span className={styles.statValue}>15.4k</span>
+                        <span className={styles.statValue}>
+                            {loading ? "..." : formatNumber(stats.totalContributions)}
+                        </span>
                         <span className={styles.statLabel}>Contributions</span>
                     </div>
                     <div className={styles.statItem}>
-                        <span className={styles.statValue}>128</span>
+                        <span className={styles.statValue}>
+                            {loading ? "..." : stats.activeThisMonth.toLocaleString()}
+                        </span>
                         <span className={styles.statLabel}>Active This Month</span>
                     </div>
                 </div>
