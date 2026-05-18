@@ -1,51 +1,36 @@
-"use client";
-
+"use client"
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-
+import logo from '@/assets/logo.png';
 import Button from '../ui/Button';
-
 import styles from './Community.module.css';
-
-const logo = "/logo-circle.png";
 
 export default function Community() {
     return (
         <section className={styles.community}>
             <div className={styles.container}>
-
-                {/* Left Content */}
                 <div className={styles.content}>
                     <h2 className={styles.title}>
-                        Join Our Thriving
-                        <br />
+                        Join Our Thriving<br />
                         Developer Community
                     </h2>
-
                     <p className={styles.description}>
-                        Connect with developers worldwide, share knowledge,
-                        and stay updated with the latest tech trends.
-                        Get help when you&apos;re stuck and celebrate your
-                        wins together.
+                        Connect with developers worldwide, share knowledge, and stay updated with the latest tech trends.
+                        Get help when you&apos;re stuck and celebrate your wins together.
                     </p>
-
                     <a
                         href="https://chat.whatsapp.com/D2PRfQy4HYgC4XURhY2X8C"
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{ textDecoration: 'none' }}
                     >
-                        <Button
-                            variant="primary"
-                            icon={<MessageCircle size={20} />}
-                        >
+                        <Button variant="primary" icon={<MessageCircle size={20} />}>
                             Join DevPath Community
                         </Button>
                     </a>
                 </div>
 
-                {/* Right Mockup */}
                 <div className={styles.mockupWrapper}>
                     <motion.div
                         className={styles.chatCard}
@@ -54,137 +39,60 @@ export default function Community() {
                         transition={{ duration: 0.8 }}
                         whileHover={{ y: -5, scale: 1.02 }}
                     >
-
-                        {/* Header */}
                         <div className={styles.chatHeader}>
                             <div className={styles.serverInfo}>
-
                                 <div className={styles.serverIcon}>
-                                    <Image
-                                        src={logo}
-                                        alt="DevPath"
-                                        width={40}
-                                        height={40}
-                                        className="rounded-full"
-                                    />
+                                    <Image src={logo} alt="DevPath" width={40} height={40} />
                                 </div>
-
                                 <div>
-                                    <span className={styles.serverName}>
-                                        DevPath Official
-                                    </span>
-
+                                    <span className={styles.serverName}>DevPath Official</span>
                                     <span className={styles.serverStatus}>
                                         <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse" />
                                         325 online
                                     </span>
                                 </div>
                             </div>
-
-                            <div
-                                style={{
-                                    color: 'var(--text-secondary)',
-                                    fontSize: '12px'
-                                }}
-                            >
+                            <div style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
                                 8,000+ members
                             </div>
                         </div>
 
-                        {/* Chat Body */}
                         <div className={styles.chatBody}>
-
-                            {/* Message 1 */}
                             <div className={styles.message}>
-                                <div
-                                    className={styles.avatar}
-                                    style={{ background: '#3b82f6' }}
-                                />
-
+                                <div className={styles.avatar} style={{ background: '#3b82f6' }} />
                                 <div className={styles.messageContent}>
                                     <div className={styles.sender}>
-                                        <span
-                                            className={styles.username}
-                                            style={{ color: '#60a5fa' }}
-                                        >
-                                            Sarah Chen
-                                        </span>
-
-                                        <span className={styles.time}>
-                                            Today at 10:42 AM
-                                        </span>
+                                        <span className={styles.username} style={{ color: '#60a5fa' }}>Sarah Chen</span>
+                                        <span className={styles.time}>Today at 10:42 AM</span>
                                     </div>
-
-                                    <p className={styles.text}>
-                                        Just finished the Advanced React Patterns
-                                        course! The compound components section
-                                        was a game changer. 🚀
-                                    </p>
+                                    <p className={styles.text}>Just finished the Advanced React Patterns course! The compound components section was a game changer. 🚀</p>
                                 </div>
                             </div>
 
-                            {/* Message 2 */}
                             <div className={styles.message}>
-                                <div
-                                    className={styles.avatar}
-                                    style={{ background: '#10b981' }}
-                                />
-
+                                <div className={styles.avatar} style={{ background: '#10b981' }} />
                                 <div className={styles.messageContent}>
                                     <div className={styles.sender}>
-                                        <span
-                                            className={styles.username}
-                                            style={{ color: '#34d399' }}
-                                        >
-                                            Alex Rivera
-                                        </span>
-
-                                        <span className={styles.time}>
-                                            Today at 10:45 AM
-                                        </span>
+                                        <span className={styles.username} style={{ color: '#34d399' }}>Alex Rivera</span>
+                                        <span className={styles.time}>Today at 10:45 AM</span>
                                     </div>
-
-                                    <p className={styles.text}>
-                                        Congrats Sarah! I&apos;m working on the
-                                        Node.js path right now. Would love to
-                                        see your final project.
-                                    </p>
+                                    <p className={styles.text}>Congrats Sarah! I&apos;m working on the Node.js path right now. Would love to see your final project.</p>
                                 </div>
                             </div>
 
-                            {/* Message 3 */}
                             <div className={styles.message}>
-                                <div
-                                    className={styles.avatar}
-                                    style={{ background: '#f59e0b' }}
-                                />
-
+                                <div className={styles.avatar} style={{ background: '#f59e0b' }} />
                                 <div className={styles.messageContent}>
                                     <div className={styles.sender}>
-                                        <span
-                                            className={styles.username}
-                                            style={{ color: '#fbbf24' }}
-                                        >
-                                            Mike Johnson
-                                        </span>
-
-                                        <span className={styles.time}>
-                                            Today at 10:48 AM
-                                        </span>
+                                        <span className={styles.username} style={{ color: '#fbbf24' }}>Mike Johnson</span>
+                                        <span className={styles.time}>Today at 10:48 AM</span>
                                     </div>
-
-                                    <p className={styles.text}>
-                                        Anyone up for a code review?
-                                        I just pushed some changes to the
-                                        open source dashboard project.
-                                    </p>
+                                    <p className={styles.text}>Anyone up for a code review? I just pushed some changes to the open source dashboard project.</p>
                                 </div>
                             </div>
-
                         </div>
                     </motion.div>
                 </div>
-
             </div>
         </section>
     );
