@@ -1,18 +1,83 @@
 "use client";
 
-import { Github, Code, FileText, MessageSquare, ExternalLink } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Github, Code, FileText, MessageSquare, ExternalLink, Loader2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import styles from './Contributors.module.css';
 
-const contributors = [
+// Type definitions
+interface Contributor {
+    name: string;
+    handle: string;
+    contributions: number;
+    types: string[];
+    avatar: string | null;
+}
+
+interface TopContributor {
+    name: string;
+    handle: string;
+    contributions: number;
+    rank: number;
+    avatar: string | null;
+}
+
+// Fallback lists if API fails or rate-limit is hit
+const FALLBACK_TOP: TopContributor[] = [
+    { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, rank: 1, avatar: null },
+    { name: "schrodingerspet", handle: "@schrodingerspet", contributions: 300, rank: 2, avatar: null },
+    { name: "Niteshagarwal01", handle: "@Niteshagarwal01", contributions: 150, rank: 3, avatar: null },
+];
+
+const contributors: Contributor[] = [
     { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, types: ["code", "design", "community"], avatar: "AP" },
 ];
 
-const topContributors = [
-    { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, rank: 1, avatar: "AP" },
-];
-
 export default function ContributorsPage() {
+    const [topContributors, setTopContributors] = useState<TopContributor[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        async function fetchTopContributors() {
+            try {
+                const res = await fetch('https://api.github.com/repos/devpathindcommunity-india/DevPath-Web/contributors');
+                if (!res.ok) {
+                    throw new Error(`Failed to fetch: ${res.statusText}`);
+                }
+                const data = await res.json();
+                
+                // Sort by contributions descending
+                const sorted = [...data].sort((a: any, b: any) => b.contributions - a.contributions);
+                
+                // Extract top 3
+                const mappedTop = sorted.slice(0, 3).map((c: any, index: number) => ({
+                    name: c.login,
+                    handle: `@${c.login}`,
+                    contributions: c.contributions,
+                    rank: index + 1,
+                    avatar: c.avatar_url,
+                }));
+
+                setTopContributors(mappedTop);
+            } catch (err: any) {
+                console.error("Error fetching contributors for podium:", err);
+                setError(err.message || "Failed to load podium data");
+                setTopContributors(FALLBACK_TOP);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        fetchTopContributors();
+    }, []);
+
+    // Standard physical podium arrangement: [2nd, 1st, 3rd]
+    const arrangePodium = (list: TopContributor[]) => {
+        if (list.length < 3) return list;
+        return [list[1], list[0], list[2]];
+    };
+
     return (
         <div className={styles.container}>
             <div className={styles.hero}>
@@ -36,22 +101,39 @@ export default function ContributorsPage() {
                 </div>
             </div>
 
-            <div className={styles.podium}>
-                {topContributors.map((contributor) => (
-                    <div key={contributor.handle} className={`${styles.podiumPlace} ${contributor.rank === 1 ? styles.first : ''}`}>
-                        <div className={styles.avatarWrapper}>
-                            {contributor.rank === 1 && <div className={styles.crown}>👑</div>}
-                            {contributor.rank === 2 && <div className={styles.crown} style={{ fontSize: '24px', filter: 'grayscale(1)' }}>🥈</div>}
-                            {contributor.rank === 3 && <div className={styles.crown} style={{ fontSize: '24px', filter: 'sepia(1)' }}>🥉</div>}
-                            <div className={styles.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '32px', fontWeight: 'bold', color: 'white' }}>
-                                {contributor.avatar}
+            {loading ? (
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '260px', gap: '16px' }}>
+                    <Loader2 className="animate-spin" size={48} style={{ color: '#00d4ff', animation: 'spin 1s linear infinite' }} />
+                    <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>Loading contributors podium...</p>
+                </div>
+            ) : (
+                <div className={styles.podium}>
+                    {arrangePodium(topContributors).map((contributor) => (
+                        <div key={contributor.handle} className={`${styles.podiumPlace} ${contributor.rank === 1 ? styles.first : ''}`}>
+                            <div className={styles.avatarWrapper}>
+                                {contributor.rank === 1 && <div className={styles.crown}>👑</div>}
+                                {contributor.rank === 2 && <div className={styles.crown} style={{ fontSize: '24px', filter: 'grayscale(1)' }}>🥈</div>}
+                                {contributor.rank === 3 && <div className={styles.crown} style={{ fontSize: '24px', filter: 'sepia(1)' }}>🥉</div>}
+                                <div className={styles.avatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
+                                    {contributor.avatar ? (
+                                        <img 
+                                            src={contributor.avatar} 
+                                            alt={contributor.name}
+                                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        />
+                                    ) : (
+                                        <div style={{ fontSize: '32px', fontWeight: 'bold', color: 'white' }}>
+                                            {contributor.name.slice(0, 2).toUpperCase()}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
+                            <div className={styles.podiumName}>{contributor.name}</div>
+                            <div className={styles.podiumContributions}>{contributor.contributions} commits</div>
                         </div>
-                        <div className={styles.podiumName}>{contributor.name}</div>
-                        <div className={styles.podiumContributions}>{contributor.contributions} commits</div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             <div className={styles.grid}>
                 {contributors.map((contributor, index) => (
