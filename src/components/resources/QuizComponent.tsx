@@ -40,9 +40,9 @@ export default function QuizComponent() {
       setShowResult(true);
 
       if (updatedScore === questions.length) {
-        addXp(350);
+        addXp(350, "Perfect Quiz Score");
       } else if (updatedScore >= Math.ceil(questions.length * 0.7)) {
-        addXp(200);
+        addXp(200, "Quiz Completed");
       }
     }
   };

@@ -32,6 +32,19 @@ export default function UserProfile() {
     }, [user, router]);
 
     const [isEditingPhoto, setIsEditingPhoto] = useState(false);
+    const [mountedProgress, setMountedProgress] = useState(0);
+
+    const levelInfo = calculateLevel(user?.points || 0);
+    const targetProgress = levelInfo.progress;
+
+    useEffect(() => {
+        if (user) {
+            const timer = setTimeout(() => {
+                setMountedProgress(targetProgress);
+            }, 100);
+            return () => clearTimeout(timer);
+        }
+    }, [user, targetProgress]);
     const [newPhotoURL, setNewPhotoURL] = useState('');
     const [isSaving, setIsSaving] = useState(false);
     const [showPrivacyModal, setShowPrivacyModal] = useState(false);
@@ -384,31 +397,105 @@ export default function UserProfile() {
 
                     {/* Hero / Intro */}
                     <div className="bg-card border border-border rounded-xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
+                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
                             <Target size={120} />
                         </div>
-                        <h2 className="text-3xl font-bold mb-2">Hi 👋, I'm {user.name}</h2>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                            {/* Left Content Column */}
+                            <div className="md:col-span-2 space-y-4 text-left">
+                                <h2 className="text-3xl font-bold">Hi 👋, I'm {user.name}</h2>
+                                
+                                {/* Level & Points Display */}
+                                <div className="flex flex-wrap items-center gap-3">
+                                    {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
+                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                                            <Shield size={14} />
+                                            Sanrakshak
+                                        </span>
+                                    ) : (
+                                        <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}>
+                                            {calculateLevel(user.points || 0).currentLevel.name}
+                                        </span>
+                                    )}
+                                    <span className="text-muted-foreground text-sm font-mono">
+                                        {user.points || 0} Dev Points
+                                    </span>
+                                </div>
 
-                        {/* Level & Points Display */}
-                        <div className="flex items-center gap-3 mb-6">
-                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
-                                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                    <Shield size={14} />
-                                    Sanrakshak
-                                </span>
-                            ) : (
-                                <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}>
-                                    {calculateLevel(user.points || 0).currentLevel.name}
-                                </span>
-                            )}
-                            <span className="text-muted-foreground text-sm font-mono">
-                                {user.points || 0} Dev Points
-                            </span>
+                                <p className="text-muted-foreground text-base leading-relaxed">
+                                    {user.bio || "Passionate developer building amazing things. Welcome to my profile!"}
+                                </p>
+                            </div>
+
+                            {/* Right Progress Ring Column */}
+                            <div className="flex justify-center md:justify-end w-full">
+                                <div className={styles.ringWrapper}>
+                                    <div className={styles.progressContainer}>
+                                        {/* Glowing SVG Filter and Gradient */}
+                                        <svg className={styles.svgRing} width="140" height="140">
+                                            <defs>
+                                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#00bfbf" />
+                                                    <stop offset="100%" stopColor="#8b5cf6" />
+                                                </linearGradient>
+                                            </defs>
+                                            
+                                            {/* Background Track Circle */}
+                                            <circle 
+                                                className={styles.circleBg}
+                                                cx="70" 
+                                                cy="70" 
+                                                r="60" 
+                                            />
+                                            
+                                            {/* Active Animated Progress Circle */}
+                                            <circle 
+                                                className={styles.circleProgress}
+                                                cx="70" 
+                                                cy="70" 
+                                                r="60" 
+                                                stroke="url(#progressGradient)"
+                                                strokeDasharray="376.99"
+                                                strokeDashoffset={376.99 * (1 - mountedProgress / 100)}
+                                            />
+                                        </svg>
+                                        
+                                        {/* Content inside the Ring */}
+                                        <div className={styles.centerText}>
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
+                                                <div className="flex flex-col items-center">
+                                                    <Trophy className="text-yellow-500 h-8 w-8 animate-bounce" />
+                                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mt-1">MAX</span>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    <span className={styles.percentText}>
+                                                        {Math.round(calculateLevel(user.points || 0).progress)}%
+                                                    </span>
+                                                    <span className={styles.lvlText}>
+                                                        Progress
+                                                    </span>
+                                                </>
+                                            )}
+                                        </div>
+                                    </div>
+                                    
+                                    {/* Sub-label under the Ring */}
+                                    <div className="text-center">
+                                        <p className="text-xs font-bold text-foreground mb-0.5">
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? 'Sanrakshak Rank' : `Level Progress`}
+                                        </p>
+                                        <p className={styles.xpDetails}>
+                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' 
+                                                ? `${(user.points || 0).toLocaleString()} XP`
+                                                : `${(user.points || 0).toLocaleString()} / ${(calculateLevel(user.points || 0).nextLevelPoints).toLocaleString()} XP`
+                                            }
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-
-                        <p className="text-muted-foreground max-w-2xl">
-                            {user.bio || "Passionate developer building amazing things. Welcome to my profile!"}
-                        </p>
                     </div>
 
                     {/* Login Heatmap */}
