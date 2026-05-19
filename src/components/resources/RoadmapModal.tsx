@@ -11,10 +11,18 @@ import { createPortal } from 'react-dom';
 import { useState, useEffect } from 'react';
 import { useGamification } from '@/context/GamificationContext';
 
+// --- FIREBASE IMPORTS ---
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
+// TODO: Replace with your actual Firebase config import path
+import { db } from '@/lib/firebase'; 
+// TODO: Replace with your actual Auth hook/context
+import { useAuth } from '@/context/AuthContext'; 
+
 interface RoadmapModalProps {
     isOpen: boolean;
     onClose: () => void;
     roadmap: {
+        id?: string; // Added ID for Firestore doc reference
         title: string;
         phases: {
             title: string;
@@ -61,8 +69,12 @@ export function RoadmapModal({
     onClose,
     roadmap,
 }: RoadmapModalProps) {
+    // Custom Auth - Make sure this matches how DevPath handles users
+    const { user } = useAuth() || { user: { uid: 'test-user-id' } }; 
+
     const [mounted, setMounted] = useState(false);
     const [currentPhaseIndex, setCurrentPhaseIndex] = useState(0);
+    const [completedPhases, setCompletedPhases] = useState<number[]>([]);
 
     const [showQuiz, setShowQuiz] = useState(false);
     const [currentQuestion, setCurrentQuestion] = useState(0);
@@ -78,23 +90,90 @@ export function RoadmapModal({
         return () => setMounted(false);
     }, []);
 
+    // 1. FETCH PROGRESS ON MODAL OPEN
     useEffect(() => {
+        let isMounted = true;
+
+        const fetchProgress = async () => {
+            if (isOpen && roadmap && user) {
+                try {
+                    // Fallback to slugified title if id doesn't exist
+                    const roadmapId = roadmap.id || roadmap.title.toLowerCase().replace(/\s+/g, '-');
+                    const docRef = doc(db, 'members', user.uid, 'progress', roadmapId);
+                    const docSnap = await getDoc(docRef);
+
+                    if (docSnap.exists() && isMounted) {
+                        const data = docSnap.data();
+                        setCurrentPhaseIndex(data.lastActiveStep || 0);
+                        setCompletedPhases(data.completedPhases || []);
+                    } else if (isMounted) {
+                        setCurrentPhaseIndex(0);
+                        setCompletedPhases([]);
+                    }
+                } catch (error) {
+                    console.error("Error fetching progress from Firestore: ", error);
+                    if (isMounted) {
+                        setCurrentPhaseIndex(0);
+                        setCompletedPhases([]);
+                    }
+                }
+            }
+        };
+
         if (isOpen) {
-            setCurrentPhaseIndex(0);
+            fetchProgress();
             setShowQuiz(false);
             setCurrentQuestion(0);
             setSelectedAnswer('');
             setScore(0);
             setShowResult(false);
         }
-    }, [isOpen]);
+
+        return () => { isMounted = false; };
+    }, [isOpen, roadmap, user]);
+
+    // 2. DEBOUNCED SAVE PROGRESS ON STEP CHANGE
+    useEffect(() => {
+        if (!isOpen || !roadmap || !user) return;
+
+        const saveProgress = async () => {
+            try {
+                const roadmapId = roadmap.id || roadmap.title.toLowerCase().replace(/\s+/g, '-');
+                const docRef = doc(db, 'members', user.uid, 'progress', roadmapId);
+                
+                await setDoc(docRef, {
+                    lastActiveStep: currentPhaseIndex,
+                    completedPhases: completedPhases,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+                
+                console.log(`Progress saved: Step ${currentPhaseIndex}`);
+            } catch (error) {
+                console.error("Error writing progress to Firestore: ", error);
+            }
+        };
+
+        // Debounce logic: Wait 2.5 seconds before hitting the database
+        const timeoutId = setTimeout(() => {
+            saveProgress();
+        }, 2500); 
+
+        return () => clearTimeout(timeoutId);
+    }, [currentPhaseIndex, completedPhases, isOpen, roadmap, user]);
 
     if (!isOpen || !roadmap || !mounted) return null;
 
     const activePhase = roadmap.phases[currentPhaseIndex];
 
+    const markPhaseComplete = (index: number) => {
+        if (!completedPhases.includes(index)) {
+            setCompletedPhases(prev => [...prev, index]);
+        }
+    };
+
     const handleNext = () => {
         if (currentPhaseIndex < roadmap.phases.length - 1) {
+            markPhaseComplete(currentPhaseIndex);
             setCurrentPhaseIndex((prev) => prev + 1);
         }
     };
@@ -105,11 +184,26 @@ export function RoadmapModal({
         }
     };
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
         try {
+            // Mark final phase as complete
+            markPhaseComplete(currentPhaseIndex);
+
+            // Final explicit save for completion
+            if (user) {
+                const roadmapId = roadmap.id || roadmap.title.toLowerCase().replace(/\s+/g, '-');
+                const docRef = doc(db, 'members', user.uid, 'progress', roadmapId);
+                await setDoc(docRef, {
+                    lastActiveStep: currentPhaseIndex,
+                    completedPhases: [...completedPhases, currentPhaseIndex],
+                    isCompleted: true,
+                    updatedAt: serverTimestamp()
+                }, { merge: true });
+            }
+
             addXp(500, `Completed the ${roadmap.title} Pathway!`);
         } catch (err) {
-            console.error('Failed to add XP: ', err);
+            console.error('Failed to add XP or save final progress: ', err);
         }
 
         onClose();
@@ -188,19 +282,19 @@ export function RoadmapModal({
                                                 className="flex items-center gap-2 flex-grow last:flex-grow-0"
                                             >
                                                 <button
-                                                    onClick={() =>
-                                                        setCurrentPhaseIndex(idx)
-                                                    }
+                                                    onClick={() => {
+                                                        markPhaseComplete(currentPhaseIndex);
+                                                        setCurrentPhaseIndex(idx);
+                                                    }}
                                                     className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                                                         idx === currentPhaseIndex
                                                             ? 'bg-primary text-white scale-110'
-                                                            : idx <
-                                                              currentPhaseIndex
+                                                            : completedPhases.includes(idx) || idx < currentPhaseIndex
                                                             ? 'bg-primary/20 text-primary border border-primary/30'
                                                             : 'bg-muted text-muted-foreground border border-border'
                                                     }`}
                                                 >
-                                                    {idx < currentPhaseIndex ? (
+                                                    {completedPhases.includes(idx) || idx < currentPhaseIndex ? (
                                                         <Check size={14} />
                                                     ) : (
                                                         idx + 1
@@ -212,8 +306,7 @@ export function RoadmapModal({
                                                         1 && (
                                                     <div
                                                         className={`h-[2px] flex-grow rounded ${
-                                                            idx <
-                                                            currentPhaseIndex
+                                                            completedPhases.includes(idx) || idx < currentPhaseIndex
                                                                 ? 'bg-primary'
                                                                 : 'bg-muted'
                                                         }`}
