@@ -51,7 +51,7 @@ async function fullRecalc() {
 
         const membersRef = collection(db, 'members');
         const snapshot = await getDocs(membersRef);
-        const batch = writeBatch(db);
+        let batch = writeBatch(db);
         let count = 0;
 
         console.log(`Found ${snapshot.size} members.`);
@@ -143,6 +143,7 @@ async function fullRecalc() {
             if (count % 400 === 0) {
                 await batch.commit();
                 console.log("Batch committed.");
+                batch = writeBatch(db);
             }
         }
 
