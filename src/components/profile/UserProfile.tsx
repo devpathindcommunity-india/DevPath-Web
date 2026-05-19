@@ -90,6 +90,22 @@ export default function UserProfile() {
     const [modalUsers, setModalUsers] = useState<any[]>([]);
     const [loadingModalUsers, setLoadingModalUsers] = useState(false);
 
+        // Sync aboutContent when user data loads from AuthContext
+    useEffect(() => {
+        if (user?.aboutMarkdown) setAboutContent(user.aboutMarkdown);
+    }, [user?.aboutMarkdown]);
+
+    // Sync socialLinks when user data loads from AuthContext
+    useEffect(() => {
+        if (user) {
+            setSocialLinks({
+                github: user.github || '',
+                linkedin: user.linkedin || '',
+                instagram: user.instagram || ''
+            });
+        }
+    }, [user?.github, user?.linkedin, user?.instagram]);
+
     useEffect(() => {
         if (user?.uid) {
             fetchProjects();
