@@ -1,8 +1,8 @@
 "use client";
 
 import { useAuth } from '@/context/AuthContext';
-import { CheckCircle, Gift, Lock } from 'lucide-react';
-import { doc, updateDoc, arrayUnion, writeBatch, increment, serverTimestamp, collection, getDocs } from 'firebase/firestore';
+import { CheckCircle } from 'lucide-react';
+import { doc, updateDoc, writeBatch, serverTimestamp, collection, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { POINTS } from '@/lib/points';
 import { calculateUserPointsAndBadges } from '@/lib/point-calculation';
@@ -12,7 +12,7 @@ import { useState, useEffect, useRef } from 'react';
 let lastBadgeCheckTime = 0;
 
 export default function Rewards({ user: propUser, projectCount = 0 }: { user?: any, projectCount?: number }) {
-    const { user: authUser, updateUserProfile } = useAuth();
+    const { user: authUser } = useAuth();
 
     // Use propUser if provided (public view), otherwise authUser (private view)
     const user = propUser || authUser;
@@ -87,12 +87,8 @@ export default function Rewards({ user: propUser, projectCount = 0 }: { user?: a
                     });
 
                     await batch.commit();
-
-                    // Update local state
-                    await updateUserProfile({
-                        points: result.points,
-                        achievements: result.achievements
-                    });
+                    // Local React state is updated automatically via the
+                    // onSnapshot listener in AuthContext — no second write needed.
 
                     if (badgesChanged) {
                         const newCount = result.achievements.length - currentBadges.length;
@@ -112,7 +108,7 @@ export default function Rewards({ user: propUser, projectCount = 0 }: { user?: a
         };
 
         checkAndSync();
-    }, [user, isOwner, updateUserProfile]);
+    }, [user, isOwner]);
 
     if (!user) return null;
 
