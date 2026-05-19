@@ -4,6 +4,9 @@ const { getAuth } = require('firebase-admin/auth');
 const { getFirestore } = require('firebase-admin/firestore');
 const path = require('path');
 
+// Configure dotenv to read from the project root .env.local
+require('dotenv').config({ path: path.join(__dirname, '..', '.env.local') });
+
 // Hardcode path to service account key (assuming it's in project root)
 // Script is in scripts/, so go up one level
 const serviceAccountPath = path.join(__dirname, '..', 'service-account-key.json');
