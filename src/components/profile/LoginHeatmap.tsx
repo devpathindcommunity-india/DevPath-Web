@@ -22,9 +22,9 @@ export default function LoginHeatmap({ loginDates = [] }: LoginHeatmapProps) {
         // But here we need to iterate.
         // Let's create a helper or just iterate using the same offset logic.
 
+        const nowMs = Date.now();
         for (let i = 364; i >= 0; i--) {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
+            const d = new Date(nowMs - i * 24 * 60 * 60 * 1000);
             dates.push(getISTDateString(d));
         }
         return dates;

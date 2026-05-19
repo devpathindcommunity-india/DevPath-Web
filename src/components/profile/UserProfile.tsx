@@ -371,7 +371,16 @@ export default function UserProfile() {
                             )}
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Calendar size={16} />
-                                <span>Joined Dec 2023</span>
+                                <span>Joined {(() => {
+                                    if (!user.createdAt) return 'Dec 2023';
+                                    try {
+                                        const d = new Date(user.createdAt.seconds ? user.createdAt.seconds * 1000 : user.createdAt);
+                                        if (isNaN(d.getTime())) return 'Dec 2023';
+                                        return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+                                    } catch (e) {
+                                        return 'Dec 2023';
+                                    }
+                                })()}</span>
                             </div>
                         </div>
 

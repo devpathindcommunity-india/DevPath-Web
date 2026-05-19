@@ -21,7 +21,6 @@ import Image from 'next/image';
 import { calculateUserPointsAndBadges } from '@/lib/point-calculation';
 
 const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
-const SUPER_ADMIN_PASSWORD = process.env.NEXT_PUBLIC_SUPER_ADMIN_PASSWORD;
 
 interface AdminDashboardProps {
     initialAuth?: boolean;
@@ -86,7 +85,7 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     useEffect(() => {
         if (activeTab === 'notifications') {
             setLoadingNotifications(true);
-            const q = query(collection(db, 'notifications'), orderBy('createdAt', 'desc'), limit(50));
+            const q = query(collection(db, 'admin_notifications'), orderBy('createdAt', 'desc'), limit(50));
             const unsubscribe = onSnapshot(q,
                 (snapshot) => {
                     setNotifications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
@@ -255,8 +254,6 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             fetchContent();
         } else if (activeTab === 'admins') {
             fetchAdmins();
-        } else if (activeTab === 'notifications') {
-            fetchNotifications();
         } else if (activeTab === 'events') {
             fetchEvents();
         }
@@ -392,7 +389,6 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             });
 
             setShowEventModal(false);
-            setShowEventModal(false);
             setNewEvent({
                 title: '', description: '', date: '', location: '', image: '', registerLink: '',
                 organisationName: '', opportunityType: 'Workshops & Webinar', opportunityCategory: '',
@@ -462,20 +458,6 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             console.error("Error fetching admins:", error);
         } finally {
             setLoadingAdmins(false);
-        }
-    };
-
-    const fetchNotifications = async () => {
-        setLoadingNotifications(true);
-        try {
-            const q = query(collection(db, 'admin_notifications'), orderBy('createdAt', 'desc'), limit(50));
-            const snapshot = await getDocs(q);
-            const notifs = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setNotifications(notifs);
-        } catch (error) {
-            console.error("Error fetching notifications:", error);
-        } finally {
-            setLoadingNotifications(false);
         }
     };
 
@@ -1022,17 +1004,6 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             const keyDoc = await getDoc(doc(db, 'superadmin_keys', 'config'));
 
             if (keyDoc.exists() && keyDoc.data().value === trimmedKey) {
-                // Auto-login as Super Admin if not already logged in as such
-                if (SUPER_ADMIN_EMAIL && SUPER_ADMIN_PASSWORD && (!auth.currentUser || auth.currentUser.email !== SUPER_ADMIN_EMAIL)) {
-                    try {
-                        await signInWithEmailAndPassword(auth, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
-                    } catch (loginError: any) {
-                        console.error("Auto-login failed:", loginError);
-                        setAuthError(`Auto-login failed: ${loginError.message}`);
-                        alert(`Warning: Could not sign in as Super Admin. You may not be able to edit content.\nError: ${loginError.message}`);
-                    }
-                }
-
                 setIsAdminAuthenticated(true);
                 sessionStorage.setItem('admin_session_key', trimmedKey);
 
@@ -1153,13 +1124,6 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                     <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
                 </div>
 
-                {/* DEBUG PANEL - REMOVE IN PRODUCTION */}
-                <div className="mb-6 p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-lg text-sm font-mono">
-                    <p><strong>Debug Info:</strong></p>
-                    <p>Auth User: {auth.currentUser?.email || 'None'} ({auth.currentUser?.uid})</p>
-                    <p>Is Super Admin: {auth.currentUser?.email === SUPER_ADMIN_EMAIL ? 'Yes' : 'No'}</p>
-                    <p>Admin Key Verified: {isAdminAuthenticated ? 'Yes' : 'No'}</p>
-                </div>
 
                 {/* Tabs */}
                 <div className="flex gap-4 mb-6 border-b border-border">
