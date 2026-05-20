@@ -1,5 +1,5 @@
 "use client";
-
+import Fuse from 'fuse.js';
 import { useState, useEffect, useMemo } from 'react';
 import { Search, ChevronRight, Book, Code, FileText, HelpCircle, ThumbsUp, ThumbsDown, Github, Users, MapPin, MessageCircle, Calendar, X } from 'lucide-react';
 import Button from '@/components/ui/Button';
@@ -54,7 +54,45 @@ function slugToLabel(slug: string): string {
 
 export default function WikiPage() {
     const [activeArticle, setActiveArticle] = useState("intro");
-    const [searchQuery, setSearchQuery] = useState("");
+    const [searchQuery, setSearchQuery] = useState(""); 
+
+    // Add this below your useState declarations
+const allItems = categories.flatMap(c => c.items.map(i => ({ ...i, category: c.title })));
+const fuse = new Fuse(allItems, { keys: ['title'], threshold: 0.4 ,  includeMatches: true});
+
+const fuseResults = fuse.search(searchQuery);  {/* ← line 57 starts here */}
+const matchMap = new Map(
+    fuseResults.map(r => [
+        r.item.id,
+        r.matches?.find(m => m.key === 'title')?.indices
+    ])
+);
+const filteredCategories = searchQuery.trim()
+    ? (() => {
+        const matched = new Set(fuseResults.map(r => r.item.id));
+        return categories
+            .map(c => ({ ...c, items: c.items.filter(i => matched.has(i.id)) }))
+            .filter(c => c.items.length > 0);
+    })()
+    : categories;
+
+
+function highlightMatch(text: string, indices?: readonly [number, number][]) {
+    if (!indices || indices.length === 0) return text;
+    const result = [];
+    let lastIndex = 0;
+    for (const [start, end] of indices) {
+        result.push(text.slice(lastIndex, start));
+        result.push(
+            <mark key={start} className={styles.highlight}>
+                {text.slice(start, end + 1)}
+            </mark>
+        );
+        lastIndex = end + 1;
+    }
+    result.push(text.slice(lastIndex));
+    return <span style={{ whiteSpace: 'normal' }}>{result}</span>;
+}
 
     // Fuzzy search results (title + keywords + description)
     const searchResults = useMemo(
@@ -63,16 +101,6 @@ export default function WikiPage() {
     );
 
     const isSearching = searchQuery.trim().length > 0;
-
-    // Sidebar nav: filter by title only when searching (lightweight)
-    const filteredCategories = isSearching
-        ? categories.map(category => ({
-            ...category,
-            items: category.items.filter(item =>
-                item.title.toLowerCase().includes(searchQuery.toLowerCase())
-            )
-        })).filter(category => category.items.length > 0)
-        : categories;
 
     // When user clicks a search result, open that article and clear search
     function handleResultSelect(id: string) {
@@ -156,7 +184,7 @@ export default function WikiPage() {
                                         onClick={() => setActiveArticle(item.id)}
                                     >
                                         {item.icon}
-                                        {item.title}
+                                        {highlightMatch(item.title, matchMap.get(item.id))}
                                     </div>
                                 ))}
                             </div>
