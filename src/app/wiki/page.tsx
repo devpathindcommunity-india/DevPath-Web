@@ -144,6 +144,17 @@ function highlightMatch(text: string, indices?: readonly [number, number][]) {
 
             wrapper.appendChild(button);
         });
+
+        return () => {
+            const wrappers = document.querySelectorAll('.code-wrapper');
+            wrappers.forEach(wrapper => {
+                const pre = wrapper.querySelector('pre');
+                if (pre) {
+                    wrapper.parentNode?.insertBefore(pre, wrapper);
+                }
+                wrapper.remove();
+            });
+        };
     }, [activeArticle]);
 
     return (

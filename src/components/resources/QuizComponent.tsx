@@ -33,6 +33,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
   const [showResult, setShowResult] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   // Reset state if quizId changes
   useEffect(() => {
@@ -41,7 +42,61 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
     setScore(0);
     setShowResult(false);
     setShowFeedback(false);
+    setSubmitError(null);
   }, [quizId]);
+
+  const saveProgress = async (updatedScore: number) => {
+    setSubmitError(null);
+    setIsSubmitting(true);
+    const isPerfect = updatedScore === questions.length;
+    const passed = updatedScore >= Math.ceil(questions.length * 0.7);
+
+    try {
+      if (user && user.email !== "devpathind.community@gmail.com") {
+        const completed = user.completedQuizzes || [];
+        
+        // Only award XP if not already completed and passed
+        if (!completed.includes(quizId) && passed) {
+          const { arrayUnion, increment } = await import('firebase/firestore');
+          const pointsEarned = isPerfect ? 350 : 200;
+          
+          // Update Firestore
+          await updateUserProfile({
+            completedQuizzes: arrayUnion(quizId) as any,
+            points: increment(pointsEarned) as any
+          });
+
+          // Trigger confetti only after successful update
+          if (isPerfect) {
+            triggerConfetti();
+          }
+
+          // Firestore already received the points update above; this call only shows feedback.
+          addXp(
+            pointsEarned,
+            isPerfect ? "Perfect Quiz Score!" : "Passed Quiz Successfully!",
+            "xp",
+            { persist: false }
+          );
+        } else if (passed && isPerfect) {
+          triggerConfetti();
+        }
+      } else if (!user) {
+        // For unauthenticated testing
+        if (isPerfect) {
+          triggerConfetti();
+          addXp(350, "Perfect Quiz Score!");
+        } else if (passed) {
+          addXp(200, "Passed Quiz Successfully!");
+        }
+      }
+    } catch (error) {
+      console.error("Failed to update quiz progress:", error);
+      setSubmitError("Failed to save progress. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const handleQuizSubmit = async () => {
     if (isSubmitting) return;
@@ -63,49 +118,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
       } else {
         // Quiz completed
         setShowResult(true);
-        setIsSubmitting(true);
-
-        const isPerfect = updatedScore === questions.length;
-        const passed = updatedScore >= Math.ceil(questions.length * 0.7);
-
-        if (isPerfect) {
-          triggerConfetti();
-        }
-
-        try {
-          if (user && user.email !== "devpathind.community@gmail.com") {
-            const completed = user.completedQuizzes || [];
-            
-            // Only award XP if not already completed and passed
-            if (!completed.includes(quizId) && passed) {
-              const newQuizzes = [...completed, quizId];
-              const pointsEarned = isPerfect ? 350 : 200;
-              const newPoints = (user.points || 0) + pointsEarned;
-              
-              // Update Firestore
-              await updateUserProfile({
-                completedQuizzes: newQuizzes,
-                points: newPoints
-              });
-
-              // Firestore already received the points update above; this call only shows feedback.
-              addXp(
-                pointsEarned,
-                isPerfect ? "Perfect Quiz Score!" : "Passed Quiz Successfully!",
-                "xp",
-                { persist: false }
-              );
-            }
-          } else if (!user) {
-            // For unauthenticated testing
-            if (isPerfect) addXp(350, "Perfect Quiz Score!");
-            else if (passed) addXp(200, "Passed Quiz Successfully!");
-          }
-        } catch (error) {
-          console.error("Failed to update quiz progress:", error);
-        } finally {
-          setIsSubmitting(false);
-        }
+        await saveProgress(updatedScore);
       }
     }, 1200);
   };
@@ -157,6 +170,45 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
           </p>
         )}
 
+        {submitError && (
+          <div style={{
+            padding: '1rem',
+            marginTop: '1.5rem',
+            marginBottom: '1rem',
+            fontSize: '0.875rem',
+            color: '#ef4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.2)',
+            borderRadius: '0.75rem',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '1rem',
+            width: '100%',
+            textAlign: 'left'
+          }}>
+            <span>{submitError}</span>
+            <button 
+              onClick={() => saveProgress(score)}
+              disabled={isSubmitting}
+              style={{
+                padding: '0.5rem 1rem',
+                fontSize: '0.75rem',
+                fontWeight: 600,
+                backgroundColor: '#ef4444',
+                color: 'white',
+                border: 'none',
+                borderRadius: '0.5rem',
+                cursor: 'pointer',
+                opacity: isSubmitting ? 0.5 : 1,
+                transition: 'opacity 0.2s'
+              }}
+            >
+              {isSubmitting ? "Retrying..." : "Try Again"}
+            </button>
+          </div>
+        )}
+
         <div className={styles.actionButtons}>
           <button
             className={styles.retryButton}
@@ -165,6 +217,7 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
               setSelectedAnswer("");
               setScore(0);
               setShowResult(false);
+              setSubmitError(null);
             }}
           >
             Retake Quiz

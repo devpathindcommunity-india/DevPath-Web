@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser, setPersistence, browserLocalPersistence } from 'firebase/auth';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, serverTimestamp } from 'firebase/firestore';
 
 interface User {
     uid: string;
@@ -197,7 +197,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 city: '',
                                 state: '',
                                 socialLinks: {},
-                                createdAt: new Date().toISOString()
+                                createdAt: serverTimestamp()
                             };
 
                             // Create the new member document
@@ -414,7 +414,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }
 
             // 3. Update Local State
-            setUser(prev => prev ? { ...prev, ...data } : null);
+            const stateUpdate = { ...data };
+            if (stateUpdate.points && typeof stateUpdate.points !== 'number') {
+                delete stateUpdate.points;
+            }
+            if (stateUpdate.completedQuizzes && !Array.isArray(stateUpdate.completedQuizzes)) {
+                delete stateUpdate.completedQuizzes;
+            }
+            setUser(prev => prev ? { ...prev, ...stateUpdate } : null);
 
         } catch (error) {
             console.error("Error updating profile:", error);
@@ -488,11 +495,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!user) return;
         if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
         try {
-            const batch = (await import('firebase/firestore')).writeBatch(db);
-            const arrayRemove = (await import('firebase/firestore')).arrayRemove;
-            const increment = (await import('firebase/firestore')).increment;
+            const { runTransaction, doc, arrayRemove, increment } = await import('firebase/firestore');
             const { POINTS } = await import('@/lib/points');
-
 
             // Update current user's following list
             const collectionName = user.role === 'admin' ? 'admins' : 'members';
@@ -500,9 +504,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const docId = user.docId || (user.role === 'admin' ? user.email!.toLowerCase() : user.uid);
 
             const currentUserRef = doc(db, collectionName, docId);
-            batch.update(currentUserRef, {
-                following: arrayRemove(targetUserId)
-            });
 
             // Update target user's followers list & Deduct Points
             const targetCollection = targetRole === 'admin' ? 'admins' : 'members';
@@ -510,27 +511,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const targetDocId = targetUserId;
 
             const targetUserRef = doc(db, targetCollection, targetDocId);
-            
-            const updateData: any = {
-                followers: arrayRemove(user.uid)
-            };
+            const targetLeaderboardRef = targetRole === 'member' ? doc(db, 'leaderboard', targetUserId) : null;
 
-            // Only deduct points if target is NOT an admin
-            if (targetRole !== 'admin') {
-                updateData.points = increment(-POINTS.FOLLOWER_GAINED);
-            }
+            await runTransaction(db, async (transaction) => {
+                const targetDoc = await transaction.get(targetUserRef);
+                if (!targetDoc.exists()) {
+                    throw new Error("Target user does not exist!");
+                }
 
-            batch.update(targetUserRef, updateData);
+                const currentPoints = targetDoc.data().points || 0;
+                const pointsToDeduct = Math.min(currentPoints, POINTS.FOLLOWER_GAINED); // Don't deduct more than they have
 
-            // Sync target user points to leaderboard (Only if target is member or has leaderboard entry)
-            if (targetRole === 'member') {
-                const targetLeaderboardRef = doc(db, 'leaderboard', targetUserId);
-                batch.set(targetLeaderboardRef, {
-                    points: increment(-POINTS.FOLLOWER_GAINED)
-                }, { merge: true });
-            }
+                transaction.update(currentUserRef, {
+                    following: arrayRemove(targetUserId)
+                });
 
-            await batch.commit();
+                const updateData: any = {
+                    followers: arrayRemove(user.uid)
+                };
+
+                if (targetRole !== 'admin' && pointsToDeduct > 0) {
+                    updateData.points = increment(-pointsToDeduct);
+                }
+
+                transaction.update(targetUserRef, updateData);
+
+                if (targetRole === 'member' && pointsToDeduct > 0 && targetLeaderboardRef) {
+                    transaction.set(targetLeaderboardRef, {
+                        points: increment(-pointsToDeduct)
+                    }, { merge: true });
+                }
+            });
 
             // Update local state
             setUser(prev => prev ? { ...prev, following: (prev.following || []).filter(id => id !== targetUserId) } : null);

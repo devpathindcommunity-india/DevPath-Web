@@ -98,6 +98,6 @@ export function highlightText(
 
     return parts.map(part => ({
         text: part,
-        highlight: regex.test(part),
+        highlight: new RegExp(`^${escaped}$`, 'i').test(part),
     }));
 }

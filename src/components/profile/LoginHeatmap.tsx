@@ -44,19 +44,26 @@ export default function LoginHeatmap({ loginDates = [] }: LoginHeatmapProps) {
             </div>
 
             <div className="flex flex-wrap gap-[2px] justify-center md:justify-start">
-                {days.map(date => {
-                    const isLoggedIn = safeLoginDates.includes(date);
-                    return (
-                        <div
-                            key={date}
-                            title={`${date}: ${isLoggedIn ? 'Logged In' : 'No Activity'}`}
-                            className={`w-2.5 h-2.5 rounded-sm transition-colors ${isLoggedIn
-                                ? 'bg-green-500 hover:bg-green-400'
-                                : 'bg-muted/30 hover:bg-muted/50'
-                                }`}
-                        />
-                    );
-                })}
+                <TooltipProvider>
+                    {days.map(date => {
+                        const isLoggedIn = safeLoginDates.includes(date);
+                        return (
+                            <Tooltip key={date}>
+                                <TooltipTrigger asChild>
+                                    <div
+                                        className={`w-2.5 h-2.5 rounded-sm transition-colors ${isLoggedIn
+                                            ? 'bg-green-500 hover:bg-green-400'
+                                            : 'bg-muted/30 hover:bg-muted/50'
+                                            }`}
+                                    />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                    <p>{date}: {isLoggedIn ? 'Logged In' : 'No Activity'}</p>
+                                </TooltipContent>
+                            </Tooltip>
+                        );
+                    })}
+                </TooltipProvider>
             </div>
             <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground justify-end">
                 <span>Less</span>

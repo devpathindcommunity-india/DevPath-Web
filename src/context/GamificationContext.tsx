@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState } from 'react';
 import { Trophy, Zap, ArrowUpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { increment } from 'firebase/firestore';
 
 export type NotificationType = 'xp' | 'achievement' | 'level-up';
 
@@ -144,7 +145,7 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
         
         if (user && shouldPersist) {
             // Persist XP to Firestore securely for authenticated users only.
-            updateUserProfile({ points: newXp }).catch(err => console.error("Failed to update XP", err));
+            updateUserProfile({ points: increment(amount) as any }).catch(err => console.error("Failed to update XP", err));
         }
 
         const baseId = Date.now();

@@ -8,6 +8,16 @@ function getISTDateString(date: Date = new Date()): string {
     return `${year}-${month}-${day}`;
 }
 
+// Helper to subtract/add calendar days in UTC to avoid DST and timezone shifts
+function getISTDateOffset(dateString: string, offsetDays: number): string {
+    const [year, month, day] = dateString.split('-').map(Number);
+    const d = new Date(Date.UTC(year, month - 1, day + offsetDays));
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+    const dayStr = String(d.getUTCDate()).padStart(2, '0');
+    return `${y}-${m}-${dayStr}`;
+}
+
 export function calculateStreak(loginDates: string[] = []) {
     if (!loginDates || !Array.isArray(loginDates) || !loginDates.length) return { currentStreak: 0, maxStreak: 0 };
 
@@ -17,23 +27,23 @@ export function calculateStreak(loginDates: string[] = []) {
 
     // Check current streak using IST
     const today = getISTDateString(new Date());
-    const yesterday = getISTDateString(new Date(Date.now() - 24 * 60 * 60 * 1000));
+    const yesterday = getISTDateOffset(today, -1);
 
     if (sortedDates.includes(today)) {
         current = 1;
-        let checkTime = Date.now() - 24 * 60 * 60 * 1000;
+        let offset = -1;
 
-        while (sortedDates.includes(getISTDateString(new Date(checkTime)))) {
+        while (sortedDates.includes(getISTDateOffset(today, offset))) {
             current++;
-            checkTime -= 24 * 60 * 60 * 1000;
+            offset--;
         }
     } else if (sortedDates.includes(yesterday)) {
-        let checkTime = Date.now() - 24 * 60 * 60 * 1000;
+        let offset = -1;
         let streak = 0;
 
-        while (sortedDates.includes(getISTDateString(new Date(checkTime)))) {
+        while (sortedDates.includes(getISTDateOffset(today, offset))) {
             streak++;
-            checkTime -= 24 * 60 * 60 * 1000;
+            offset--;
         }
         current = streak;
     }
