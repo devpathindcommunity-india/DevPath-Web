@@ -18,11 +18,20 @@ const firebaseConfig = {
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
 const db = getFirestore(app);
-const auth = getAuth(app);
+const auth =
+    typeof window !== "undefined" &&
+        firebaseConfig.apiKey
+        ? getAuth(app)
+        : null;
 
 let analytics;
 
-if (typeof window !== "undefined") {
+if (
+    typeof window !== "undefined" &&
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+) {
     isSupported().then((supported) => {
         if (supported) {
             analytics = getAnalytics(app);

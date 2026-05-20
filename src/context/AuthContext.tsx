@@ -100,9 +100,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         // Ensure persistence is set to local
-        setPersistence(auth, browserLocalPersistence).catch((error) => {
-            console.error("Error setting persistence:", error);
-        });
+        if (auth) {
+            setPersistence(auth, browserLocalPersistence).catch((error) => {
+                console.error("Error setting persistence:", error);
+            });
+        }
+
+        if (!auth) {
+            setIsLoading(false);
+            return;
+        }
 
         const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             // Cleanup previous listener if any
