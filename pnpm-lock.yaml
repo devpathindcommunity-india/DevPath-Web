@@ -15,7 +15,7 @@ importers:
         specifier: ^10.7.7
         version: 10.7.7(@react-three/fiber@9.6.1(@types/react@19.2.15)(react-dom@19.2.1(react@19.2.6))(react@19.2.6)(three@0.184.0))(@types/react@19.2.15)(@types/three@0.184.1)(react-dom@19.2.1(react@19.2.6))(react@19.2.6)(three@0.184.0)
       '@react-three/fiber':
-        specifier: ^9.4.2
+        specifier: ^9.6.1
         version: 9.6.1(@types/react@19.2.15)(react-dom@19.2.1(react@19.2.6))(react@19.2.6)(three@0.184.0)
       canvas-confetti:
         specifier: ^1.9.4
