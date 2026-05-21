@@ -11,6 +11,7 @@ import MaintenanceBanner from '@/components/layout/MaintenanceBanner';
 import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { FloatingAssistant } from "@/components/assistant/floating-assistant";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -122,6 +123,7 @@ export default function RootLayout({
                   {children}
                 </PageWrapper>
                 <FooterWrapper />
+                <FloatingAssistant />
               </RealTimeProvider>
             </GamificationProvider>
           </AuthProvider>

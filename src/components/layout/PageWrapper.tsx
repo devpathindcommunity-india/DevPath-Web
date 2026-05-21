@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 export default function PageWrapper({
     children,
 }: {
-    children: React.ReactNode;
+    children: React.ReactNode; 
 }) {
     const pathname = usePathname();
     const isHome = pathname === "/";
