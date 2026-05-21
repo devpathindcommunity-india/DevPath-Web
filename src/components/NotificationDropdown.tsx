@@ -48,7 +48,12 @@ export function NotificationDropdown() {
     }, [isOpen, closePanel])
 
     useEffect(() => {
-        if (!user) return;
+        if (!user) {
+            // Clear sensitive state on sign-out / user switch to avoid showing stale notifications.
+            setNotifications([])
+            setIsOpen(false)
+            return
+        }
 
         const q = query(
             collection(db, 'members', user.uid, 'notifications'),
