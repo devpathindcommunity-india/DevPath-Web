@@ -31,9 +31,7 @@ export function FloatingAssistant({
             <AssistantPanel
                 isOpen={isOpen}
                 onClose={() => setIsOpen(false)}
-                onExpand={() => {
-                    console.log("Expand to full view");
-                }}
+                onExpand={() => {}}
                 onSend={(message) => {
                     onSend?.(message);
                     setIsOpen(false);
