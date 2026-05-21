@@ -17,28 +17,32 @@ export function FloatingAssistant({
     hasNotification = false,
 }: FloatingAssistantProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const handleClose = () => {
+        setIsOpen(false);
+        document.getElementById("floating-assistant-trigger")?.focus();
+    };
 
     return (
         <>
             <AnimatePresence>
                 <FloatingAssistantButton
                     isOpen={isOpen}
-                    onClick={() => setIsOpen(!isOpen)}
+                    onClick={() => setIsOpen((prev) => !prev)}
                     hasNotification={hasNotification}
                 />
             </AnimatePresence>
 
             <AssistantPanel
                 isOpen={isOpen}
-                onClose={() => setIsOpen(false)}
+                onClose={handleClose}
                 onExpand={() => {}}
                 onSend={(message) => {
                     onSend?.(message);
-                    setIsOpen(false);
+                    handleClose();
                 }}
                 onSuggestionSelect={(id) => {
                     onSuggestionSelect?.(id);
-                    setIsOpen(false);
+                    handleClose();
                 }}
             />
         </>

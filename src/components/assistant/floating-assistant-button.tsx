@@ -17,6 +17,7 @@ export function FloatingAssistantButton({
 }: FloatingAssistantButtonProps) {
     return (
         <motion.button
+            id="floating-assistant-trigger"
             onClick={onClick}
             type="button"
             initial={{ scale: 0, opacity: 0 }}
@@ -35,6 +36,9 @@ export function FloatingAssistantButton({
             )}
             aria-label="Open AI Assistant"
             aria-pressed={isOpen}
+            aria-haspopup="dialog"
+            aria-expanded={isOpen}
+            aria-controls="floating-assistant-panel"
         >
             <motion.div
                 animate={{ rotate: isOpen ? 180 : 0 }}

@@ -1,6 +1,6 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import {
     Briefcase,
     FileText,
@@ -32,6 +32,8 @@ interface SuggestionCardsProps {
 }
 
 export function SuggestionCards({ onSelect }: SuggestionCardsProps) {
+    const shouldReduceMotion = useReducedMotion();
+
     return (
         <div className="grid grid-cols-2 gap-3 px-5 py-4">
             {suggestions.map((card, idx) => {
@@ -42,11 +44,11 @@ export function SuggestionCards({ onSelect }: SuggestionCardsProps) {
                         key={card.id}
                         type="button"
                         onClick={() => onSelect?.(card.id)}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.05 * idx, duration: 0.25 }}
-                        whileHover={{ y: -2, borderColor: "rgba(34, 211, 238, 0.5)" }}
-                        whileTap={{ scale: 0.95 }}
+                        initial={shouldReduceMotion ? false : { opacity: 0, y: 8 }}
+                        animate={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                        transition={shouldReduceMotion ? undefined : { delay: 0.05 * idx, duration: 0.25 }}
+                        whileHover={shouldReduceMotion ? undefined : { y: -2, borderColor: "rgba(34, 211, 238, 0.5)" }}
+                        whileTap={shouldReduceMotion ? undefined : { scale: 0.95 }}
                         className={cn(
                             "group relative overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04]",
                             "p-3 text-left transition-all",
