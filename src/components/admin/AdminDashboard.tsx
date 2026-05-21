@@ -18,7 +18,7 @@ import {
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
-import { calculateUserPointsAndBadges } from '@/lib/point-calculation';
+import { determineBadges, getBadgeXp } from '@/lib/point-calculation';
 
 const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
 
@@ -858,10 +858,21 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
     };
 
     const handleRecalculateAll = async () => {
-        if (!confirm("Are you sure you want to RECALCULATE ALL BADGES & POINTS for ALL USERS (Members & Admins)? This disregards the 24h limit.")) return;
+        if (!confirm("Are you sure you want to RECALCULATE ALL BADGES & POINTS for ALL USERS (Members & Admins)?\n\nThis will:\n- Recalculate badge eligibility for all users\n- Award XP for newly earned badges only\n- Preserve existing transactional points\n- Update leaderboard accordingly\n\nThis action cannot be undone.")) return;
 
         setMigrating(true);
-        setMigrationLog(['Starting Full Recalculation...']);
+        setMigrationLog(['Starting Full Recalculation...', 'Initializing...']);
+
+        // Statistics tracking
+        const stats = {
+            totalUsers: 0,
+            processedUsers: 0,
+            skippedUsers: 0,
+            newBadgesAwarded: 0,
+            totalXpAwarded: 0,
+            errors: 0,
+            usersWithChanges: 0
+        };
 
         try {
             const batch = (await import('firebase/firestore')).writeBatch(db);
@@ -869,11 +880,13 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             let batchCount = 0;
 
             // 1. Fetch Members
+            setMigrationLog((prev: string[]) => [...prev, 'Fetching members...']);
             const membersRef = collection(db, 'members');
             const membersSnapshot = await getDocs(membersRef);
             setMigrationLog((prev: string[]) => [...prev, `Found ${membersSnapshot.size} members.`]);
 
             // 2. Fetch Admins
+            setMigrationLog((prev: string[]) => [...prev, 'Fetching admins...']);
             const adminsRef = collection(db, 'admins');
             const adminsSnapshot = await getDocs(adminsRef);
             setMigrationLog((prev: string[]) => [...prev, `Found ${adminsSnapshot.size} admins.`]);
@@ -882,61 +895,106 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
             const allDocs = [
                 ...membersSnapshot.docs.map(d => ({ ...d.data(), id: d.id, collection: 'members', isAuthUid: true })),
                 ...adminsSnapshot.docs.map(d => ({ ...d.data(), id: d.id, collection: 'admins', isAuthUid: false }))
-                // Note: Admin ID is email. We need to find their Auth UID from data if possible, or use email if that's how we track.
-                // Leaderboard uses Auth UID. Admin docs SHOULD have 'uid' field.
             ];
+
+            stats.totalUsers = allDocs.length;
+            setMigrationLog((prev: string[]) => [...prev, `Total users to process: ${stats.totalUsers}`]);
+            setMigrationLog((prev: string[]) => [...prev, 'Starting badge recalculation...']);
 
             for (const userDoc of allDocs) {
                 const data = userDoc as any;
-                const docId = userDoc.id; // UID for members, Email for admins
+                const docId = userDoc.id;
                 const collectionName = userDoc.collection;
 
-                // For Leaderboard, we need the Auth UID.
-                // Members: docId is Auth UID.
-                // Admins: data.uid should be Auth UID.
+                // For Leaderboard, we need the Auth UID
                 const authUid = collectionName === 'members' ? docId : data.uid;
 
                 if (!authUid) {
-                    setMigrationLog((prev: string[]) => [...prev, `Skipping ${docId}: No Auth UID found.`]);
+                    setMigrationLog((prev: string[]) => [...prev, `⚠️ Skipping ${docId}: No Auth UID found.`]);
+                    stats.skippedUsers++;
+                    stats.errors++;
                     continue;
                 }
 
-                // Fetch Projects for this user (Projects are always under 'members/{uid}/projects' ?? 
-                // Wait, if we moved projects to subcollections, where are Admin projects?
-                // If Admins are in 'admins' collection, maybe their projects are in 'admins/{email}/projects'?
-                // OR 'members/{uid}/projects'?
-                // The migration script moved projects to `members/${userId}/projects`.
-                // If an Admin has projects, they might be under `members/${uid}` even if the user profile is in `admins`?
-                // OR we should check both or assume `members` path for projects for consistency if we use UID?
-                // Let's assume projects are stored under `members/{uid}/projects` because `userId` in projects was likely UID.
-                // But if we are writing to `admins` collection, we should probably check if we need to read projects from there too?
-                // For now, let's assume projects are under `members/{uid}/projects` as per migration script.
+                try {
+                    // Fetch Projects for this user
+                    const projectsRef = collection(db, 'members', authUid, 'projects');
+                    const projectsSnap = await getDocs(projectsRef);
+                    const userProjects = projectsSnap.docs.map(doc => doc.data());
 
-                const projectsRef = collection(db, 'members', authUid, 'projects');
-                const projectsSnap = await getDocs(projectsRef);
-                const userProjects = projectsSnap.docs.map(doc => doc.data());
+                    // Calculate badges using safe method (preserves existing points)
+                    const achievements = determineBadges({ uid: authUid, ...data }, userProjects);
+                    const currentBadges = data.achievements || [];
+                    
+                    // Identify only newly earned badges (incremental approach)
+                    const newBadges = achievements.filter(id => !currentBadges.includes(id));
+                    const newBadgeXp = newBadges.reduce((sum, id) => sum + getBadgeXp(id), 0);
 
-                // Calculate using shared logic
-                const result = calculateUserPointsAndBadges({ uid: authUid, ...data }, userProjects);
+                    // Skip if no changes needed
+                    if (newBadges.length === 0) {
+                        stats.skippedUsers++;
+                        count++;
+                        batchCount++;
+                        
+                        // Still update lastBadgeScan to refresh the timestamp
+                        const userRef = doc(db, collectionName, docId);
+                        batch.update(userRef, { lastBadgeScan: Date.now() });
+                        
+                        if (batchCount >= 400) {
+                            await batch.commit();
+                            setMigrationLog((prev: string[]) => [...prev, `Processed ${count}/${stats.totalUsers} users...`]);
+                            batchCount = 0;
+                        }
+                        continue;
+                    }
 
-                // Update User Doc (in correct collection)
-                const userRef = doc(db, collectionName, docId);
-                batch.update(userRef, {
-                    points: result.points,
-                    achievements: result.achievements,
-                    lastBadgeScan: Date.now() // Reset scan time
-                });
+                    // Update User Doc (in correct collection)
+                    const userRef = doc(db, collectionName, docId);
+                    
+                    // Build update object - only update achievements and scan time
+                    // DO NOT overwrite points - preserve existing transactional XP
+                    const userUpdate: any = {
+                        achievements: achievements,
+                        lastBadgeScan: Date.now()
+                    };
+                    
+                    // Only increment points for newly earned badges
+                    if (newBadgeXp > 0) {
+                        userUpdate.points = increment(newBadgeXp);
+                    }
+                    
+                    batch.update(userRef, userUpdate);
 
-                // Update Leaderboard (Always uses Auth UID)
-                const leaderboardRef = doc(db, 'leaderboard', authUid);
-                batch.set(leaderboardRef, { points: result.points }, { merge: true });
+                    // Update Leaderboard (Always uses Auth UID)
+                    // Only update if there are new badge points to add
+                    if (newBadgeXp > 0) {
+                        const leaderboardRef = doc(db, 'leaderboard', authUid);
+                        batch.set(leaderboardRef, { points: increment(newBadgeXp) }, { merge: true });
+                    }
 
-                count++;
-                batchCount++;
-                if (batchCount >= 400) {
-                    await batch.commit();
-                    setMigrationLog((prev: string[]) => [...prev, `Processed ${count} users...`]);
-                    batchCount = 0;
+                    // Track statistics
+                    stats.newBadgesAwarded += newBadges.length;
+                    stats.totalXpAwarded += newBadgeXp;
+                    stats.usersWithChanges++;
+                    
+                    setMigrationLog((prev: string[]) => [...prev, 
+                        `✓ ${docId}: +${newBadges.length} badges, +${newBadgeXp} XP`
+                    ]);
+
+                    stats.processedUsers++;
+                    count++;
+                    batchCount++;
+                    
+                    if (batchCount >= 400) {
+                        await batch.commit();
+                        setMigrationLog((prev: string[]) => [...prev, `Processed ${count}/${stats.totalUsers} users...`]);
+                        batchCount = 0;
+                    }
+                } catch (err) {
+                    console.error(`Error processing user ${docId}:`, err);
+                    setMigrationLog((prev: string[]) => [...prev, `❌ Error processing ${docId}: ${err}`]);
+                    stats.errors++;
+                    stats.skippedUsers++;
                 }
             }
 
@@ -945,13 +1003,26 @@ export default function AdminDashboard({ initialAuth = false }: AdminDashboardPr
                 await batch.commit();
             }
 
-            setMigrationLog((prev: string[]) => [...prev, `Recalculation Complete. Processed ${count} users.`]);
-            alert("Recalculation Complete!");
+            // Final summary
+            setMigrationLog((prev: string[]) => [...prev, '']);
+            setMigrationLog((prev: string[]) => [...prev, '═══════════════════════════════════════']);
+            setMigrationLog((prev: string[]) => [...prev, 'RECALCULATION COMPLETE']);
+            setMigrationLog((prev: string[]) => [...prev, '═══════════════════════════════════════']);
+            setMigrationLog((prev: string[]) => [...prev, `Total Users: ${stats.totalUsers}`]);
+            setMigrationLog((prev: string[]) => [...prev, `Processed: ${stats.processedUsers}`]);
+            setMigrationLog((prev: string[]) => [...prev, `Skipped (no changes): ${stats.skippedUsers}`]);
+            setMigrationLog((prev: string[]) => [...prev, `Users with Changes: ${stats.usersWithChanges}`]);
+            setMigrationLog((prev: string[]) => [...prev, `New Badges Awarded: ${stats.newBadgesAwarded}`]);
+            setMigrationLog((prev: string[]) => [...prev, `Total XP Awarded: ${stats.totalXpAwarded}`]);
+            setMigrationLog((prev: string[]) => [...prev, `Errors: ${stats.errors}`]);
+            setMigrationLog((prev: string[]) => [...prev, '═══════════════════════════════════════']);
+
+            alert(`Recalculation Complete!\n\nTotal Users: ${stats.totalUsers}\nProcessed: ${stats.processedUsers}\nNew Badges: ${stats.newBadgesAwarded}\nTotal XP Awarded: ${stats.totalXpAwarded}\nErrors: ${stats.errors}`);
 
         } catch (error) {
             console.error("Recalculation failed:", error);
-            setMigrationLog((prev: string[]) => [...prev, `Fatal Error: ${error}`]);
-            alert("Recalculation failed.");
+            setMigrationLog((prev: string[]) => [...prev, `❌ Fatal Error: ${error}`]);
+            alert(`Recalculation failed: ${error}`);
         } finally {
             setMigrating(false);
         }
