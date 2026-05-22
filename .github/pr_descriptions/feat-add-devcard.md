@@ -124,7 +124,7 @@ Scoped CSS for the card. Highlights:
 - [ ] Avatar ring spins continuously
 - [ ] Download button produces a `devcard-{name}.png` at 2× resolution
 - [ ] Downloaded PNG shows only the card (no browser chrome or surrounding page)
-- [ ] Copy link button copies `{origin}/u?uid={uid}` and resets after 2.5 s
+- [ ] Copy link button copies `{origin}/u/{uid}` and resets after 2.5 s
 - [ ] Card stacks to single column on mobile (below 600 px)
 - [ ] No console errors in development mode
 - [ ] `html2canvas` does not appear in the server-rendered HTML (lazy-loaded only)

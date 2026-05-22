@@ -12,7 +12,6 @@ import Rewards from '@/components/profile/Rewards';
 import FollowButton from '@/components/profile/FollowButton';
 import LoginHeatmap from '@/components/profile/LoginHeatmap';
 import DOMPurify from 'dompurify';
-import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { GIT_FALLBACK_STATS } from '@/lib/github';
 
@@ -80,10 +79,9 @@ interface Project {
     createdAt: any;
 }
 
-function ProfileContent() {
-    const searchParams = useSearchParams();
+function ProfileContent({ propUid }: { propUid?: string }) {
     const { user: currentUser } = useAuth();
-    const [uid, setUid] = useState<string | null>(null);
+    const [uid, setUid] = useState<string | null>(propUid || null);
     const [user, setUser] = useState<PublicUser | null>(null);
     const [projects, setProjects] = useState<Project[]>([]);
     const [loading, setLoading] = useState(true);
@@ -99,11 +97,10 @@ function ProfileContent() {
     };
 
     useEffect(() => {
-        const paramUid = searchParams.get('uid');
-        if (paramUid) {
-            setUid(paramUid);
+        if (propUid) {
+            setUid(propUid);
         }
-    }, [searchParams]);
+    }, [propUid]);
 
     useEffect(() => {
         const fetchUserAndProjects = async () => {
@@ -887,10 +884,10 @@ function ProfileContent() {
     );
 }
 
-export default function ProfileClient() {
+export default function ProfileClient({ uid }: { uid?: string }) {
     return (
         <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-background"><div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div></div>}>
-            <ProfileContent />
+            <ProfileContent propUid={uid} />
         </Suspense>
     );
 }

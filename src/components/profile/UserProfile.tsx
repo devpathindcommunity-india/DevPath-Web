@@ -192,7 +192,7 @@ useEffect(() => {
 
     const handleShareProfile = () => {
         if (!user) return;
-        const url = `${window.location.origin}/u?uid=${user.uid}`;
+        const url = `${window.location.origin}/u/${user.uid}`;
         navigator.clipboard.writeText(url);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -938,7 +938,7 @@ useEffect(() => {
                                             <h4 className="font-bold truncate">{u.name}</h4>
                                             <p className="text-xs text-muted-foreground truncate">@{u.email?.split('@')[0]}</p>
                                         </div>
-                                        <a href={`/u?uid=${u.uid}`} className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20">
+                                        <a href={`/u/${u.uid}`} className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20">
                                             View
                                         </a>
                                     </div>
