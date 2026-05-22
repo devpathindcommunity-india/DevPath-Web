@@ -417,17 +417,6 @@ export default function ResourcesTabs() {
                 isOpen={isMindsetModalOpen}
                 onClose={() => setIsMindsetModalOpen(false)}
             />
-
-            {/* Header */}
-            <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                    Developer Resources
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Curated tools, prompts, and roadmaps to accelerate your career.
-                </p>
-            </div>
-
             {/* Main Navigation (Top Level) */}
             <div className="flex flex-wrap justify-center gap-4 mb-10">
                 {mainSections.map((section) => {
