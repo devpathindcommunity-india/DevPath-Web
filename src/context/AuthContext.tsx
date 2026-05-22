@@ -79,7 +79,6 @@ interface AuthContextType {
     login: (email: string, pass: string) => Promise<void>;
     logout: () => Promise<void>;
     updateUserProfile: (data: Partial<User>) => Promise<void>;
-    awardPoints: (pointsDelta: number) => Promise<void>;
     followUser: (targetUserId: string, targetRole?: string, targetEmail?: string) => Promise<void>;
     unfollowUser: (targetUserId: string, targetRole?: string, targetEmail?: string) => Promise<void>;
     followCommunity: () => Promise<void>;
@@ -391,14 +390,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 Object.entries(data).filter(([_, v]) => v !== undefined)
             );
 
-            // NOTE: Avoid absolute writes for `points`. Those can overwrite concurrent
-            // `increment()` writes and corrupt XP totals/leaderboard.
-            if ((cleanData as any).points !== undefined) {
-                console.warn("[updateUserProfile] Ignoring `points` field. Use awardPoints(pointsDelta) instead.");
-                delete (cleanData as any).points;
-            }
-
             await setDoc(doc(db, collectionName, docId), cleanData, { merge: true });
+
+            // Sync to Leaderboard if points are updated
+            if (data.points !== undefined) {
+                const leaderboardRef = doc(db, 'leaderboard', user.uid);
+                setDoc(leaderboardRef, {
+                    points: data.points,
+                    name: data.name || user.name, // Update name/photo if changed too
+                    photoURL: data.photoURL || user.photoURL,
+                    lastActive: new Date().toISOString().split('T')[0]
+                }, { merge: true }).catch(err => console.error("Error syncing leaderboard:", err));
+            }
 
             // 2. Update Auth Profile (if name or photoURL changed)
             if (data.name || data.photoURL) {
@@ -417,39 +420,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error("Error updating profile:", error);
             throw error;
         }
-    };
-
-    const awardPoints = async (pointsDelta: number) => {
-        if (!user || !auth.currentUser) return;
-        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
-        if (!Number.isFinite(pointsDelta) || pointsDelta === 0) return;
-
-        const { writeBatch, increment } = await import('firebase/firestore');
-        const batch = writeBatch(db);
-
-        const collectionName = user.role === 'admin' ? 'admins' : 'members';
-        const docId = user.docId || (user.role === 'admin' ? user.email!.toLowerCase() : user.uid);
-        const userRef = doc(db, collectionName, docId);
-
-        batch.set(userRef, { points: increment(pointsDelta) }, { merge: true });
-
-        const today = new Date().toISOString().split('T')[0];
-        const leaderboardRef = doc(db, 'leaderboard', user.uid);
-        batch.set(leaderboardRef, {
-            uid: user.uid,
-            name: user.name,
-            photoURL: user.photoURL,
-            points: increment(pointsDelta),
-            role: user.role,
-            lastActive: today
-        }, { merge: true });
-
-        await batch.commit();
-
-        setUser(prev => prev ? {
-            ...prev,
-            points: (prev.points || 0) + pointsDelta
-        } : null);
     };
 
     const followUser = async (targetUserId: string, targetRole: string = 'member', targetEmail?: string) => {
@@ -608,7 +578,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, awardPoints, followUser, unfollowUser, followCommunity, isLoading, isAdminVerified, verifyAdmin }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, followUser, unfollowUser, followCommunity, isLoading, isAdminVerified, verifyAdmin }}>
             {children}
         </AuthContext.Provider>
     );

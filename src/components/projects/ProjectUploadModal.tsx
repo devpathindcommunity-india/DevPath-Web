@@ -149,21 +149,12 @@ export default function ProjectUploadModal({ isOpen, onClose, userId, userEmail,
                 const rootRef    = doc(db, 'projects', newId);
                 const subRef     = doc(db, 'members', userId, 'projects', newId);
                 const memberRef  = doc(db, 'members', userId);
-                const leaderboardRef = doc(db, 'leaderboard', userId);
-                const today = new Date().toISOString().split('T')[0];
 
                 batch.set(rootRef,   newProjectData);
                 batch.set(subRef,    newProjectData);
                 // XP award is part of the same atomic batch — it only lands if both
                 // project writes succeed.
                 batch.update(memberRef, { points: increment(POINTS.CREATE_PROJECT) });
-                batch.set(leaderboardRef, {
-                    uid: userId,
-                    name: userName,
-                    points: increment(POINTS.CREATE_PROJECT),
-                    role: 'member',
-                    lastActive: today
-                }, { merge: true });
             }
 
             await batch.commit();

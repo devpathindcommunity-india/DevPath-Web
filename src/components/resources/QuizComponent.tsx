@@ -25,7 +25,7 @@ export interface QuizComponentProps {
  */
 export default function QuizComponent({ quizId, questions, onComplete, title = "Quiz Time" }: QuizComponentProps) {
   const { addXp } = useGamification();
-  const { user, updateUserProfile, awardPoints } = useAuth();
+  const { user, updateUserProfile } = useAuth();
 
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState("");
@@ -80,12 +80,13 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
             if (!completed.includes(quizId) && passed) {
               const newQuizzes = [...completed, quizId];
               const pointsEarned = isPerfect ? 350 : 200;
-               
-              // Update quiz progress (non-point fields)
-              await updateUserProfile({ completedQuizzes: newQuizzes });
-
-              // Award XP atomically (also keeps leaderboard in sync)
-              await awardPoints(pointsEarned);
+              const newPoints = (user.points || 0) + pointsEarned;
+              
+              // Update Firestore
+              await updateUserProfile({
+                completedQuizzes: newQuizzes,
+                points: newPoints
+              });
 
               // Firestore already received the points update above; this call only shows feedback.
               addXp(

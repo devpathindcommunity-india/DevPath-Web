@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { addDoc, collection, serverTimestamp, updateDoc, doc, increment, setDoc } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, updateDoc, doc, increment } from 'firebase/firestore';
 import { POINTS } from '@/lib/points';
 import { db } from '@/lib/firebase';
 
@@ -43,15 +43,6 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
             await updateDoc(doc(db, 'members', userId), {
                 points: increment(POINTS.CREATE_DISCUSSION)
             });
-
-            const today = new Date().toISOString().split('T')[0];
-            await setDoc(doc(db, 'leaderboard', userId), {
-                uid: userId,
-                name: userName,
-                points: increment(POINTS.CREATE_DISCUSSION),
-                role: 'member',
-                lastActive: today
-            }, { merge: true });
 
             onSuccess();
             onClose();
