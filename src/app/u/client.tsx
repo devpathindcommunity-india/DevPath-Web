@@ -92,6 +92,10 @@ function ProfileContent() {
     const [copied, setCopied] = useState(false);
     const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+    // Derived privacy check - combines error state with privacy setting
+    const isProfilePrivate = error === 'This profile is private.' || user?.privacySettings?.isPublic === false;
+    const isProfileOwner = currentUser?.uid === uid;
+
     // Helper to strip HTML for preview
     const stripHtml = (html: string) => {
         if (!html) return '';
@@ -354,17 +358,50 @@ function ProfileContent() {
     }
 
     if (error || !user) {
+        // If it's a privacy error and user is the owner, allow access
+        if (error === 'This profile is private.' && isProfileOwner) {
+            // Clear the error and allow access for profile owner
+            setError('');
+        } else {
+            return (
+                <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
+                    <UserIcon size={64} className="text-muted-foreground mb-4" />
+                    <h1 className="text-2xl font-bold mb-2">Profile Not Found</h1>
+                    <p className="text-muted-foreground">{error || "The user you are looking for does not exist."}</p>
+                </div>
+            );
+        }
+    }
+
+    // Additional guard - if user is still null after error handling, return
+    if (!user) {
         return (
             <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4 text-center">
                 <UserIcon size={64} className="text-muted-foreground mb-4" />
                 <h1 className="text-2xl font-bold mb-2">Profile Not Found</h1>
-                <p className="text-muted-foreground">{error || "The user you are looking for does not exist."}</p>
+                <p className="text-muted-foreground">The user you are looking for does not exist.</p>
             </div>
         );
     }
 
     const showMobile = user.privacySettings?.showMobile;
     const showLocation = user.privacySettings?.showLocation ?? true;
+
+    // Privacy guard wrapper for all tab content
+    const PrivacyGuard = ({ children }: { children: React.ReactNode }) => {
+        if (isProfilePrivate && !isProfileOwner) {
+            return (
+                <div className="min-h-[400px] flex flex-col items-center justify-center bg-muted/20 rounded-xl border border-border/50 border-dashed">
+                    <Shield size={48} className="text-muted-foreground mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">Private Profile</h3>
+                    <p className="text-muted-foreground text-center max-w-md">
+                        This profile is set to private. Only the profile owner can view this content.
+                    </p>
+                </div>
+            );
+        }
+        return <>{children}</>;
+    };
 
     return (
         <section className={styles.profile}>
@@ -622,191 +659,209 @@ function ProfileContent() {
                 <div className={styles.tabs}>
                     <div
                         className={`${styles.tab} ${activeTab === 'Overview' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('Overview')}
+                        onClick={() => !isProfilePrivate && setActiveTab('Overview')}
+                        style={{ opacity: isProfilePrivate ? 0.5 : 1, pointerEvents: isProfilePrivate ? 'none' : 'auto' }}
                     >
                         Overview
                     </div>
                     <div
                         className={`${styles.tab} ${activeTab === 'Projects' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('Projects')}
-                        style={{ display: user.privacySettings?.showProjects === false ? 'none' : 'block' }}
+                        onClick={() => !isProfilePrivate && setActiveTab('Projects')}
+                        style={{
+                            display: (isProfilePrivate || user.privacySettings?.showProjects === false) ? 'none' : 'block',
+                            opacity: isProfilePrivate ? 0.5 : 1,
+                            pointerEvents: isProfilePrivate ? 'none' : 'auto'
+                        }}
                     >
                         Projects
                     </div>
                     <div
                         className={`${styles.tab} ${activeTab === 'Achievements' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('Achievements')}
+                        onClick={() => !isProfilePrivate && setActiveTab('Achievements')}
+                        style={{ opacity: isProfilePrivate ? 0.5 : 1, pointerEvents: isProfilePrivate ? 'none' : 'auto' }}
                     >
                         Achievements
                     </div>
                     <div
                         className={`${styles.tab} ${activeTab === 'Rewards' ? styles.activeTab : ''}`}
-                        onClick={() => setActiveTab('Rewards')}
-                        style={{ display: user.privacySettings?.showRewards === false ? 'none' : 'block' }}
+                        onClick={() => !isProfilePrivate && setActiveTab('Rewards')}
+                        style={{
+                            display: (isProfilePrivate || user.privacySettings?.showRewards === false) ? 'none' : 'block',
+                            opacity: isProfilePrivate ? 0.5 : 1,
+                            pointerEvents: isProfilePrivate ? 'none' : 'auto'
+                        }}
                     >
                         Rewards
                     </div>
                 </div>
 
                 {activeTab === 'Overview' && (
-                    <div className="space-y-6">
-                        {/* Contribution Heatmap */}
-                        <div>
-                            <h2 className={styles.sectionTitle}>Contribution Activity</h2>
-                            <LoginHeatmap loginDates={user.loginDates} />
+                    <PrivacyGuard>
+                        <div className="space-y-6">
+                            {/* Contribution Heatmap */}
+                            <div>
+                                <h2 className={styles.sectionTitle}>Contribution Activity</h2>
+                                <LoginHeatmap loginDates={user.loginDates} />
+                            </div>
+
+
                         </div>
-
-
-                    </div>
+                    </PrivacyGuard>
                 )}
 
                 {activeTab === 'Projects' && (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4">
-                        {projects.length === 0 ? (
-                            <div className="col-span-full text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
-                                <Target size={48} className="mx-auto mb-4 opacity-50" />
-                                <p>No projects showcased yet.</p>
-                            </div>
-                        ) : (
-                            projects.map(project => (
-                                <div key={project.id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-                                    {/* Media Display: Screenshots OR Video */}
-                                    <div className="aspect-video bg-muted relative group overflow-hidden">
-                                        {project.videoUrl ? (
-                                            <div className="w-full h-full flex items-center justify-center bg-black/5">
-                                                <a
-                                                    href={project.videoUrl}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="flex flex-col items-center gap-2 text-primary hover:scale-105 transition-transform"
-                                                >
-                                                    <div className="p-3 bg-background rounded-full shadow-lg">
-                                                        <Video size={32} />
-                                                    </div>
-                                                    <span className="text-sm font-medium bg-background/80 px-2 py-1 rounded-md">Watch Video</span>
-                                                </a>
-                                            </div>
-                                        ) : (
-                                            <>
-                                                {project.screenshots.length > 0 ? (
-                                                    <Image
-                                                        src={project.screenshots[0]}
-                                                        alt={project.title}
-                                                        fill
-                                                        className="object-cover transition-transform group-hover:scale-105"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                                                        <ImageIcon size={32} />
-                                                    </div>
-                                                )}
-                                                {project.screenshots.length > 1 && (
-                                                    <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
-                                                        +{project.screenshots.length - 1} more
-                                                    </div>
-                                                )}
-                                            </>
-                                        )}
-                                    </div>
-
-                                    <div className="p-4">
-                                        <div className="flex justify-between items-start mb-2">
-                                            <h3 className="font-bold text-lg line-clamp-1" title={project.title}>{project.title}</h3>
-                                            <div className="flex gap-1">
-                                                {project.websiteUrl && (
+                    <PrivacyGuard>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-in fade-in slide-in-from-bottom-4">
+                            {projects.length === 0 ? (
+                                <div className="col-span-full text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
+                                    <Target size={48} className="mx-auto mb-4 opacity-50" />
+                                    <p>No projects showcased yet.</p>
+                                </div>
+                            ) : (
+                                projects.map(project => (
+                                    <div key={project.id} className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                        {/* Media Display: Screenshots OR Video */}
+                                        <div className="aspect-video bg-muted relative group overflow-hidden">
+                                            {project.videoUrl ? (
+                                                <div className="w-full h-full flex items-center justify-center bg-black/5">
                                                     <a
-                                                        href={project.websiteUrl}
+                                                        href={project.videoUrl}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
-                                                        title="Visit Website"
+                                                        className="flex flex-col items-center gap-2 text-primary hover:scale-105 transition-transform"
                                                     >
-                                                        <Globe size={16} />
+                                                        <div className="p-3 bg-background rounded-full shadow-lg">
+                                                            <Video size={32} />
+                                                        </div>
+                                                        <span className="text-sm font-medium bg-background/80 px-2 py-1 rounded-md">Watch Video</span>
                                                     </a>
-                                                )}
-                                            </div>
+                                                </div>
+                                            ) : (
+                                                <>
+                                                    {project.screenshots.length > 0 ? (
+                                                        <Image
+                                                            src={project.screenshots[0]}
+                                                            alt={project.title}
+                                                            fill
+                                                            className="object-cover transition-transform group-hover:scale-105"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                                                            <ImageIcon size={32} />
+                                                        </div>
+                                                    )}
+                                                    {project.screenshots.length > 1 && (
+                                                        <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded-full">
+                                                            +{project.screenshots.length - 1} more
+                                                        </div>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
 
-                                        <div className="text-sm text-muted-foreground mb-3">
-                                            <p className="line-clamp-2">{stripHtml(project.description)}</p>
-                                            <button
-                                                onClick={() => setSelectedProject(project)}
-                                                className="text-primary text-xs font-medium hover:underline mt-1"
-                                            >
-                                                Read More
-                                            </button>
-                                        </div>
-
-                                        {project.skills && project.skills.length > 0 && (
-                                            <div className="flex flex-wrap gap-1 mb-4 h-6 overflow-hidden">
-                                                {project.skills.slice(0, 3).map(skill => (
-                                                    <span key={skill} className="text-[10px] px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-md">
-                                                        {skill}
-                                                    </span>
-                                                ))}
-                                                {project.skills.length > 3 && (
-                                                    <span className="text-[10px] px-1.5 py-0.5 bg-muted text-muted-foreground rounded-md">
-                                                        +{project.skills.length - 3}
-                                                    </span>
-                                                )}
+                                        <div className="p-4">
+                                            <div className="flex justify-between items-start mb-2">
+                                                <h3 className="font-bold text-lg line-clamp-1" title={project.title}>{project.title}</h3>
+                                                <div className="flex gap-1">
+                                                    {project.websiteUrl && (
+                                                        <a
+                                                            href={project.websiteUrl}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="p-1.5 text-muted-foreground hover:text-primary hover:bg-primary/10 rounded-full transition-colors"
+                                                            title="Visit Website"
+                                                        >
+                                                            <Globe size={16} />
+                                                        </a>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
 
-                                        <div className="flex items-center justify-between pt-3 border-t border-border">
-                                            <div className="flex items-center gap-4">
+                                            <div className="text-sm text-muted-foreground mb-3">
+                                                <p className="line-clamp-2">{stripHtml(project.description)}</p>
                                                 <button
-                                                    onClick={() => handleLikeProject(project.id, project.likes)}
-                                                    className={`flex items-center gap-1.5 text-sm transition-colors ${currentUser && project.likes.includes(currentUser.uid) ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
+                                                    onClick={() => setSelectedProject(project)}
+                                                    className="text-primary text-xs font-medium hover:underline mt-1"
                                                 >
-                                                    <Heart size={16} fill={currentUser && project.likes.includes(currentUser.uid) ? "currentColor" : "none"} />
-                                                    <span>{project.likes.length}</span>
-                                                </button>
-                                                <button
-                                                    onClick={() => handleShareProject(project.id)}
-                                                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
-                                                >
-                                                    <Share2 size={16} />
-                                                    <span>Share</span>
+                                                    Read More
                                                 </button>
                                             </div>
-                                            <span className="text-xs text-muted-foreground">
-                                                {formatDate(project.createdAt)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))
-                        )}
-                    </div>
-                )}
-                {activeTab === 'Achievements' && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {user.achievements && user.achievements.length > 0 ? (
-                                user.achievements.map((badgeId, index) => (
-                                    <div key={index} className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl">
-                                        <div className="p-3 bg-primary/10 text-primary rounded-full">
-                                            <Trophy size={24} />
-                                        </div>
-                                        <div>
-                                            <h3 className="font-bold capitalize">{badgeId.replace(/-/g, ' ')}</h3>
-                                            <p className="text-sm text-muted-foreground">Earned Badge</p>
+
+                                            {project.skills && project.skills.length > 0 && (
+                                                <div className="flex flex-wrap gap-1 mb-4 h-6 overflow-hidden">
+                                                    {project.skills.slice(0, 3).map(skill => (
+                                                        <span key={skill} className="text-[10px] px-1.5 py-0.5 bg-secondary text-secondary-foreground rounded-md">
+                                                            {skill}
+                                                        </span>
+                                                    ))}
+                                                    {project.skills.length > 3 && (
+                                                        <span className="text-[10px] px-1.5 py-0.5 bg-muted text-muted-foreground rounded-md">
+                                                            +{project.skills.length - 3}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            )}
+
+                                            <div className="flex items-center justify-between pt-3 border-t border-border">
+                                                <div className="flex items-center gap-4">
+                                                    <button
+                                                        onClick={() => handleLikeProject(project.id, project.likes)}
+                                                        className={`flex items-center gap-1.5 text-sm transition-colors ${currentUser && project.likes.includes(currentUser.uid) ? 'text-red-500' : 'text-muted-foreground hover:text-red-500'}`}
+                                                    >
+                                                        <Heart size={16} fill={currentUser && project.likes.includes(currentUser.uid) ? "currentColor" : "none"} />
+                                                        <span>{project.likes.length}</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleShareProject(project.id)}
+                                                        className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
+                                                    >
+                                                        <Share2 size={16} />
+                                                        <span>Share</span>
+                                                    </button>
+                                                </div>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {formatDate(project.createdAt)}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
                                 ))
-                            ) : (
-                                <div className="col-span-full text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
-                                    <Trophy size={48} className="mx-auto mb-4 opacity-50" />
-                                    <p>No achievements yet.</p>
-                                </div>
                             )}
                         </div>
-                    </div>
+                    </PrivacyGuard>
+                )}
+                {activeTab === 'Achievements' && (
+                    <PrivacyGuard>
+                        <div className="animate-in fade-in slide-in-from-bottom-4">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {user.achievements && user.achievements.length > 0 ? (
+                                    user.achievements.map((badgeId, index) => (
+                                        <div key={index} className="flex items-center gap-4 p-4 bg-card border border-border rounded-xl">
+                                            <div className="p-3 bg-primary/10 text-primary rounded-full">
+                                                <Trophy size={24} />
+                                            </div>
+                                            <div>
+                                                <h3 className="font-bold capitalize">{badgeId.replace(/-/g, ' ')}</h3>
+                                                <p className="text-sm text-muted-foreground">Earned Badge</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <div className="col-span-full text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
+                                        <Trophy size={48} className="mx-auto mb-4 opacity-50" />
+                                        <p>No achievements yet.</p>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </PrivacyGuard>
                 )}
                 {activeTab === 'Rewards' && (
-                    <div className="animate-in fade-in slide-in-from-bottom-4">
-                        <Rewards user={user} />
-                    </div>
+                    <PrivacyGuard>
+                        <div className="animate-in fade-in slide-in-from-bottom-4">
+                            <Rewards user={user} />
+                        </div>
+                    </PrivacyGuard>
                 )}
             </div >
 
