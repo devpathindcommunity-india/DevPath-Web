@@ -71,3 +71,9 @@ Thumbs.db
 
 # Temp
 tmp/
+
+# Additional local temp, log, and eslintcache rules
+firebase-debug.log*
+ui-debug.log*
+.eslintcache
+*.log
