@@ -5,17 +5,91 @@ import { Check, Upload, ArrowRight, ArrowLeft } from 'lucide-react';
 import Button from '../ui/Button';
 import styles from './SubmitWizard.module.css';
 
+interface FormData {
+    title: string;
+    description: string;
+    primaryLanguage: string;
+    frameworks: string;
+    thumbnail: string | null;
+    demoUrl: string;
+}
+
 const steps = ['Details', 'Tech Stack', 'Media', 'Review'];
 
 export default function SubmitWizard() {
     const [currentStep, setCurrentStep] = useState(0);
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [formData, setFormData] = useState<FormData>({
+        title: '',
+        description: '',
+        primaryLanguage: 'JavaScript',
+        frameworks: '',
+        thumbnail: null,
+        demoUrl: ''
+    });
+    const [errors, setErrors] = useState<Partial<Record<keyof FormData, string>> & { submit?: string }>({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const handleChange = (field: keyof FormData, value: string) => {
+        setFormData(prev => ({ ...prev, [field]: value }));
+        // Clear error for this field when user starts typing
+        if (errors[field]) {
+            setErrors(prev => ({ ...prev, [field]: undefined }));
+        }
+    };
+
+    const validateStep = (step: number): boolean => {
+        const newErrors: Partial<Record<keyof FormData, string>> = {};
+        
+        if (step === 0) {
+            if (!formData.title.trim()) newErrors.title = 'Title is required';
+            if (!formData.description.trim()) newErrors.description = 'Description is required';
+        }
+        
+        if (step === 1) {
+            if (!formData.frameworks.trim()) newErrors.frameworks = 'Frameworks are required';
+        }
+        
+        if (step === 2) {
+            if (!formData.demoUrl.trim()) newErrors.demoUrl = 'Demo URL is required';
+            if (formData.demoUrl && !formData.demoUrl.startsWith('http')) {
+                newErrors.demoUrl = 'Please enter a valid URL';
+            }
+        }
+        
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    const handleSubmit = async () => {
+        if (!validateStep(3)) return;
+        
+        setIsSubmitting(true);
+        
+        try {
+            // TODO: Integrate with Firebase project submission
+            // This would call the existing project submission logic
+            console.log('Submitting project:', formData);
+            
+            // Simulate API call
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            
+            setIsSubmitted(true);
+        } catch (error) {
+            console.error('Error submitting project:', error);
+            setErrors({ submit: 'Failed to submit project. Please try again.' });
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
 
     const handleNext = () => {
+        if (!validateStep(currentStep)) return;
+        
         if (currentStep < steps.length - 1) {
             setCurrentStep(currentStep + 1);
         } else {
-            setIsSubmitted(true);
+            handleSubmit();
         }
     };
 
@@ -75,11 +149,25 @@ export default function SubmitWizard() {
                         <div className="space-y-6">
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Project Title</label>
-                                <input type="text" className={styles.input} placeholder="e.g. AI Code Assistant" />
+                                <input 
+                                    type="text" 
+                                    className={styles.input} 
+                                    placeholder="e.g. AI Code Assistant"
+                                    value={formData.title}
+                                    onChange={(e) => handleChange('title', e.target.value)}
+                                />
+                                {errors.title && <span style={{ display: 'block', marginTop: '6px', fontSize: '14px', color: '#ef4444' }}>{errors.title}</span>}
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Description</label>
-                                <textarea className={styles.textarea} placeholder="Describe your project..." />
+                                <textarea 
+                                    className={styles.textarea} 
+                                    placeholder="Describe your project..."
+                                    value={formData.description}
+                                    onChange={(e) => handleChange('description', e.target.value)}
+                                    rows={4}
+                                />
+                                {errors.description && <span style={{ display: 'block', marginTop: '6px', fontSize: '14px', color: '#ef4444' }}>{errors.description}</span>}
                             </div>
                         </div>
                     )}
@@ -88,16 +176,27 @@ export default function SubmitWizard() {
                         <div className="space-y-6">
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Primary Language</label>
-                                <select className={styles.select}>
-                                    <option>JavaScript</option>
-                                    <option>Python</option>
-                                    <option>Go</option>
-                                    <option>Rust</option>
+                                <select 
+                                    className={styles.select}
+                                    value={formData.primaryLanguage}
+                                    onChange={(e) => handleChange('primaryLanguage', e.target.value)}
+                                >
+                                    <option value="JavaScript">JavaScript</option>
+                                    <option value="Python">Python</option>
+                                    <option value="Go">Go</option>
+                                    <option value="Rust">Rust</option>
                                 </select>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Frameworks</label>
-                                <input type="text" className={styles.input} placeholder="e.g. React, Next.js, Django" />
+                                <input 
+                                    type="text" 
+                                    className={styles.input} 
+                                    placeholder="e.g. React, Next.js, Django"
+                                    value={formData.frameworks}
+                                    onChange={(e) => handleChange('frameworks', e.target.value)}
+                                />
+                                {errors.frameworks && <span style={{ display: 'block', marginTop: '6px', fontSize: '14px', color: '#ef4444' }}>{errors.frameworks}</span>}
                             </div>
                         </div>
                     )}
@@ -109,11 +208,21 @@ export default function SubmitWizard() {
                                 <div className={styles.uploadArea}>
                                     <Upload size={32} style={{ margin: '0 auto 16px', color: 'var(--text-secondary)' }} />
                                     <p style={{ color: 'var(--text-secondary)' }}>Drag and drop or click to upload</p>
+                                    <p style={{ color: 'var(--text-secondary)', fontSize: '12px', marginTop: '8px' }}>
+                                        {formData.thumbnail ? 'File selected' : 'No file selected'}
+                                    </p>
                                 </div>
                             </div>
                             <div className={styles.formGroup}>
                                 <label className={styles.label}>Demo URL</label>
-                                <input type="url" className={styles.input} placeholder="https://" />
+                                <input 
+                                    type="url" 
+                                    className={styles.input} 
+                                    placeholder="https://"
+                                    value={formData.demoUrl}
+                                    onChange={(e) => handleChange('demoUrl', e.target.value)}
+                                />
+                                {errors.demoUrl && <span style={{ display: 'block', marginTop: '6px', fontSize: '14px', color: '#ef4444' }}>{errors.demoUrl}</span>}
                             </div>
                         </div>
                     )}
@@ -122,8 +231,30 @@ export default function SubmitWizard() {
                         <div className="space-y-6">
                             <h3 className={styles.label}>Review Details</h3>
                             <div style={{ background: 'var(--bg-primary)', padding: '16px', borderRadius: '12px' }}>
-                                <p style={{ color: 'var(--text-secondary)' }}>Please verify all information before submitting.</p>
+                                <div className="space-y-4">
+                                    <div>
+                                        <span className={styles.label}>Title:</span>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{formData.title || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                        <span className={styles.label}>Description:</span>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{formData.description || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                        <span className={styles.label}>Language:</span>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{formData.primaryLanguage}</p>
+                                    </div>
+                                    <div>
+                                        <span className={styles.label}>Frameworks:</span>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{formData.frameworks || 'Not provided'}</p>
+                                    </div>
+                                    <div>
+                                        <span className={styles.label}>Demo URL:</span>
+                                        <p style={{ color: 'var(--text-secondary)' }}>{formData.demoUrl || 'Not provided'}</p>
+                                    </div>
+                                </div>
                             </div>
+                            {errors.submit && <span style={{ display: 'block', marginTop: '6px', fontSize: '14px', color: '#ef4444' }}>{errors.submit}</span>}
                         </div>
                     )}
 
@@ -136,8 +267,12 @@ export default function SubmitWizard() {
                         >
                             <ArrowLeft size={20} /> Back
                         </Button>
-                        <Button variant="primary" onClick={handleNext}>
-                            {currentStep === steps.length - 1 ? 'Submit Project' : 'Next Step'} <ArrowRight size={20} />
+                        <Button 
+                            variant="primary" 
+                            onClick={handleNext}
+                            disabled={isSubmitting}
+                        >
+                            {isSubmitting ? 'Submitting...' : (currentStep === steps.length - 1 ? 'Submit Project' : 'Next Step')} {!isSubmitting && <ArrowRight size={20} />}
                         </Button>
                     </div>
                 </div>
