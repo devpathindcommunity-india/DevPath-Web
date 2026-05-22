@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { Github, Star, GitFork, CircleDot, GitPullRequest, BookOpen, Plus, ExternalLink, Loader2, AlertCircle } from 'lucide-react';
+import { Github, Star, GitFork, CircleDot, GitPullRequest, BookOpen, Plus, ExternalLink, Loader2, AlertCircle, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
 interface Repo {
@@ -27,8 +27,12 @@ interface Issue {
     html_url: string;
     state: string;
     created_at: string;
+    closed_at?: string;
     user: {
         login: string;
+    };
+    pull_request?: {
+        url: string;
     };
 }
 
@@ -244,24 +248,33 @@ export default function GitHubDashboard({ accessToken }: GitHubDashboardProps) {
                                 {loadingIssues ? (
                                     <div className="text-center py-4 text-muted-foreground text-sm">Loading issues...</div>
                                 ) : issues.length > 0 ? (
-                                    issues.map(issue => (
-                                        <div key={issue.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/40 transition-colors">
-                                            <div className="flex items-center gap-3 overflow-hidden">
-                                                {issue.html_url.includes('pull') ? (
-                                                    <GitPullRequest size={16} className="text-purple-500 shrink-0" />
-                                                ) : (
-                                                    <CircleDot size={16} className="text-green-500 shrink-0" />
-                                                )}
-                                                <span className="text-sm font-medium truncate">
-                                                    <span className="text-muted-foreground mr-2">#{issue.number}</span>
-                                                    {issue.title}
-                                                </span>
+                                    issues.map(issue => {
+                                        const isPR = !!issue.pull_request || issue.html_url.includes('pull');
+                                        const isClosed = issue.state === 'closed';
+
+                                        return (
+                                            <div key={issue.id} className="flex items-center justify-between p-3 bg-muted/20 rounded-lg hover:bg-muted/40 transition-colors">
+                                                <div className="flex items-center gap-3 overflow-hidden">
+                                                    {isPR ? (
+                                                        <GitPullRequest size={16} className={isClosed ? "text-muted-foreground shrink-0" : "text-purple-500 shrink-0"} />
+                                                    ) : (
+                                                        isClosed ? (
+                                                            <CheckCircle2 size={16} className="text-muted-foreground shrink-0" />
+                                                        ) : (
+                                                            <CircleDot size={16} className="text-green-500 shrink-0" />
+                                                        )
+                                                    )}
+                                                    <span className={`text-sm font-medium truncate ${isClosed ? 'text-muted-foreground' : ''}`}>
+                                                        <span className="text-muted-foreground mr-2">#{issue.number}</span>
+                                                        {issue.title}
+                                                    </span>
+                                                </div>
+                                                <Link href={issue.html_url} target="_blank" className="text-xs text-muted-foreground hover:text-primary whitespace-nowrap ml-2">
+                                                    View
+                                                </Link>
                                             </div>
-                                            <Link href={issue.html_url} target="_blank" className="text-xs text-muted-foreground hover:text-primary whitespace-nowrap ml-2">
-                                                View
-                                            </Link>
-                                        </div>
-                                    ))
+                                        );
+                                    })
                                 ) : (
                                     <div className="text-center py-4 text-muted-foreground text-sm">No recent issues found.</div>
                                 )}
