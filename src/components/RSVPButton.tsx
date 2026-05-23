@@ -21,7 +21,6 @@ export function RSVPButton({ eventId }: RSVPButtonProps) {
 
     /**
      * In-flight ref lock — synchronously set to true before the first await.
-     * This blocks any concurrent click handlers regardless of React re-render timing,
      * making duplicate Firestore writes structurally impossible.
      */
     const isSubmitting = useRef(false)
