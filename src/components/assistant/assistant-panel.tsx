@@ -45,7 +45,7 @@ export function AssistantPanel({
                             "border border-white/10 bg-background/90 shadow-2xl",
                             "backdrop-blur-2xl",
                             "md:bottom-auto md:right-8 md:top-24",
-                            "flex flex-col max-h-[calc(100vh-120px)] md:max-h-96"
+                            "flex flex-col max-h-[calc(100vh-120px)] md:max-h-[calc(100vh-180px)]"
                         )}
                     >
                         <AssistantHeader onClose={onClose} onExpand={onExpand} />
