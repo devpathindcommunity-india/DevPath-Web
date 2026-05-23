@@ -15,6 +15,7 @@ import DOMPurify from 'dompurify';
 import { useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { GIT_FALLBACK_STATS } from '@/lib/github';
+import { getSafeSocialUrl } from '@/lib/safe-social-url';
 
 interface PublicUser {
     id?: string;
@@ -365,6 +366,11 @@ function ProfileContent() {
 
     const showMobile = user.privacySettings?.showMobile;
     const showLocation = user.privacySettings?.showLocation ?? true;
+    const safeSocialLinks = {
+        github: getSafeSocialUrl(user.github, 'github'),
+        linkedin: getSafeSocialUrl(user.linkedin, 'linkedin'),
+        instagram: getSafeSocialUrl(user.instagram, 'instagram')
+    };
 
     return (
         <section className={styles.profile}>
@@ -421,18 +427,18 @@ function ProfileContent() {
                             </div>
 
                             <div className="flex flex-wrap gap-3 mt-3">
-                                {user.github && (
-                                    <a href={user.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                {safeSocialLinks.github && (
+                                    <a href={safeSocialLinks.github} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Github size={14} /> GitHub
                                     </a>
                                 )}
-                                {user.linkedin && (
-                                    <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                {safeSocialLinks.linkedin && (
+                                    <a href={safeSocialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Linkedin size={14} /> LinkedIn
                                     </a>
                                 )}
-                                {user.instagram && (
-                                    <a href={user.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
+                                {safeSocialLinks.instagram && (
+                                    <a href={safeSocialLinks.instagram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-sm hover:text-primary transition-colors">
                                         <Instagram size={14} /> Instagram
                                     </a>
                                 )}

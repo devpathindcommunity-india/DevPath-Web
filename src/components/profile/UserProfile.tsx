@@ -24,6 +24,7 @@ import { db } from '@/lib/firebase';
 import { calculateLevel } from '@/lib/points';
 import { getEmbedUrl } from '@/lib/utils';
 import { GIT_FALLBACK_STATS } from '@/lib/github';
+import { getSafeSocialUrl, sanitizeSocialLinks } from '@/lib/safe-social-url';
 
 /**
  * UserProfile component renders the main dashboard profile page for authenticated developers.
@@ -216,16 +217,17 @@ useEffect(() => {
     const handleSaveAbout = async () => {
         setIsSaving(true);
         try {
+            const safeSocialLinks = sanitizeSocialLinks(socialLinks);
+
             await updateUserProfile({
                 aboutMarkdown: aboutContent,
-                github: socialLinks.github,
-                linkedin: socialLinks.linkedin,
-                instagram: socialLinks.instagram
+                ...safeSocialLinks
             });
+            setSocialLinks(safeSocialLinks);
             setIsEditingAbout(false);
         } catch (error) {
             console.error("Failed to update profile:", error);
-            alert("Failed to update profile. Please try again.");
+            alert(error instanceof Error ? error.message : "Failed to update profile. Please try again.");
         } finally {
             setIsSaving(false);
         }
@@ -293,6 +295,12 @@ useEffect(() => {
             </div>
         );
     }
+
+    const safeSocialLinks = {
+        github: getSafeSocialUrl(user.github, 'github'),
+        linkedin: getSafeSocialUrl(user.linkedin, 'linkedin'),
+        instagram: getSafeSocialUrl(user.instagram, 'instagram')
+    };
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-8 px-4 md:px-8">
@@ -402,9 +410,9 @@ useEffect(() => {
                         </div>
 
                         <div className="flex gap-3 mt-6">
-                            {user.github && <a href={user.github} target="_blank" className="text-muted-foreground hover:text-foreground"><Github size={20} /></a>}
-                            {user.linkedin && <a href={user.linkedin} target="_blank" className="text-muted-foreground hover:text-foreground"><Linkedin size={20} /></a>}
-                            {user.instagram && <a href={user.instagram} target="_blank" className="text-muted-foreground hover:text-foreground"><Instagram size={20} /></a>}
+                            {safeSocialLinks.github && <a href={safeSocialLinks.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Github size={20} /></a>}
+                            {safeSocialLinks.linkedin && <a href={safeSocialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Linkedin size={20} /></a>}
+                            {safeSocialLinks.instagram && <a href={safeSocialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Instagram size={20} /></a>}
                         </div>
                     </div>
 
