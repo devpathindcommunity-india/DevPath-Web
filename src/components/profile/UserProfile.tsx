@@ -397,13 +397,13 @@ useEffect(() => {
                             <div className="flex items-center gap-2 text-muted-foreground">
                                 <Calendar size={16} />
                                 <span>Joined {(() => {
-                                    if (!user.createdAt) return 'Dec 2023';
+                                    if (!user.createdAt) return "Recently";
                                     try {
                                         const d = new Date(user.createdAt.seconds ? user.createdAt.seconds * 1000 : user.createdAt);
-                                        if (isNaN(d.getTime())) return 'Dec 2023';
+                                        if (isNaN(d.getTime())) return "Recently";
                                         return d.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
                                     } catch (e) {
-                                        return 'Dec 2023';
+                                        return "Recently";
                                     }
                                 })()}</span>
                             </div>
