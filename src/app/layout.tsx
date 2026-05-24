@@ -13,6 +13,7 @@ import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { ThemeProvider } from "@/components/providers/theme-provider";
 import { FloatingAssistant } from "@/components/assistant/floating-assistant";
+import { getThemeInitScript } from "@/lib/theme-script";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -96,6 +97,12 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        {/* Theme initialization script - runs before hydration to prevent flash-of-incorrect-theme */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: getThemeInitScript(),
+          }}
+        />
         <script
           async
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192400464044260"
