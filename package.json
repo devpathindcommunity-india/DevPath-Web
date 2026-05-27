@@ -30,7 +30,7 @@
     "react-markdown": "^10.1.0",
     "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
-    "three": "^0.182.0"
+    "three": "^0.184.0"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
