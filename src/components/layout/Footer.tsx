@@ -73,6 +73,7 @@ export default function Footer() {
                             <a
                                 href={`mailto:${siteConfig.contact.email}`}
                                 className="text-sm text-cyan-400 hover:underline"
+                                aria-label={`Send email to ${siteConfig.contact.email}`}
                             >
                                 {siteConfig.contact.email}
                             </a>
