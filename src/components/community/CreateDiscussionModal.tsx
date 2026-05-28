@@ -2,9 +2,9 @@
 
 import { useState } from 'react';
 import { X, Loader2 } from 'lucide-react';
-import { addDoc, collection, serverTimestamp, updateDoc, doc, increment, setDoc } from 'firebase/firestore';
-import { POINTS } from '@/lib/points';
 import { db } from '@/lib/firebase';
+import {writeBatch, doc, collection, serverTimestamp, increment } from 'firebase/firestore';
+import { POINTS } from '@/lib/points';
 
 interface CreateDiscussionModalProps {
     isOpen: boolean;
@@ -28,8 +28,11 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
 
         try {
             const tagsArray = tags.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0);
-
-            await addDoc(collection(db, 'discussions'), {
+            const batch = writeBatch(db);
+            
+            const discussionRef = doc(collection(db, 'discussions'));
+            const memberRef = doc(db, 'members', userId);
+            batch.set(discussionRef,{
                 authorId: userId,
                 authorName: userName,
                 title,
@@ -38,26 +41,16 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
                 likes: [],
                 replyCount: 0,
                 createdAt: serverTimestamp()
-            });
-            
-            await updateDoc(doc(db, 'members', userId), {
-                points: increment(POINTS.CREATE_DISCUSSION)
-            });
-
-            const today = new Date().toISOString().split('T')[0];
-            await setDoc(doc(db, 'leaderboard', userId), {
-                uid: userId,
-                name: userName,
-                points: increment(POINTS.CREATE_DISCUSSION),
-                role: 'member',
-                lastActive: today
-            }, { merge: true });
-
-            onSuccess();
-            onClose();
+                });
+                batch.update(memberRef, {
+                    points: increment(POINTS.CREATE_DISCUSSION)
+                });
+            await batch.commit();
             setTitle('');
             setContent('');
             setTags('');
+            onSuccess();
+            onClose();
         } catch (error) {
             console.error("Error creating discussion:", error);
             alert("Failed to create discussion. Please try again.");

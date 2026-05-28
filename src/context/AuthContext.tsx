@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { leaderboardSyncErrorEmitter } from '@/lib/leaderboard-sync-error';
 
 interface User {
     uid: string;
@@ -90,6 +91,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -97,7 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeSnapshot = useRef<(() => void) | null>(null);
 
 
-    const SUPER_ADMIN_EMAIL = 'devpathind.community@gmail.com';
+    const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || 'devpathind.community@gmail.com';
+
 
     useEffect(() => {
         // Ensure persistence is set to local
@@ -267,9 +270,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         if (currentStreak > (userData.streak || 0)) {
                             pointsDelta += POINTS.DAILY_LOGIN;
 
-                            // Streak Bonus logic simplified: 1 point per day (via DAILY_LOGIN)
-                            // pointsDelta += (currentStreak * POINTS.STREAK_BONUS_PER_DAY); // Removed multiplier
-
                             // 7-Day Streak Bonus
                             if (currentStreak % 7 === 0 && currentStreak > 0) {
                                 pointsDelta += POINTS.WEEKLY_STREAK_BONUS;
@@ -299,7 +299,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 points: increment(pointsDelta),
                                 role: role,
                                 lastActive: today
-                            }, { merge: true }).catch(err => console.error("Error updating leaderboard:", err));
+                            }, { merge: true }).catch(err => {
+                                leaderboardSyncErrorEmitter.emit(err, 'login-streak-sync');
+                            });
                         }
 
                         setDoc(doc(db, collectionName, docId), firestoreUpdate, { merge: true }).catch(err => console.error("Error updating user data:", err));
@@ -341,15 +343,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Update Firestore with Session ID
         if (userCredential.user) {
-            // We need to know if it's an admin or member to update the right collection
-            // But at this point we might not know the role for sure without fetching.
-            // However, we can try updating both or checking.
-            // Actually, onAuthStateChanged will fire and fetch the user.
-            // But we need to set the sessionId BEFORE the listener potentially logs us out?
-            // No, the listener checks data.sessionId. If it's empty in DB, it might be fine?
-            // But we want to enforce it.
 
-            // Let's fetch the doc to know where to write.
             const { doc, getDoc, setDoc } = await import('firebase/firestore');
 
             // Check Admin
@@ -378,7 +372,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const updateUserProfile = async (data: Partial<User>) => {
         if (!user || !auth.currentUser) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
 
         try {
             // 1. Update Firestore
@@ -391,8 +385,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 Object.entries(data).filter(([_, v]) => v !== undefined)
             );
 
-            // NOTE: Avoid absolute writes for `points`. Those can overwrite concurrent
-            // `increment()` writes and corrupt XP totals/leaderboard.
             if ((cleanData as any).points !== undefined) {
                 console.warn("[updateUserProfile] Ignoring `points` field. Use awardPoints(pointsDelta) instead.");
                 delete (cleanData as any).points;
@@ -444,7 +436,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             lastActive: today
         }, { merge: true });
 
-        await batch.commit();
+        try {
+            await batch.commit();
+        } catch (error) {
+            leaderboardSyncErrorEmitter.emit(error, 'awardPoints');
+            throw error; // Re-throw so callers know it failed
+        }
 
         setUser(prev => prev ? {
             ...prev,
@@ -478,9 +475,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Use targetUserId directly as it is resolved correctly by client.tsx (Document ID)
             const targetDocId = targetUserId;
 
-            console.log(`[followUser] Target: ${targetCollection}/${targetDocId}`);
-            console.log(`[followUser] Target Role: ${targetRole}, Email: ${targetEmail}, UID: ${targetUserId}`);
-
             const targetUserRef = doc(db, targetCollection, targetDocId);
 
             const updateData: any = {
@@ -504,7 +498,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }, { merge: true });
             }
 
-            await batch.commit();
+            try {
+                await batch.commit();
+            } catch (error) {
+                leaderboardSyncErrorEmitter.emit(error, 'followUser-leaderboard-sync');
+                throw error;
+            }
 
             // Update local state
             setUser(prev => prev ? { ...prev, following: [...(prev.following || []), targetUserId] } : null);
@@ -516,7 +515,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unfollowUser = async (targetUserId: string, targetRole: string = 'member', targetEmail?: string) => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         try {
             const batch = (await import('firebase/firestore')).writeBatch(db);
             const arrayRemove = (await import('firebase/firestore')).arrayRemove;
@@ -560,7 +559,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }, { merge: true });
             }
 
-            await batch.commit();
+            try {
+                await batch.commit();
+            } catch (error) {
+                leaderboardSyncErrorEmitter.emit(error, 'unfollowUser-leaderboard-sync');
+                throw error;
+            }
 
             // Update local state
             setUser(prev => prev ? { ...prev, following: (prev.following || []).filter(id => id !== targetUserId) } : null);
@@ -572,7 +576,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const followCommunity = async () => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         // Check if already followed (using a flag or badge)
         if (user.achievements?.includes('community_follower')) return;
 
@@ -592,9 +596,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Sync to Leaderboard
             const leaderboardRef = doc(db, 'leaderboard', user.uid);
-            await setDoc(leaderboardRef, {
-                points: increment(POINTS.FOLLOW_COMMUNITY)
-            }, { merge: true });
+            try {
+                await setDoc(leaderboardRef, {
+                    points: increment(POINTS.FOLLOW_COMMUNITY)
+                }, { merge: true });
+            } catch (syncError) {
+                leaderboardSyncErrorEmitter.emit(syncError, 'followCommunity-leaderboard-sync');
+                // Don't re-throw here since the main points were already awarded
+            }
 
             setUser(prev => prev ? {
                 ...prev,

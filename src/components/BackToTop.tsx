@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
-const BackToTop = () => {
-  const [isVisible, setIsVisible] = useState(false);
+const BackToTop = (): JSX.Element | null => {
+  const [isVisible, setIsVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    const toggleVisibility = () => {
+    const toggleVisibility = (): void => {
       if (window.scrollY > 300) {
         setIsVisible(true);
       } else {
@@ -22,7 +22,7 @@ const BackToTop = () => {
     };
   }, []);
 
-  const scrollToTop = () => {
+  const scrollToTop = (): void => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",

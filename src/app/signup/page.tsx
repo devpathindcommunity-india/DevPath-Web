@@ -52,6 +52,12 @@ export default function SignupPage() {
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (!/^\d{10}$/.test(mobile)) {
+            setError('Please enter a valid 10-digit mobile number.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -221,9 +227,11 @@ export default function SignupPage() {
                                     <input
                                         type="tel"
                                         value={mobile}
-                                        onChange={(e) => setMobile(e.target.value)}
+                                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
                                         className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                         placeholder="98765 43210"
+                                        pattern="[0-9]{10}"
+                                        maxLength={10}
                                         required
                                     />
                                 </div>

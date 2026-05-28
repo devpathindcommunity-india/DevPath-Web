@@ -144,7 +144,6 @@ export function GamificationProvider({ children }: { children: React.ReactNode }
         const newLevel = Math.floor(Math.sqrt(newXp / 100));
         
         if (user && shouldPersist) {
-            // Persist XP using atomic increments to avoid overwriting concurrent updates.
             awardPoints(amount).catch(err => console.error("Failed to award XP", err));
         }
 

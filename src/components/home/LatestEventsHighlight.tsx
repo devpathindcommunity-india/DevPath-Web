@@ -23,7 +23,6 @@ export default function LatestEventsHighlight({ className }: { className?: strin
                     orderBy('date', 'asc'),
                     limit(1)
                 );
-
                 const snapshot = await getDocs(q);
                 if (mounted && !snapshot.empty) {
                     const eventData = { id: snapshot.docs[0].id, ...snapshot.docs[0].data() };
@@ -31,6 +30,19 @@ export default function LatestEventsHighlight({ className }: { className?: strin
                 }
             } catch (error) {
                 console.error("Error fetching latest event:", error);
+
+                try {
+                    // Fallback: fetch and sort client-side
+                    const fallbackSnapshot = await getDocs(query(collection(db, 'events'),where('completed', '==', false))); 
+
+                    if (mounted && !fallbackSnapshot.empty) {
+                        const sortedEvents = fallbackSnapshot.docs.map((doc) => ({id: doc.id,...doc.data(),}))
+                        .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
+                        setEvent(sortedEvents[0]);
+                    }
+                } catch (fallbackError) {
+                    console.error("Fallback fetch failed:", fallbackError);
+                }
             } finally {
                 if (mounted) setLoading(false);
             }

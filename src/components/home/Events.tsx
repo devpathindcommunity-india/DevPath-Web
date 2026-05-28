@@ -97,7 +97,7 @@ function EventCard({ event, index, isCompleted = false }: { event: any, index: n
         >
             <div className={styles.cardContent}>
                 <div className={styles.thumbnail}>
-                    {event.image ? (
+                    {event.image && event.image.trim() !== '' ? (
                         <Image
                             src={event.image}
                             alt={event.title || 'Event Image'}

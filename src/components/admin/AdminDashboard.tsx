@@ -49,7 +49,7 @@ export default function AdminDashboard({ initialAuth = false }: { initialAuth?: 
     });
 
     const { user, isAdminAuthenticated } = useAuth() as any; 
-    const SUPER_ADMIN_EMAIL = "admin@devpath.com"; // Change this to actual super admin email
+    const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL;
 
     // ==========================================
     // 1. YOUR MAINTENANCE MODE LISTENER

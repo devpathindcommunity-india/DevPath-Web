@@ -74,6 +74,7 @@ export default function CodingNews() {
     const [news, setNews] = useState<NewsItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const loopedNews = news.length > 0 ? [...news, ...news] : [];
 
     // Scroll Logic Refs
     const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -116,9 +117,12 @@ export default function CodingNews() {
         if (!container) return;
 
         let animationFrameId: number;
+        const AUTO_SCROLL_EDGE_THRESHOLD = 2;
 
         const scroll = () => {
             if (container) {
+                const loopBoundary = container.scrollWidth / 2;
+
                 if (isHovering) {
                     // Mouse movement scrolling logic
                     const rect = container.getBoundingClientRect();
@@ -138,10 +142,18 @@ export default function CodingNews() {
                         const speed = Math.max(1, (relativeX - rightZone) / 10); // Adjusted speed divisor
                         container.scrollLeft += speed;
                     }
+
+                    if (loopBoundary > 0 && container.scrollLeft >= loopBoundary) {
+                        container.scrollLeft -= loopBoundary;
+                    } else if (loopBoundary > 0 && container.scrollLeft < 0) {
+                        container.scrollLeft += loopBoundary;
+                    }
                 } else {
-                    // Auto-scroll when not hovering
-                    if (container.scrollLeft + container.clientWidth >= container.scrollWidth - 1) {
+                    // Auto-scroll when not hovering using a seamless loop
+                    if (loopBoundary <= 0) {
                         container.scrollLeft = 0;
+                    } else if (container.scrollLeft >= loopBoundary - AUTO_SCROLL_EDGE_THRESHOLD) {
+                        container.scrollLeft -= loopBoundary;
                     } else {
                         container.scrollLeft += 0.5; // Slow auto-scroll speed
                     }
@@ -207,7 +219,7 @@ export default function CodingNews() {
                         }}
                     >
                         <div className={styles.scrollTrack}>
-                            {news.map((item, index) => (
+                            {loopedNews.map((item, index) => (
                                 <motion.a
                                     key={`${index}-${item.url}`}
                                     href={item.url}
