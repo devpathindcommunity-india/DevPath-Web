@@ -270,9 +270,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         if (currentStreak > (userData.streak || 0)) {
                             pointsDelta += POINTS.DAILY_LOGIN;
 
-                            // Streak Bonus logic simplified: 1 point per day (via DAILY_LOGIN)
-                            // pointsDelta += (currentStreak * POINTS.STREAK_BONUS_PER_DAY); // Removed multiplier
-
                             // 7-Day Streak Bonus
                             if (currentStreak % 7 === 0 && currentStreak > 0) {
                                 pointsDelta += POINTS.WEEKLY_STREAK_BONUS;
@@ -346,15 +343,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Update Firestore with Session ID
         if (userCredential.user) {
-            // We need to know if it's an admin or member to update the right collection
-            // But at this point we might not know the role for sure without fetching.
-            // However, we can try updating both or checking.
-            // Actually, onAuthStateChanged will fire and fetch the user.
-            // But we need to set the sessionId BEFORE the listener potentially logs us out?
-            // No, the listener checks data.sessionId. If it's empty in DB, it might be fine?
-            // But we want to enforce it.
 
-            // Let's fetch the doc to know where to write.
             const { doc, getDoc, setDoc } = await import('firebase/firestore');
 
             // Check Admin
@@ -396,8 +385,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 Object.entries(data).filter(([_, v]) => v !== undefined)
             );
 
-            // NOTE: Avoid absolute writes for `points`. Those can overwrite concurrent
-            // `increment()` writes and corrupt XP totals/leaderboard.
             if ((cleanData as any).points !== undefined) {
                 console.warn("[updateUserProfile] Ignoring `points` field. Use awardPoints(pointsDelta) instead.");
                 delete (cleanData as any).points;

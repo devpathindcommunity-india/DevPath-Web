@@ -35,7 +35,7 @@ import { getSafeSocialUrl, sanitizeSocialLinks } from '@/lib/safe-social-url';
  * - Rendering animated progress rings and privacy toggle modals.
  */
 export default function UserProfile() {
-    const { user, logout, updateUserProfile } = useAuth();
+    const { user, logout, updateUserProfile, awardPoints } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -171,9 +171,9 @@ useEffect(() => {
         if (earnedRisingStar && !hasRisingStarBadge) {
             try {
                 await updateUserProfile({
-                    achievements: [...(user.achievements || []), RISING_STAR_BADGE_ID],
-                    points: (user.points || 0) + 10
+                    achievements: [...(user.achievements || []), RISING_STAR_BADGE_ID]
                 });
+                await awardPoints(10);
                 alert("🎉 Congratulations! You earned the 'Rising Star' badge and 10 XP!");
             } catch (error) {
                 console.error("Error awarding badge:", error);
