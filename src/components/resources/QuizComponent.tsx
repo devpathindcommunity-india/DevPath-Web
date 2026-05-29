@@ -69,12 +69,12 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
     isSubmittingRef.current = true;
     
     const current = questions[currentQuestion];
+    const isCorrect = selectedAnswer === current.answer;
+    
     setShowFeedback(true);
 
-    let updatedScore = score;
-    if (selectedAnswer === current.answer) {
-      updatedScore += 1;
-      setScore(updatedScore);
+    if (isCorrect) {
+      setScore(prev => prev + 1);
     }
 
     timerRef.current = setTimeout(async () => {
@@ -82,15 +82,16 @@ export default function QuizComponent({ quizId, questions, onComplete, title = "
       setShowFeedback(false);
 
       if (currentQuestion + 1 < questions.length) {
-        setCurrentQuestion(currentQuestion + 1);
+        setCurrentQuestion(prev => prev + 1);
         setSelectedAnswer("");
         isSubmittingRef.current = false;
       } else {
         // Quiz completed
         setShowResult(true);
 
-        const isPerfect = updatedScore === questions.length;
-        const passed = updatedScore >= Math.ceil(questions.length * 0.7);
+        const finalScore = score + (isCorrect ? 1 : 0);
+        const isPerfect = finalScore === questions.length;
+        const passed = finalScore >= Math.ceil(questions.length * 0.7);
 
         if (isPerfect) {
           triggerConfetti();
