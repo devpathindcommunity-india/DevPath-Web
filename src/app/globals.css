@@ -170,70 +170,10 @@ a {
 }
 
 /* Premium Utilities */
-.glass {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-}
-
-.text-gradient {
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-size: 200% auto;
-  animation: gradient-flow 5s linear infinite;
-}
-
 .container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
-}
-
-/* Animations */
-@keyframes gradient-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-@keyframes pulse-glow {
-  0% {
-    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4);
-  }
-
-  70% {
-    box-shadow: 0 0 0 10px rgba(0, 212, 255, 0);
-  }
-
-  100% {
-    box-shadow: 0 0 0 0 rgba(0, 212, 255, 0);
-  }
 }
 
 /* Scrollbar */
@@ -265,73 +205,6 @@ a {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
-}
-
-/* Theme-Aware Text Color Utilities */
-.text-primary-theme {
-  color: var(--text-primary);
-  transition: color var(--transition-fast);
-}
-
-.text-secondary-theme {
-  color: var(--text-secondary);
-  transition: color var(--transition-fast);
-}
-
-.text-muted-theme {
-  color: var(--text-muted);
-  transition: color var(--transition-fast);
-}
-
-.text-light-theme {
-  color: var(--text-light);
-  transition: color var(--transition-fast);
-}
-
-.text-dark-theme {
-  color: var(--text-dark);
-  transition: color var(--transition-fast);
-}
-
-/* Dark mode detection alternative for components */
-.theme-aware-gray {
-  color: #475569;
-}
-
-.dark .theme-aware-gray {
-  color: #cbd5e1;
-}
-
-.theme-aware-black {
-  color: #000;
-}
-
-.dark .theme-aware-black {
-  color: #ffffff;
-}
-
-.theme-aware-light-gray {
-  color: #a1a1aa;
-}
-
-.dark .theme-aware-light-gray {
-  color: #a1a1aa;
-}
-
-.theme-aware-subtle-gray {
-  color: #52525b;
-}
-
-.dark .theme-aware-subtle-gray {
-  color: #a1a1aa;
-}
-
-.theme-aware-dark-gray {
-  color: #71717a;
-}
-
-.dark .theme-aware-dark-gray {
-  color: #a1a1aa;
 }
 
 /* Legacy HTML Attribute Support for Markdown */
