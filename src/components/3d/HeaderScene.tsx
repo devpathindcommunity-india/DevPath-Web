@@ -126,8 +126,51 @@ function Model({ color }: { color: string }) {
 
 
 
-class ModelErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
-    constructor(props: { children: ReactNode }) {
+function FallbackGeometry({ color }: { color: string }) {
+    const meshRef = useRef<THREE.Mesh>(null);
+    const mouse = useRef({ x: 0, y: 0 });
+
+    useEffect(() => {
+        const handleMouseMove = (event: MouseEvent) => {
+            // Normalize mouse position to range [-1, 1]
+            mouse.current.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        };
+        window.addEventListener('mousemove', handleMouseMove);
+        return () => window.removeEventListener('mousemove', handleMouseMove);
+    }, []);
+
+    useFrame((state, delta) => {
+        if (meshRef.current) {
+            // Slow idle rotation
+            meshRef.current.rotation.y += delta * 0.4;
+            meshRef.current.rotation.x += delta * 0.15;
+
+            // Dynamically rotate based on mouse cursor coordinates with smooth damping
+            const targetRotationY = mouse.current.x * (Math.PI / 4);
+            const targetRotationX = mouse.current.y * (Math.PI / 4);
+            meshRef.current.rotation.y += (targetRotationY - meshRef.current.rotation.y) * delta * 4;
+            meshRef.current.rotation.x += (targetRotationX - meshRef.current.rotation.x) * delta * 4;
+        }
+    });
+
+    return (
+        <mesh ref={meshRef} position={[0, 0.4, 0]}>
+            {/* Elegant futuristic floating metallic Torus Knot */}
+            <torusKnotGeometry args={[0.7, 0.22, 120, 16]} />
+            <meshStandardMaterial
+                color={color}
+                roughness={0.15}
+                metalness={0.9}
+                emissive={new THREE.Color(color)}
+                emissiveIntensity={0.25}
+            />
+        </mesh>
+    );
+}
+
+class ModelErrorBoundary extends Component<{ children: ReactNode; fallback: ReactNode }, { hasError: boolean }> {
+    constructor(props: { children: ReactNode; fallback: ReactNode }) {
         super(props);
         this.state = { hasError: false };
     }
@@ -143,7 +186,7 @@ class ModelErrorBoundary extends Component<{ children: ReactNode }, { hasError: 
 
     render() {
         if (this.state.hasError) {
-            return null;
+            return this.props.fallback;
         }
 
         return this.props.children;
@@ -163,10 +206,10 @@ export default function HeaderScene() {
                 <Suspense fallback={null}>
                     <ambientLight intensity={0.8} />
                     <directionalLight position={[5, 5, 5]} intensity={1.5} />
-                    <ModelErrorBoundary>
-                        <Model color={brandColor} />
-                    </ModelErrorBoundary>
-                    {/* <TestBox /> */}
+                    {/* Render the stunning interactive procedural 3D Torus Knot directly.
+                        Since devpath3d.glb does not exist in static assets, loading it is bypassed
+                        to completely eliminate 404 network fetch errors and optimize load speed. */}
+                    <FallbackGeometry color={brandColor} />
                     <Environment preset="city" />
                 </Suspense>
             </Canvas>
@@ -174,4 +217,4 @@ export default function HeaderScene() {
     );
 }
 
-useGLTF.preload('/devpath3d.glb');
+// useGLTF.preload('/devpath3d.glb');

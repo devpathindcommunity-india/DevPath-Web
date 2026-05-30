@@ -1,3 +1,4 @@
+import MaintenanceBlocker from '@/components/layout/MaintenanceBlocker';
 import type { Metadata } from "next";
 import { Inter, Space_Grotesk, Barlow_Condensed } from "next/font/google";
 import Navbar from "@/components/layout/Navbar";
@@ -11,6 +12,10 @@ import MaintenanceBanner from '@/components/layout/MaintenanceBanner';
 import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { FloatingAssistant } from "@/components/assistant/floating-assistant";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { ToastContainer } from "@/components/ui/ToastContainer";
+import { SyncErrorListener } from "@/components/providers/sync-error-listener";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
@@ -52,7 +57,7 @@ export const metadata: Metadata = {
     siteName: "DevPath Community",
     images: [
       {
-        url: "/DevPath-logo.png",
+        url: "/DevPath-logo.webp",
         width: 800,
         height: 600,
         alt: "DevPath Community Logo",
@@ -63,12 +68,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "DevPath Community",
     description: "Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.",
-    images: ["/DevPath-logo.png"],
+    images: ["/DevPath-logo.webp"],
     creator: "@DevPath_Community", // Assuming handle
   },
   icons: {
-    icon: '/DevPath-logo.png',
-    apple: '/DevPath-logo.png',
+    icon: '/DevPath-logo.webp',
+    apple: '/DevPath-logo.webp',
   },
 };
 
@@ -77,11 +82,11 @@ const jsonLd = {
   "@type": "Organization",
   "name": "DevPath Community",
   "url": "https://devpath-website.web.app",
-  "logo": "https://devpath-website.web.app/DevPath-logo.png",
+  "logo": "https://devpath-website.web.app/DevPath-logo.webp",
   "sameAs": [
     "https://twitter.com/DevPath_Community",
     "https://www.linkedin.com/company/devpath-community",
-    "https://github.com/DevPath-Community-Website"
+    "https://github.com/devpathindcommunity-india/DevPath-Web"
   ],
   "description": "A community of 50,000+ developers accelerating their coding skills through structured paths and real projects."
 };
@@ -93,6 +98,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192400464044260"
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className={`${inter.variable} ${spaceGrotesk.variable} ${barlowCondensed.variable}`}>
         <ThemeProvider
           attribute="class"
@@ -100,24 +112,35 @@ export default function RootLayout({
           enableSystem={false}
           disableTransitionOnChange
         >
-          <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-          />
-          <AuthProvider>
-            <GamificationProvider>
-              <RealTimeProvider>
-                <AnimatedBackground />
-                {/* <BackgroundMesh /> */}
-                <MaintenanceBanner />
-                <Navbar />
-                <PageWrapper>
-                  {children}
-                </PageWrapper>
-                <FooterWrapper />
-              </RealTimeProvider>
-            </GamificationProvider>
-          </AuthProvider>
+          <NotificationProvider>
+            <SyncErrorListener>
+              <script
+                 type="application/ld+json"
+                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+              />
+              <AuthProvider>
+                <GamificationProvider>
+                  <RealTimeProvider>
+                    <AnimatedBackground />
+                    {/* <BackgroundMesh /> */}
+                    <MaintenanceBanner />
+                    <Navbar />
+                    
+                    {/* YAHAN HUMNE BLOCKER ADD KIYA HAI */}
+                    <MaintenanceBlocker>
+                      <PageWrapper>
+                        {children}
+                      </PageWrapper>
+                    </MaintenanceBlocker>
+                    
+                    <FooterWrapper />
+                    <FloatingAssistant />
+                    <ToastContainer />
+                  </RealTimeProvider>
+                </GamificationProvider>
+              </AuthProvider>
+            </SyncErrorListener>
+          </NotificationProvider>
         </ThemeProvider>
       </body>
     </html>

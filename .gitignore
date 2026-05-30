@@ -1,6 +1,7 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
+/backend/node_modules
 /node_modules
 /.pnp
 .pnp.*
@@ -42,6 +43,12 @@ yarn-error.log*
 .env*.local
 !.env.example
 
+# service account key
+service-account-key.json
+
+# test scripts
+scripts/create-test-credentials.ts
+
 # vercel
 .vercel
 
@@ -65,3 +72,9 @@ Thumbs.db
 
 # Temp
 tmp/
+
+# Additional local temp, log, and eslintcache rules
+firebase-debug.log*
+ui-debug.log*
+.eslintcache
+*.log

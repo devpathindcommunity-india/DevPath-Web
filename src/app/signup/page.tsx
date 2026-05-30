@@ -7,8 +7,9 @@ import { motion } from 'framer-motion';
 import { User, Mail, Lock, Phone, Github, Linkedin, Instagram, ArrowRight, MapPin, Key } from 'lucide-react';
 import Link from 'next/link';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db } from '@/lib/firebase';
+import { sanitizeSocialLinks } from '@/lib/safe-social-url';
 
 // const ADMIN_KEY = "DEVPATH_CORE_2025"; // Removed in favor of dynamic key
 
@@ -48,27 +49,15 @@ export default function SignupPage() {
 
     if (user) return null;
 
-    const checkIsAdminEmail = async (emailToCheck: string) => {
-        if (!emailToCheck) return;
-        try {
-            const adminDoc = await getDoc(doc(db, 'admins', emailToCheck));
-            if (adminDoc.exists()) {
-                setIsAdminSignup(true);
-            } else {
-                setIsAdminSignup(false);
-            }
-        } catch (err) {
-            console.error("Error checking admin email:", err);
-        }
-    };
-
-    const handleEmailBlur = () => {
-        checkIsAdminEmail(email);
-    };
-
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+
+        if (!/^\d{10}$/.test(mobile)) {
+            setError('Please enter a valid 10-digit mobile number.');
+            return;
+        }
+
         setLoading(true);
 
         try {
@@ -91,6 +80,7 @@ export default function SignupPage() {
 
             // 2. Update Profile Name
             await updateProfile(user, { displayName: name });
+            const safeSocialLinks = sanitizeSocialLinks({ linkedin, github, instagram });
 
             // 3. Create Document in Firestore
             if (isAdminSignup) {
@@ -104,9 +94,7 @@ export default function SignupPage() {
                     state,
                     city,
                     district,
-                    linkedin,
-                    github,
-                    instagram,
+                    ...safeSocialLinks,
                     // Preserve existing fields if any (merge is true by default for setDoc if we use { merge: true } but here we want to overwrite/add)
                     // Actually, let's use merge to not lose seeded data like role/name if they match
                 }, { merge: true });
@@ -120,12 +108,10 @@ export default function SignupPage() {
                     state,
                     city,
                     district,
-                    linkedin,
-                    github,
-                    instagram,
+                    ...safeSocialLinks,
                     role: 'member',
-                    createdAt: new Date().toISOString(),
-                    xp: 0,
+                    createdAt: serverTimestamp(),
+                    points: 0,
                     rank: 0,
                     streak: 0,
                     projects: 0
@@ -179,15 +165,21 @@ export default function SignupPage() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    onBlur={handleEmailBlur}
                                     className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                     placeholder="name@example.com"
                                     required
                                 />
                             </div>
-                            {isAdminSignup && (
-                                <p className="text-xs text-blue-500 mt-1">Admin email detected. Admin Key required.</p>
-                            )}
+                            <div className="flex items-center gap-2 mt-2">
+                                <input
+                                    type="checkbox"
+                                    id="isAdminToggle"
+                                    checked={isAdminSignup}
+                                    onChange={(e) => setIsAdminSignup(e.target.checked)}
+                                    className="rounded border-border text-primary focus:ring-primary"
+                                />
+                                <label htmlFor="isAdminToggle" className="text-sm text-muted-foreground cursor-pointer">Register as Admin</label>
+                            </div>
                         </div>
 
                         {isAdminSignup && (
@@ -235,9 +227,11 @@ export default function SignupPage() {
                                     <input
                                         type="tel"
                                         value={mobile}
-                                        onChange={(e) => setMobile(e.target.value)}
+                                        onChange={(e) => setMobile(e.target.value.replace(/\D/g, ''))}
                                         className="w-full pl-10 pr-3 py-2 bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                                         placeholder="98765 43210"
+                                        pattern="[0-9]{10}"
+                                        maxLength={10}
                                         required
                                     />
                                 </div>
@@ -347,7 +341,7 @@ export default function SignupPage() {
                             <div className="text-red-500 text-sm">{error}</div>
                         )}
 
-                        <button
+                        <button aria-label="Action button" 
                             type="submit"
                             disabled={loading}
                             className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"

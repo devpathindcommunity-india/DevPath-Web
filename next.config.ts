@@ -15,7 +15,7 @@ const nextConfig: NextConfig = {
   reactCompiler: false,
 
   images: {
-    unoptimized: true,
+    unoptimized: true,  //Required for static export (output:'export')
   },
 };
 

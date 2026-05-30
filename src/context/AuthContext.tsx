@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { auth, db } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { leaderboardSyncErrorEmitter } from '@/lib/leaderboard-sync-error';
 
 interface User {
     uid: string;
@@ -36,6 +37,7 @@ interface User {
     };
     points?: number;
     achievements?: string[]; // Array of achievement IDs
+    completedQuizzes?: string[]; // Array of completed quiz IDs
     claimedRewards?: string[]; // Array of claimed reward IDs
     githubStats?: {
         connected: boolean;
@@ -58,6 +60,9 @@ interface User {
         company?: string;
         location?: string;
         createdAt?: string;
+        linesAdded?: number;
+        linesRemoved?: number;
+        linesContributed?: number;
     };
     followers?: string[]; // Array of user UIDs
     following?: string[]; // Array of user UIDs
@@ -67,6 +72,7 @@ interface User {
     badges?: string[];
     sessionId?: string;
     docId?: string; // Actual Firestore Document ID (Email or UID)
+    createdAt?: any;
 }
 
 interface AuthContextType {
@@ -74,6 +80,7 @@ interface AuthContextType {
     login: (email: string, pass: string) => Promise<void>;
     logout: () => Promise<void>;
     updateUserProfile: (data: Partial<User>) => Promise<void>;
+    awardPoints: (pointsDelta: number) => Promise<void>;
     followUser: (targetUserId: string, targetRole?: string, targetEmail?: string) => Promise<void>;
     unfollowUser: (targetUserId: string, targetRole?: string, targetEmail?: string) => Promise<void>;
     followCommunity: () => Promise<void>;
@@ -84,6 +91,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -91,7 +99,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const unsubscribeSnapshot = useRef<(() => void) | null>(null);
 
 
-    const SUPER_ADMIN_EMAIL = 'devpathind.community@gmail.com';
+    const SUPER_ADMIN_EMAIL = process.env.NEXT_PUBLIC_SUPER_ADMIN_EMAIL || 'devpathind.community@gmail.com';
+
 
     useEffect(() => {
         // Ensure persistence is set to local
@@ -108,29 +117,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             if (firebaseUser) {
                 try {
-                    // SUPER ADMIN BYPASS
-                    if (firebaseUser.email === SUPER_ADMIN_EMAIL) {
-                        const superAdminUser: User = {
-                            uid: firebaseUser.uid,
-                            email: firebaseUser.email,
-                            name: "Super Admin",
-                            photoURL: firebaseUser.photoURL,
-                            role: 'admin',
-                            // Minimal required fields to prevent crashes
-                            privacySettings: {
-                                showMobile: false,
-                                showLocation: false,
-                                showEmail: false,
-                                showProjects: false,
-                                showRewards: false,
-                                isPublic: false,
-                                showInCommunity: false
-                            }
-                        };
-                        setUser(superAdminUser);
-                        setIsLoading(false);
-                        return;
-                    }
+                    // REMOVED SUPER ADMIN BYPASS: The super admin now goes through the standard listener flow.
+                    // This ensures their session is tracked and they are validated securely via Firestore `admins` collection.
 
                     let role: 'admin' | 'member' = 'member';
                     let userData: any = {
@@ -188,6 +176,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 level: 0,
                                 badges: [],
                                 achievements: [],
+                                completedQuizzes: [],
                                 claimedRewards: [],
                                 followers: [],
                                 following: [],
@@ -211,8 +200,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 bio: '',
                                 city: '',
                                 state: '',
-                                district: '',
-                                socialLinks: {}
+                                socialLinks: {},
+                                createdAt: new Date().toISOString()
                             };
 
                             // Create the new member document
@@ -281,9 +270,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                         if (currentStreak > (userData.streak || 0)) {
                             pointsDelta += POINTS.DAILY_LOGIN;
 
-                            // Streak Bonus logic simplified: 1 point per day (via DAILY_LOGIN)
-                            // pointsDelta += (currentStreak * POINTS.STREAK_BONUS_PER_DAY); // Removed multiplier
-
                             // 7-Day Streak Bonus
                             if (currentStreak % 7 === 0 && currentStreak > 0) {
                                 pointsDelta += POINTS.WEEKLY_STREAK_BONUS;
@@ -313,7 +299,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                 points: increment(pointsDelta),
                                 role: role,
                                 lastActive: today
-                            }, { merge: true }).catch(err => console.error("Error updating leaderboard:", err));
+                            }, { merge: true }).catch(err => {
+                                leaderboardSyncErrorEmitter.emit(err, 'login-streak-sync');
+                            });
                         }
 
                         setDoc(doc(db, collectionName, docId), firestoreUpdate, { merge: true }).catch(err => console.error("Error updating user data:", err));
@@ -355,15 +343,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
         // Update Firestore with Session ID
         if (userCredential.user) {
-            // We need to know if it's an admin or member to update the right collection
-            // But at this point we might not know the role for sure without fetching.
-            // However, we can try updating both or checking.
-            // Actually, onAuthStateChanged will fire and fetch the user.
-            // But we need to set the sessionId BEFORE the listener potentially logs us out?
-            // No, the listener checks data.sessionId. If it's empty in DB, it might be fine?
-            // But we want to enforce it.
 
-            // Let's fetch the doc to know where to write.
             const { doc, getDoc, setDoc } = await import('firebase/firestore');
 
             // Check Admin
@@ -392,7 +372,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const updateUserProfile = async (data: Partial<User>) => {
         if (!user || !auth.currentUser) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
 
         try {
             // 1. Update Firestore
@@ -405,18 +385,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 Object.entries(data).filter(([_, v]) => v !== undefined)
             );
 
-            await setDoc(doc(db, collectionName, docId), cleanData, { merge: true });
-
-            // Sync to Leaderboard if points are updated
-            if (data.points !== undefined) {
-                const leaderboardRef = doc(db, 'leaderboard', user.uid);
-                setDoc(leaderboardRef, {
-                    points: data.points,
-                    name: data.name || user.name, // Update name/photo if changed too
-                    photoURL: data.photoURL || user.photoURL,
-                    lastActive: new Date().toISOString().split('T')[0]
-                }, { merge: true }).catch(err => console.error("Error syncing leaderboard:", err));
+            if ((cleanData as any).points !== undefined) {
+                console.warn("[updateUserProfile] Ignoring `points` field. Use awardPoints(pointsDelta) instead.");
+                delete (cleanData as any).points;
             }
+
+            await setDoc(doc(db, collectionName, docId), cleanData, { merge: true });
 
             // 2. Update Auth Profile (if name or photoURL changed)
             if (data.name || data.photoURL) {
@@ -435,6 +409,44 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error("Error updating profile:", error);
             throw error;
         }
+    };
+
+    const awardPoints = async (pointsDelta: number) => {
+        if (!user || !auth.currentUser) return;
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
+        if (!Number.isFinite(pointsDelta) || pointsDelta === 0) return;
+
+        const { writeBatch, increment } = await import('firebase/firestore');
+        const batch = writeBatch(db);
+
+        const collectionName = user.role === 'admin' ? 'admins' : 'members';
+        const docId = user.docId || (user.role === 'admin' ? user.email!.toLowerCase() : user.uid);
+        const userRef = doc(db, collectionName, docId);
+
+        batch.set(userRef, { points: increment(pointsDelta) }, { merge: true });
+
+        const today = new Date().toISOString().split('T')[0];
+        const leaderboardRef = doc(db, 'leaderboard', user.uid);
+        batch.set(leaderboardRef, {
+            uid: user.uid,
+            name: user.name,
+            photoURL: user.photoURL,
+            points: increment(pointsDelta),
+            role: user.role,
+            lastActive: today
+        }, { merge: true });
+
+        try {
+            await batch.commit();
+        } catch (error) {
+            leaderboardSyncErrorEmitter.emit(error, 'awardPoints');
+            throw error; // Re-throw so callers know it failed
+        }
+
+        setUser(prev => prev ? {
+            ...prev,
+            points: (prev.points || 0) + pointsDelta
+        } : null);
     };
 
     const followUser = async (targetUserId: string, targetRole: string = 'member', targetEmail?: string) => {
@@ -463,9 +475,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             // Use targetUserId directly as it is resolved correctly by client.tsx (Document ID)
             const targetDocId = targetUserId;
 
-            console.log(`[followUser] Target: ${targetCollection}/${targetDocId}`);
-            console.log(`[followUser] Target Role: ${targetRole}, Email: ${targetEmail}, UID: ${targetUserId}`);
-
             const targetUserRef = doc(db, targetCollection, targetDocId);
 
             const updateData: any = {
@@ -489,7 +498,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }, { merge: true });
             }
 
-            await batch.commit();
+            try {
+                await batch.commit();
+            } catch (error) {
+                leaderboardSyncErrorEmitter.emit(error, 'followUser-leaderboard-sync');
+                throw error;
+            }
 
             // Update local state
             setUser(prev => prev ? { ...prev, following: [...(prev.following || []), targetUserId] } : null);
@@ -501,11 +515,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const unfollowUser = async (targetUserId: string, targetRole: string = 'member', targetEmail?: string) => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         try {
             const batch = (await import('firebase/firestore')).writeBatch(db);
             const arrayRemove = (await import('firebase/firestore')).arrayRemove;
             const increment = (await import('firebase/firestore')).increment;
+            const { POINTS } = await import('@/lib/points');
 
 
             // Update current user's following list
@@ -518,18 +533,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 following: arrayRemove(targetUserId)
             });
 
-            // Update target user's followers list
+            // Update target user's followers list & Deduct Points
             const targetCollection = targetRole === 'admin' ? 'admins' : 'members';
             // Use targetUserId directly
             const targetDocId = targetUserId;
 
             const targetUserRef = doc(db, targetCollection, targetDocId);
-            // Revert to update
-            batch.update(targetUserRef, {
+            
+            const updateData: any = {
                 followers: arrayRemove(user.uid)
-            });
+            };
 
-            await batch.commit();
+            // Only deduct points if target is NOT an admin
+            if (targetRole !== 'admin') {
+                updateData.points = increment(-POINTS.FOLLOWER_GAINED);
+            }
+
+            batch.update(targetUserRef, updateData);
+
+            // Sync target user points to leaderboard (Only if target is member or has leaderboard entry)
+            if (targetRole === 'member') {
+                const targetLeaderboardRef = doc(db, 'leaderboard', targetUserId);
+                batch.set(targetLeaderboardRef, {
+                    points: increment(-POINTS.FOLLOWER_GAINED)
+                }, { merge: true });
+            }
+
+            try {
+                await batch.commit();
+            } catch (error) {
+                leaderboardSyncErrorEmitter.emit(error, 'unfollowUser-leaderboard-sync');
+                throw error;
+            }
 
             // Update local state
             setUser(prev => prev ? { ...prev, following: (prev.following || []).filter(id => id !== targetUserId) } : null);
@@ -541,7 +576,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const followCommunity = async () => {
         if (!user) return;
-        if (user.email === 'devpathind.community@gmail.com') return; // Super Admin Guard
+        if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
         // Check if already followed (using a flag or badge)
         if (user.achievements?.includes('community_follower')) return;
 
@@ -561,9 +596,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
             // Sync to Leaderboard
             const leaderboardRef = doc(db, 'leaderboard', user.uid);
-            await setDoc(leaderboardRef, {
-                points: increment(POINTS.FOLLOW_COMMUNITY)
-            }, { merge: true });
+            try {
+                await setDoc(leaderboardRef, {
+                    points: increment(POINTS.FOLLOW_COMMUNITY)
+                }, { merge: true });
+            } catch (syncError) {
+                leaderboardSyncErrorEmitter.emit(syncError, 'followCommunity-leaderboard-sync');
+                // Don't re-throw here since the main points were already awarded
+            }
 
             setUser(prev => prev ? {
                 ...prev,
@@ -577,7 +617,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, followUser, unfollowUser, followCommunity, isLoading, isAdminVerified, verifyAdmin }}>
+        <AuthContext.Provider value={{ user, login, logout, updateUserProfile, awardPoints, followUser, unfollowUser, followCommunity, isLoading, isAdminVerified, verifyAdmin }}>
             {children}
         </AuthContext.Provider>
     );

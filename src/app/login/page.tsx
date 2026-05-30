@@ -9,6 +9,8 @@ import Link from 'next/link';
 import AdminKeyModal from '@/components/auth/AdminKeyModal';
 import { useMaintenance } from '@/hooks/useMaintenance';
 import { AlertTriangle } from 'lucide-react';
+import {doc , getDoc} from 'firebase/firestore'
+import { db } from '@/lib/firebase';
 
 
 export default function LoginPage() {
@@ -56,11 +58,9 @@ export default function LoginPage() {
             await login(email, password);
             // Login successful. Now check if admin.
 
-            const { doc, getDoc, getFirestore } = await import('firebase/firestore');
-            const { app } = await import('@/lib/firebase');
-            const db = getFirestore(app);
 
-            const adminDoc = await getDoc(doc(db, 'admins', email));
+
+const adminDoc = await getDoc(doc(db, 'admins', email));
             if (adminDoc.exists()) {
                 setShowAdminKeyModal(true);
             } else {
@@ -143,7 +143,7 @@ export default function LoginPage() {
                             <div className="text-red-500 text-sm text-center">{error}</div>
                         )}
 
-                        <button
+                        <button aria-label="Action button" 
                             type="submit"
                             className="w-full bg-primary text-primary-foreground py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                             disabled={isMaintenanceMode}

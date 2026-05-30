@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
+import Image from 'next/image';
 import { Calendar, Video, MapPin, ExternalLink } from 'lucide-react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { db } from '@/lib/firebase';
@@ -95,15 +96,20 @@ function EventCard({ event, index, isCompleted = false }: { event: any, index: n
             style={{ perspective: 1000 }}
         >
             <div className={styles.cardContent}>
-                <div
-                    className={styles.thumbnail}
-                    style={{
-                        backgroundImage: event.image ? `url(${event.image})` : undefined,
-                        backgroundSize: 'cover',
-                        backgroundPosition: 'center',
-                        backgroundColor: event.image ? undefined : '#1a1f35'
-                    }}
-                />
+                <div className={styles.thumbnail}>
+                    {event.image && event.image.trim() !== '' ? (
+                        <Image
+                            src={event.image}
+                            alt={event.title || 'Event Image'}
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 300px, 350px"
+                            priority={index === 0 && !isCompleted}
+                        />
+                    ) : (
+                        <div className="w-full h-full bg-[#1a1f35]" />
+                    )}
+                </div>
 
                 <div className={styles.details}>
                     <div className={styles.dateBadge}>

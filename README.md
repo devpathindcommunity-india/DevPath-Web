@@ -1,7 +1,7 @@
 # DevPath India Community Website
 
 <p align="center">
-  <img src="public/logo.png" alt="DevPath Logo" width="250"/>
+  <img src="public/logo.webp" alt="DevPath Logo" width="250"/>
 </p>
 
 <p align="center">
@@ -22,6 +22,7 @@
 
 - [🚀 Features](#-features)
 - [🛠️ Tech Stack](#️-tech-stack)
+- [📁 Folder Structure](#-folder-structure)
 - [📸 Screenshots](#-screenshots)
 - [🏁 Getting Started](#-getting-started)
   - [Prerequisites](#prerequisites)
@@ -56,15 +57,43 @@ This project leverages a modern and powerful technology stack:
 - **Icons**: [Lucide React](https://lucide.dev/)
 - **Linting**: [ESLint](https://eslint.org/)
 
+## 📁 Folder Structure
+
+A quick overview of the project's organization to help new contributors navigate the codebase easily.
+
+```
+DevPath-Web/
+├── .github/               # GitHub workflows, PR & issue templates
+├── public/                # Static assets (images, icons, fonts, logo)
+├── scripts/               # Utility and automation scripts
+├── src/                   # Main source code
+│   ├── app/               # Next.js App Router — pages, layouts & routing
+│   ├── assets/            # Project assets (SVGs, illustrations)
+│   ├── components/        # Reusable UI components used across pages
+│   ├── config/            # App-level configuration and constants
+│   ├── context/           # React Context API providers (global state)
+│   ├── data/              # Static data, mock data & content constants
+│   ├── hooks/             # Custom React hooks for shared logic
+│   ├── lib/               # Third-party library setups (Firebase, etc.)
+│   └── utils/             # Helper functions and utility methods
+├── .env.example           # Environment variables template
+├── .env.local             # Local environment variables (git-ignored)
+├── firebase.json          # Firebase Hosting & services configuration
+├── firestore.rules        # Firestore security rules
+├── firestore.indexes.json # Firestore composite indexes
+├── next.config.ts         # Next.js configuration
+├── tailwind.config.ts     # Tailwind CSS configuration
+├── tsconfig.json          # TypeScript compiler configuration
+├── postcss.config.js      # PostCSS configuration
+└── eslint.config.mjs      # ESLint rules and configuration
+```
+
+
 ## 📸 Screenshots
 
-*(Add your screenshots here)*
-
-| Home Page | Dashboard |
+| Home Page | Community |
 | :---: | :---: |
-| <img src="public/placeholder-home.png" alt="Home Page" width="400"/> | <img src="public/placeholder-dashboard.png" alt="Dashboard" width="400"/> |
-
-> **Note**: These are placeholders. Please upload actual screenshots to the `public/` folder and link them here.
+| <img src="public/screenshot-home.png" alt="Home Page" height="250"/> | <img src="public/screenshot-community.png" alt="Community" height="250"/> |
 
 ## 🏁 Getting Started
 
@@ -135,6 +164,22 @@ To run this project locally, you'll need your own Firebase project:
 
 5. **Open your browser:**
    Navigate to [http://localhost:3000](http://localhost:3000) to see the application running.
+
+### 🚀 Firebase Hosting Deployment
+
+To deploy the production-ready site directly to Firebase Hosting:
+
+1. **Build the production static export**:
+   This compiles the Next.js App Router files into highly optimized static assets inside the `out/` directory:
+   ```bash
+   npm run build
+   ```
+
+2. **Deploy to Firebase**:
+   Deploy the build files along with custom Firestore indexes and rules to the live platform:
+   ```bash
+   npx firebase deploy
+   ```
 
 ## 📜 Scripts
 

@@ -2,7 +2,7 @@
 import { MessageCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import logo from '@/assets/logo.png';
+import logo from '@/assets/logo.webp';
 import Button from '../ui/Button';
 import styles from './Community.module.css';
 
@@ -25,7 +25,7 @@ export default function Community() {
                         rel="noopener noreferrer"
                         style={{ textDecoration: 'none' }}
                     >
-                        <Button variant="primary" icon={<MessageCircle size={20} />}>
+                        <Button aria-label="Action button"  variant="primary" icon={<MessageCircle size={20} />}>
                             Join DevPath Community
                         </Button>
                     </a>

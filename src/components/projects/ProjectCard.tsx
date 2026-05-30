@@ -1,10 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import Image from 'next/image';
 import { Target, ExternalLink, Github, Edit3, Play, Maximize2, Star } from 'lucide-react';
-import ReactMarkdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
 import { useAuth } from '@/context/AuthContext';
 import { doc, updateDoc, arrayUnion, arrayRemove, increment } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
@@ -138,10 +136,11 @@ export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: Pr
                         title={project.title}
                     />
                 ) : project.screenshots?.[0] ? (
-                    <img
+                    <Image
                         src={project.screenshots[0]}
                         alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        fill
+                        className="object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                 ) : (
                     <div className="w-full h-full flex items-center justify-center text-muted-foreground bg-muted/50">
@@ -151,7 +150,7 @@ export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: Pr
 
                 {/* Overlay Actions */}
                 {isOwner && (
-                    <button
+                    <button aria-label="Action button" 
                         onClick={(e) => {
                             e.stopPropagation();
                             onEdit?.(project);
@@ -186,7 +185,7 @@ export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: Pr
                     <p className="text-xs text-primary font-medium">by {project.authorName || 'Anonymous'}</p>
 
                     {/* Star Button */}
-                    <button
+                    <button aria-label="Action button" 
                         onClick={handleToggleStar}
                         disabled={isStarring}
                         className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-colors ${hasStarred
@@ -222,7 +221,7 @@ export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: Pr
                     </p>
                 </div>
 
-                <button
+                <button aria-label="Action button" 
                     onClick={() => onReadMore ? onReadMore(project) : setShowFullDescription(!showFullDescription)}
                     className="text-xs text-primary hover:underline mt-auto self-start"
                 >

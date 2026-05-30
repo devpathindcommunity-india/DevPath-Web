@@ -66,6 +66,12 @@
     color: var(--text-primary);
     letter-spacing: -0.5px;
     text-decoration: none;
+    border-radius: 8px;
+}
+
+.logo:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 4px;
 }
 
 .logoIcon {
@@ -94,6 +100,13 @@
 }
 
 .navLink:hover {
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.navLink:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
     color: #fff;
     background: rgba(255, 255, 255, 0.1);
 }
@@ -129,6 +142,11 @@
     transform: scale(1.05);
 }
 
+.iconButton:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
 .profileButton {
     display: flex;
     align-items: center;
@@ -150,6 +168,11 @@
     transform: translateY(-1px);
 }
 
+.profileButton:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
 /* Hamburger Menu Button - Hidden on Desktop */
 .hamburger {
     display: none;
@@ -168,6 +191,11 @@
 
 .hamburger:hover {
     background: rgba(255, 255, 255, 0.1);
+}
+
+.hamburger:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
 }
 
 /* Mobile Menu Backdrop */
@@ -231,6 +259,11 @@
     color: var(--text-primary);
 }
 
+.mobileClose:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
 .mobileNav {
     display: flex;
     flex-direction: column;
@@ -250,6 +283,13 @@
 
 .mobileLink:hover,
 .mobileLink:active {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
+
+.mobileLink:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
     background: rgba(255, 255, 255, 0.05);
     color: var(--text-primary);
 }
@@ -290,6 +330,11 @@
     background: rgba(255, 255, 255, 0.1);
 }
 
+.mobileProfileButton:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
+}
+
 .profileAvatar {
     display: flex;
     align-items: center;
@@ -310,6 +355,11 @@
 .profileAvatar:hover {
     background: #2563eb;
     transform: translateY(-1px);
+}
+
+.profileAvatar:focus-visible {
+    outline: 2px solid #38bdf8;
+    outline-offset: 2px;
 }
 
 /* Mobile Responsive Styles */
