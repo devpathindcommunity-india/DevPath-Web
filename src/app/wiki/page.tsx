@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
 import { Search, ChevronRight, Book, Code, FileText, HelpCircle, ThumbsUp, ThumbsDown, Github, Users, MapPin, MessageCircle, Calendar } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import styles from './Wiki.module.css';
@@ -38,9 +40,20 @@ const categories = [
     }
 ];
 
-export default function WikiPage() {
-    const [activeArticle, setActiveArticle] = useState("intro");
+function WikiPageContent() {
+    const router = useRouter();
+    const searchParams = useSearchParams();
     const [searchQuery, setSearchQuery] = useState("");
+
+    const activeArticleParam = searchParams.get('article');
+    // Ensure activeArticle is a valid article in wikiContent, otherwise default to "intro"
+    const activeArticle = activeArticleParam && wikiContent[activeArticleParam] 
+        ? activeArticleParam 
+        : "intro";
+
+    const handleArticleChange = (id: string) => {
+        router.push(`/wiki?article=${id}`, { scroll: false });
+    };
 
     return (
         <div className={styles.container}>
@@ -64,7 +77,7 @@ export default function WikiPage() {
                                 <div
                                     key={item.id}
                                     className={`${styles.navLink} ${activeArticle === item.id ? styles.active : ''}`}
-                                    onClick={() => setActiveArticle(item.id)}
+                                    onClick={() => handleArticleChange(item.id)}
                                 >
                                     {item.icon}
                                     {item.title}
@@ -79,17 +92,17 @@ export default function WikiPage() {
                 <div className={styles.breadcrumb}>
                     <span>Docs</span>
                     <ChevronRight size={14} />
-                    <span>{categories.find(c => c.items.some(i => i.id === activeArticle))?.title}</span>
+                    <span>{categories.find(c => c.items.some(i => i.id === activeArticle))?.title ?? "Getting Started"}</span>
                     <ChevronRight size={14} />
-                    <span>{wikiContent[activeArticle]?.title}</span>
+                    <span>{wikiContent[activeArticle]?.title ?? "Introduction to DevPath"}</span>
                 </div>
 
                 <article>
                     <div className={styles.articleHeader}>
-                        <h1 className={styles.title}>{wikiContent[activeArticle]?.title}</h1>
+                        <h1 className={styles.title}>{wikiContent[activeArticle]?.title ?? "Introduction to DevPath"}</h1>
                         <div className={styles.meta}>
-                            <span>Last updated: {wikiContent[activeArticle]?.lastUpdated}</span>
-                            <span>Reading time: {wikiContent[activeArticle]?.readingTime}</span>
+                            <span>Last updated: {wikiContent[activeArticle]?.lastUpdated ?? "Dec 14, 2025"}</span>
+                            <span>Reading time: {wikiContent[activeArticle]?.readingTime ?? "5 min"}</span>
                         </div>
                     </div>
 
@@ -107,5 +120,17 @@ export default function WikiPage() {
                 </article>
             </main>
         </div>
+    );
+}
+
+export default function WikiPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-background text-muted-foreground font-medium">
+                Loading Documentation...
+            </div>
+        }>
+            <WikiPageContent />
+        </Suspense>
     );
 }
