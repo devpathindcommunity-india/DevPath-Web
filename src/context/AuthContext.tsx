@@ -35,6 +35,9 @@ interface User {
         isPublic?: boolean;
         showInCommunity?: boolean;
     };
+    preferences?: {
+        theme?: 'light' | 'dark';
+    };
     points?: number;
     achievements?: string[]; // Array of achievement IDs
     completedQuizzes?: string[]; // Array of completed quiz IDs
@@ -189,6 +192,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                                     showRewards: true,
                                     isPublic: true,
                                     showInCommunity: true
+                                },
+                                preferences: {
+                                    theme: 'dark'
                                 },
                                 githubStats: {
                                     connected: false,
