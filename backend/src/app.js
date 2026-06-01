@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
+const authRoutes = require("./routes/auth");
 const assistantRoutes = require("./routes/assistant");
 const { notFoundHandler, errorHandler } = require("./middlewares/errorMiddleware");
 const { requestLoggerStream } = require("./utils/logger");
@@ -28,6 +29,7 @@ app.get("/health", async (req, res) => {
   });
 });
 
+app.use("/api/auth", authRoutes);
 app.use("/api/assistant", assistantRoutes);
 
 // Terminal middleware pair for unknown routes and runtime failures.
