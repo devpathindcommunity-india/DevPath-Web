@@ -124,7 +124,7 @@ export default function ProjectCard({ project, isOwner, onEdit, onReadMore }: Pr
     const embedUrl = getEmbedUrl(project.videoUrl || '');
 
     return (
-        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col h-full group/card">
+        <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/20 hover:scale-[1.02] transition-all duration-300 flex flex-col h-full group/card">
             {/* Media Section */}
             <div className="aspect-video bg-muted relative group">
                 {embedUrl ? (
