@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Github, Code, FileText, MessageSquare, ExternalLink, Loader2 } from 'lucide-react';
+import { Github, Code, FileText, MessageSquare, ExternalLink } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import styles from './Contributors.module.css';
 
@@ -23,19 +23,19 @@ interface TopContributor {
     avatar: string | null;
 }
 
-// Fallback lists if API fails or rate-limit is hit
 const FALLBACK_TOP: TopContributor[] = [
     { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, rank: 1, avatar: null },
     { name: "schrodingerspet", handle: "@schrodingerspet", contributions: 300, rank: 2, avatar: null },
     { name: "Niteshagarwal01", handle: "@Niteshagarwal01", contributions: 150, rank: 3, avatar: null },
 ];
 
-const contributors: Contributor[] = [
-    { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, types: ["code", "design", "community"], avatar: "AP" },
+const FALLBACK_CONTRIBUTORS: Contributor[] = [
+    { name: "Aditya Patil", handle: "@Aditya948351", contributions: 500, types: ["code", "design", "community"], avatar: null },
 ];
 
 export default function ContributorsPage() {
     const [topContributors, setTopContributors] = useState<TopContributor[]>([]);
+    const [contributors, setContributors] = useState<Contributor[]>([]);
     const [stats, setStats] = useState({
         totalContributors: 1240,
         totalContributions: 15400,
@@ -66,6 +66,15 @@ export default function ContributorsPage() {
                 }));
 
                 setTopContributors(mappedTop);
+
+                const gridContributors = sorted.slice(0, 12).map((c: any) => ({
+                    name: c.login,
+                    handle: `@${c.login}`,
+                    contributions: c.contributions,
+                    avatar: c.avatar_url,
+                    types: ['code'],
+                }));
+                setContributors(gridContributors);
 
                 // Calculate stats
                 const totalContributorsCount = sorted.length;
@@ -98,6 +107,7 @@ export default function ContributorsPage() {
                 console.error("Error fetching contributors data:", err);
                 setError(err.message || "Failed to load contributors data");
                 setTopContributors(FALLBACK_TOP);
+                setContributors(FALLBACK_CONTRIBUTORS);
             } finally {
                 setLoading(false);
             }
@@ -150,9 +160,14 @@ export default function ContributorsPage() {
             </div>
 
             {loading ? (
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '260px', gap: '16px' }}>
-                    <Loader2 className="animate-spin" size={48} style={{ color: '#00d4ff', animation: 'spin 1s linear infinite' }} />
-                    <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>Loading contributors podium...</p>
+                <div className={styles.skeletonPodium}>
+                    {[0, 1, 2].map((i) => (
+                        <div key={i} className={`${styles.skeletonPodiumItem} ${i === 1 ? styles.first : ''}`}>
+                            <div className={styles.skeletonAvatar} />
+                            <div className={styles.skeletonPodiumLine} style={{ width: '100px' }} />
+                            <div className={styles.skeletonPodiumLine} style={{ width: '80px', height: '14px' }} />
+                        </div>
+                    ))}
                 </div>
             ) : (
                 <div className={styles.podium}>
@@ -184,28 +199,46 @@ export default function ContributorsPage() {
                 </div>
             )}
 
-            <div className={styles.grid}>
-                {contributors.map((contributor, index) => (
-                    <div key={index} className={styles.card}>
-                        <div className={styles.cardAvatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
-                            {contributor.avatar}
+            {loading ? (
+                <div className={styles.skeletonCards}>
+                    {[...Array(6)].map((_, i) => (
+                        <div key={i} className={styles.skeletonCard}>
+                            <div className={styles.skeletonCardAvatar} />
+                            <div className={styles.skeletonCardLine} style={{ width: '60%' }} />
+                            <div className={styles.skeletonCardLine} style={{ width: '40%' }} />
+                            <div className={styles.skeletonCardLine} style={{ width: '80%', height: '14px', marginTop: '20px' }} />
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', marginTop: '24px' }}>
+                                {[...Array(3)].map((_, j) => (
+                                    <div key={j} className={styles.skeletonTypeIcon} />
+                                ))}
+                            </div>
                         </div>
-                        <h3 className={styles.cardName}>{contributor.name}</h3>
-                        <p className={styles.cardHandle}>{contributor.handle}</p>
+                    ))}
+                </div>
+            ) : (
+                <div className={styles.grid}>
+                    {contributors.map((contributor, index) => (
+                        <div key={index} className={styles.card}>
+                            <div className={styles.cardAvatar} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '24px', fontWeight: 'bold', color: 'white' }}>
+                                {contributor.avatar}
+                            </div>
+                            <h3 className={styles.cardName}>{contributor.name}</h3>
+                            <p className={styles.cardHandle}>{contributor.handle}</p>
 
-                        <div className={styles.cardStats}>
-                            <span>{contributor.contributions} contributions</span>
-                        </div>
+                            <div className={styles.cardStats}>
+                                <span>{contributor.contributions} contributions</span>
+                            </div>
 
-                        <div className={styles.types}>
-                            {contributor.types.includes('code') && <div className={styles.typeIcon} title="Code"><Code size={16} /></div>}
-                            {contributor.types.includes('docs') && <div className={styles.typeIcon} title="Documentation"><FileText size={16} /></div>}
-                            {contributor.types.includes('design') && <div className={styles.typeIcon} title="Design"><MessageSquare size={16} /></div>}
-                            {contributor.types.includes('community') && <div className={styles.typeIcon} title="Community"><Github size={16} /></div>}
+                            <div className={styles.types}>
+                                {contributor.types.includes('code') && <div className={styles.typeIcon} title="Code"><Code size={16} /></div>}
+                                {contributor.types.includes('docs') && <div className={styles.typeIcon} title="Documentation"><FileText size={16} /></div>}
+                                {contributor.types.includes('design') && <div className={styles.typeIcon} title="Design"><MessageSquare size={16} /></div>}
+                                {contributor.types.includes('community') && <div className={styles.typeIcon} title="Community"><Github size={16} /></div>}
+                            </div>
                         </div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
+            )}
 
             <div className={styles.cta}>
                 <h2 className={styles.ctaTitle}>Want to see your name here?</h2>

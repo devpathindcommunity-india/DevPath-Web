@@ -232,3 +232,87 @@
         gap: 32px;
     }
 }
+
+/* Skeleton Loading */
+.skeletonPodium {
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 40px;
+    margin-bottom: 100px;
+    padding-top: 40px;
+    min-height: 260px;
+}
+
+.skeletonPodiumItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+.skeletonPodiumItem.first {
+    transform: scale(1.1);
+}
+
+.skeletonAvatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    animation: pulse 1.5s infinite;
+}
+
+.skeletonPodiumLine {
+    height: 20px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: pulse 1.5s infinite;
+}
+
+.skeletonCards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 32px;
+    max-width: 1400px;
+    margin: 0 auto 80px;
+}
+
+.skeletonCard {
+    background: var(--card);
+    border: 1px solid var(--glass-border);
+    border-radius: 20px;
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.skeletonCardAvatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: var(--glass-bg);
+    margin: 0 auto 20px;
+    animation: pulse 1.5s infinite;
+}
+
+.skeletonCardLine {
+    height: 16px;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    margin: 0 auto 12px;
+    animation: pulse 1.5s infinite;
+}
+
+.skeletonTypeIcon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.5; }
+}
