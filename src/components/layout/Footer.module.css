@@ -87,12 +87,20 @@
 @media (max-width: 768px) {
     .content {
         grid-template-columns: 1fr;
-        gap: 40px;
+        gap: 20px; /* reduced gap for tighter mobile layout */
+        padding: 0 16px; /* add horizontal padding */
     }
 
+    .links {
+        align-items: center;
+    }
+    .link {
+        justify-content: center;
+    }
     .bottom {
         flex-direction: column;
         gap: 20px;
         text-align: center;
+        align-items: center;
     }
 }
