@@ -181,7 +181,7 @@ function FallbackGeometry({ color }: { color: string }) {
     }, [geometry, material]);
 
     return (
-        <mesh ref={meshRef} position={[0, 0.4, 0]} geometry={geometry} material={material} />
+        
         <mesh ref={meshRef} position={[0, 0.4, 0]}>
             {/* Elegant futuristic floating metallic Torus Knot */}
             {/* @ts-ignore */}

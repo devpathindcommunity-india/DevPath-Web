@@ -55,7 +55,6 @@ export function ToastContainer() {
                             <p className="text-sm font-medium">{toast.message}</p>
                         </div>
                         <button
-                        <button 
                             onClick={() => removeToast(toast.id)}
                             className={`${config.color} flex-shrink-0 hover:opacity-70 transition-opacity`}
                             aria-label="Close notification"
