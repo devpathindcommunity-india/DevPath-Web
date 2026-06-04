@@ -59,7 +59,7 @@
     "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.10",
-    "firebase-tools": "^15.1.0",
+    "firebase-tools": "^15.19.1",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "postcss": "^8.5.6",
