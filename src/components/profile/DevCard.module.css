@@ -359,6 +359,99 @@
   white-space: nowrap;
 }
 
+.identityStrip {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  margin-top: 4px;
+  padding: 8px;
+  border: 1px solid var(--devcard-panel-border);
+  border-radius: 14px;
+  background:
+    linear-gradient(135deg, rgba(0, 212, 255, 0.08), rgba(52, 211, 153, 0.06)),
+    var(--devcard-panel);
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  overflow: hidden;
+  box-shadow: 0 8px 18px -12px rgba(15, 23, 42, 0.45);
+}
+
+:global(.dark) .logoMark {
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.identityText {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.identityTitle {
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--devcard-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.identitySubtext {
+  font-size: 10px;
+  color: var(--devcard-text-soft);
+}
+
+.socialLinks {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  color: var(--devcard-text-muted);
+  background: var(--devcard-badge-bg);
+  border: 1px solid var(--devcard-badge-border);
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.socialLink:hover,
+.socialLink:focus-visible {
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.32);
+  background: rgba(0, 212, 255, 0.10);
+  transform: translateY(-2px);
+  outline: none;
+}
+
+.socialLinkProfile {
+  color: #34d399;
+}
+
 /* ── Level progress ────────────────────────────────────────────────── */
 .progressSection {
   width: 100%;
@@ -703,6 +796,16 @@
 
   .meta {
     align-items: flex-start;
+  }
+
+  .identityStrip {
+    width: calc(100% - 96px);
+    min-width: 180px;
+    margin-top: 0;
+  }
+
+  .socialLinks {
+    justify-content: flex-start;
   }
 
   .name {

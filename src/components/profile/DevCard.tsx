@@ -7,13 +7,14 @@ import {
   Download, Link2, Check, MapPin, Calendar,
   Trophy, Zap, Flame, Star, Award, Github,
   Layers, Code2, Globe, Users, Brain,
-  ChevronRight, Sparkles, Medal,
+  ChevronRight, Sparkles, Medal, Linkedin, Instagram, ExternalLink,
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
 import { collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useNotificationActions } from '@/stores/ui-store';
+import { getSafeSocialUrl } from '@/lib/safe-social-url';
 import styles from './DevCard.module.css';
 
 // ── Badge registry ────────────────────────────────────────────────────────────
@@ -44,6 +45,7 @@ const LANG_COLORS: Record<string, string> = {
   Shell: '#89e051', Vue: '#41b883',
 };
 const getLangColor = (lang: string) => LANG_COLORS[lang] ?? '#94a3b8';
+const DEVPATH_LOGO_URL = 'https://devpath-website.web.app/_next/static/media/logo.0lp58p9nludg2.webp';
 
 function resolveLevelColor(colorClass: string): string {
   const map: Record<string, string> = {
@@ -105,6 +107,21 @@ function fmtDate(raw: any): string {
   } catch { return 'Recent Member'; }
 }
 
+function resolveSocialUrl(value: string | undefined, platform: 'github' | 'linkedin' | 'instagram'): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed) return null;
+
+  if (/^https?:\/\//i.test(trimmed)) {
+    return getSafeSocialUrl(trimmed, platform);
+  }
+
+  if (platform === 'github' && /^[a-z\d](?:[a-z\d-]{0,37}[a-z\d])?$/i.test(trimmed)) {
+    return `https://github.com/${trimmed}`;
+  }
+
+  return null;
+}
+
 export default function DevCard({ user }: { user: any }) {
   const IMAGE_WAIT_TIMEOUT_MS = 5000;
   const cardRef = useRef<HTMLDivElement>(null);
@@ -158,6 +175,21 @@ export default function DevCard({ user }: { user: any }) {
   const extraCount = Math.max(0, earnedBadges.length - 4);
   const topLangs = ((user?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
+  const socialLinks = {
+    github: resolveSocialUrl(user?.github ?? user?.githubStats?.username, 'github'),
+    linkedin: resolveSocialUrl(user?.linkedin, 'linkedin'),
+    instagram: resolveSocialUrl(user?.instagram, 'instagram'),
+  };
+  const socialCount = Object.values(socialLinks).filter(Boolean).length;
+  const profileSignals = [
+    user?.photoURL,
+    user?.bio || user?.aboutMarkdown,
+    user?.city || user?.state,
+    user?.githubStats?.connected,
+    socialCount > 0,
+    earnedBadges.length > 0,
+  ].filter(Boolean).length;
+  const profileCompletion = Math.round((profileSignals / 6) * 100);
 
   const animXP     = useAnimatedCount(user?.points ?? 0);
   const animStreak = useAnimatedCount(user?.streak ?? 0, 900);
@@ -326,6 +358,43 @@ export default function DevCard({ user }: { user: any }) {
               <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
               {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
             </motion.div>
+            <motion.div className={styles.identityStrip} variants={item}>
+              <span className={styles.logoMark} aria-label="DevPath Community">
+                <Image
+                  src={DEVPATH_LOGO_URL}
+                  alt="DevPath Community logo"
+                  width={26}
+                  height={26}
+                  unoptimized
+                />
+              </span>
+              <span className={styles.identityText}>
+                <span className={styles.identityTitle}>DevPath Verified</span>
+                <span className={styles.identitySubtext}>{profileCompletion}% profile ready</span>
+              </span>
+            </motion.div>
+            {socialCount > 0 && (
+              <motion.div className={styles.socialLinks} variants={item} aria-label="DevCard social links">
+                {socialLinks.github && (
+                  <a className={styles.socialLink} href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="Open GitHub profile">
+                    <Github size={13} />
+                  </a>
+                )}
+                {socialLinks.linkedin && (
+                  <a className={styles.socialLink} href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="Open LinkedIn profile">
+                    <Linkedin size={13} />
+                  </a>
+                )}
+                {socialLinks.instagram && (
+                  <a className={styles.socialLink} href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Open Instagram profile">
+                    <Instagram size={13} />
+                  </a>
+                )}
+                <a className={`${styles.socialLink} ${styles.socialLinkProfile}`} href={profileUrl} target="_blank" rel="noopener noreferrer" aria-label="Open public DevPath profile">
+                  <ExternalLink size={13} />
+                </a>
+              </motion.div>
+            )}
             <motion.div className={styles.progressSection} variants={item}>
               <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
               <div className={styles.progressTrack}>
