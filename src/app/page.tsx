@@ -15,10 +15,10 @@ export default function Home() {
     <>
       <main className="min-h-screen bg-background">
         <FloatingParticles />
-        <div className="max-w-6xl mx-auto px-4 pt-8">
+        <Hero />
+        <div className="max-w-6xl mx-auto px-4 py-12">
           <NextBestActionWidget />
         </div>
-        <Hero />
         <SectionDivider />
         <ErrorBoundary>
           <SectionEntrance>

@@ -8,6 +8,7 @@ import {
   RefreshCw,
   Code,
   MessageSquare,
+  Shield,
 } from "lucide-react";
 import logo from "@/assets/logo.webp";
 import styles from "./Footer.module.css";
@@ -94,7 +95,7 @@ export default function Footer() {
               />
             </div>
             <div className={styles.links}>
-              <Link href="/terms" className={styles.link}>
+              <Link href="/terms-and-conditions" className={styles.link}>
                 <Book size={16} /> Terms & Conditions
               </Link>
 
