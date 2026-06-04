@@ -1,23 +1,25 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { motion, type Variants } from 'framer-motion';
 import {
   Download, Link2, Check, MapPin, Calendar,
   Trophy, Zap, Flame, Star, Award, Github,
   Layers, Code2, Globe, Users, Brain,
-  ChevronRight, Sparkles, Medal,
+  Sparkles, Medal, Linkedin, Instagram, ExternalLink, ShieldCheck,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
 import { collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useNotificationActions } from '@/stores/ui-store';
+import { getSafeSocialUrl } from '@/lib/safe-social-url';
 import styles from './DevCard.module.css';
 
 // ── Badge registry ────────────────────────────────────────────────────────────
-const BADGE_REGISTRY: Record<string, { name: string; Icon: any; color: string }> = {
+const BADGE_REGISTRY: Record<string, { name: string; Icon: LucideIcon; color: string }> = {
   'early-adopter':     { name: 'Early Adopter',     Icon: Sparkles,    color: '#60a5fa' },
   'profile-perfect':   { name: 'Profile Perfect',   Icon: Check,       color: '#34d399' },
   'builder-1':         { name: 'Builder',            Icon: Layers,      color: '#fb923c' },
@@ -44,6 +46,38 @@ const LANG_COLORS: Record<string, string> = {
   Shell: '#89e051', Vue: '#41b883',
 };
 const getLangColor = (lang: string) => LANG_COLORS[lang] ?? '#94a3b8';
+
+type TimestampLike = {
+  toDate?: () => Date;
+};
+
+type DevCardUser = {
+  uid?: string;
+  name?: string;
+  photoURL?: string;
+  city?: string;
+  state?: string;
+  createdAt?: string | number | Date | TimestampLike | null;
+  points?: number;
+  streak?: number;
+  achievements?: string[];
+  completedQuizzes?: unknown[];
+  followers?: unknown[];
+  github?: string;
+  linkedin?: string;
+  instagram?: string;
+  bio?: string;
+  githubStats?: {
+    connected?: boolean;
+    username?: string;
+    totalStars?: number;
+    stars?: number;
+    topLanguages?: Array<{
+      language: string;
+      count: number;
+    }>;
+  };
+};
 
 function resolveLevelColor(colorClass: string): string {
   const map: Record<string, string> = {
@@ -89,13 +123,13 @@ function fmtPoints(n: number) {
   if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
-function fmtDate(raw: any): string {
+function fmtDate(raw: DevCardUser['createdAt']): string {
   if (raw === null || raw === undefined) return 'Recent Member';
   try {
     let d: Date;
     if (typeof raw === 'string' || typeof raw === 'number') {
       d = new Date(raw);
-    } else if (typeof raw.toDate === 'function') {
+    } else if (typeof raw === 'object' && raw && typeof raw.toDate === 'function') {
       d = raw.toDate();
     } else {
       d = new Date(raw);
@@ -105,7 +139,12 @@ function fmtDate(raw: any): string {
   } catch { return 'Recent Member'; }
 }
 
-export default function DevCard({ user }: { user: any }) {
+const getGithubUrlFromUsername = (username?: string) => {
+  if (!username) return null;
+  return getSafeSocialUrl(`https://github.com/${username}`, 'github');
+};
+
+export default function DevCard({ user }: { user: DevCardUser }) {
   const IMAGE_WAIT_TIMEOUT_MS = 5000;
   const cardRef = useRef<HTMLDivElement>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
@@ -116,6 +155,32 @@ export default function DevCard({ user }: { user: any }) {
   const [langMounted, setLangMounted] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const { showSuccess, showError } = useNotificationActions();
+
+  const safeSocialLinks = useMemo(() => ({
+    github: getSafeSocialUrl(user?.github, 'github') ?? getGithubUrlFromUsername(user?.githubStats?.username),
+    linkedin: getSafeSocialUrl(user?.linkedin, 'linkedin'),
+    instagram: getSafeSocialUrl(user?.instagram, 'instagram'),
+  }), [user?.github, user?.githubStats?.username, user?.instagram, user?.linkedin]);
+
+  const socialLinks = [
+    safeSocialLinks.github && { key: 'github', label: 'GitHub', href: safeSocialLinks.github, Icon: Github },
+    safeSocialLinks.linkedin && { key: 'linkedin', label: 'LinkedIn', href: safeSocialLinks.linkedin, Icon: Linkedin },
+    safeSocialLinks.instagram && { key: 'instagram', label: 'Instagram', href: safeSocialLinks.instagram, Icon: Instagram },
+  ].filter(Boolean) as Array<{ key: string; label: string; href: string; Icon: LucideIcon }>;
+
+  const profileCompletionItems = [
+    Boolean(user?.name),
+    Boolean(user?.photoURL),
+    Boolean(user?.city || user?.state),
+    Boolean(user?.bio),
+    Boolean(safeSocialLinks.github),
+    Boolean(safeSocialLinks.linkedin),
+    Boolean(safeSocialLinks.instagram),
+    Boolean(user?.githubStats?.connected),
+  ];
+  const profileCompletion = Math.round(
+    (profileCompletionItems.filter(Boolean).length / profileCompletionItems.length) * 100
+  );
 
   useEffect(() => {
     const fetch = async () => {
@@ -154,8 +219,8 @@ export default function DevCard({ user }: { user: any }) {
     .filter((id: string) => BADGE_REGISTRY[id])
     .map((id: string) => ({ id, ...BADGE_REGISTRY[id] }));
 
-  const topBadges  = earnedBadges.slice(0, 4);
-  const extraCount = Math.max(0, earnedBadges.length - 4);
+  const topBadges  = earnedBadges.slice(0, 3);
+  const extraCount = Math.max(0, earnedBadges.length - 3);
   const topLangs = ((user?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
 
@@ -209,11 +274,30 @@ export default function DevCard({ user }: { user: any }) {
   };
 
   const handleDownload = async () => {
-    // Download functionality temporarily disabled in build environment.
-    // Restoring this requires bundler-compatible html2canvas integration.
-    // For now, show a friendly message to the user.
-    if (typeof window !== 'undefined') {
-      alert('DevCard download is temporarily disabled.');
+    if (!cardRef.current || downloading) return;
+
+    setDownloading(true);
+    try {
+      await waitForCardImages(cardRef.current);
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: Math.min(window.devicePixelRatio || 2, 3),
+        useCORS: true,
+      });
+      const safeName = (user?.name || 'devpath-member')
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+      const link = document.createElement('a');
+      link.download = `${safeName || 'devpath-member'}-devcard.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      showSuccess('DevCard downloaded as PNG.');
+    } catch {
+      showError('Unable to download the DevCard right now. Please try again.');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -326,6 +410,23 @@ export default function DevCard({ user }: { user: any }) {
               <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
               {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
             </motion.div>
+            {socialLinks.length > 0 && (
+              <motion.div className={styles.socialRow} variants={item}>
+                {socialLinks.map(({ key, label, href, Icon }) => (
+                  <a
+                    key={key}
+                    className={styles.socialLink}
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label={`${label} profile`}
+                    title={label}
+                  >
+                    <Icon size={13} />
+                  </a>
+                ))}
+              </motion.div>
+            )}
             <motion.div className={styles.progressSection} variants={item}>
               <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
               <div className={styles.progressTrack}>
@@ -335,6 +436,26 @@ export default function DevCard({ user }: { user: any }) {
           </motion.div>
 
           <motion.div className={styles.rightPanel} variants={container} initial="hidden" animate="show">
+            <motion.div className={styles.identityStrip} variants={item}>
+              <div className={styles.brandMark}>
+                <Image
+                  src="/DevPath-logo.webp"
+                  alt="DevPath Community"
+                  width={30}
+                  height={30}
+                  className={styles.brandLogo}
+                  unoptimized
+                />
+                <div>
+                  <span className={styles.brandEyebrow}>DevPath Community</span>
+                  <strong>Verified Developer Card</strong>
+                </div>
+              </div>
+              <div className={styles.completionBadge}>
+                <ShieldCheck size={14} />
+                <span>{profileCompletion}% complete</span>
+              </div>
+            </motion.div>
             <motion.div className={styles.statsGrid} variants={item}>
               <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(0,212,255,0.1)', color: '#00d4ff' }}><Zap size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.cyan}`}>{fmtPoints(animXP)}</span><span className={styles.statLabel}>Dev XP</span></div>
               <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}><Trophy size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.purple}`}>{rankLoading ? '—' : rank ? `#${rank}` : '—'}</span><span className={styles.statLabel}>Global Rank</span></div>
@@ -349,7 +470,7 @@ export default function DevCard({ user }: { user: any }) {
                   <Award size={11} /> Top Achievements
                 </span>
                 <div className={styles.badgesRow}>
-                  {topBadges.map((b: { id: string; name: string; Icon: any; color: string }) => {
+                  {topBadges.map((b) => {
                     const BadgeIcon = b.Icon;
                     return (
                       <span key={b.id} className={styles.badge} style={{ borderColor: `${b.color}33` }}>
@@ -375,8 +496,13 @@ export default function DevCard({ user }: { user: any }) {
           </motion.div>
 
           <div className={styles.footer}>
+            <span className={styles.footerSeal}>
+              <Image src="/DevPath-logo.webp" alt="" width={18} height={18} className={styles.footerLogo} unoptimized />
+            </span>
             <span className={styles.footerBrand}>DevPath · Developer Network</span>
-            <span className={styles.footerUrl}><ChevronRight size={11} style={{ opacity: 0.5 }} />devpath.in</span>
+            <a className={styles.footerUrl} href={profileUrl} target="_blank" rel="noopener noreferrer">
+              <ExternalLink size={11} style={{ opacity: 0.7 }} />devpath.in
+            </a>
           </div>
         </div>
       </motion.div>

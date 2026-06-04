@@ -359,6 +359,34 @@
   white-space: nowrap;
 }
 
+.socialRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: 100%;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: var(--devcard-text-muted);
+  background: var(--devcard-badge-bg);
+  border: 1px solid var(--devcard-badge-border);
+  transition: color 0.2s, border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.socialLink:hover {
+  color: #00d4ff;
+  border-color: rgba(0, 212, 255, 0.28);
+  background: rgba(0, 212, 255, 0.08);
+  transform: translateY(-1px);
+}
+
 /* ── Level progress ────────────────────────────────────────────────── */
 .progressSection {
   width: 100%;
