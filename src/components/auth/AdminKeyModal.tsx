@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Key, Lock, AlertCircle } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { secureFetch } from '@/lib/apiClient';  
+import { db } from '@/lib/firebase';
+import { doc, getDoc } from 'firebase/firestore';
 
 interface AdminKeyModalProps {
     isOpen: boolean;
@@ -22,22 +23,15 @@ export default function AdminKeyModal({ isOpen, onVerified, onCancel }: AdminKey
         setIsLoading(true);
 
         try {
-            // Sending key to the secure backend route instead of checking in browser
-            const response = await secureFetch('/api/auth/verify-admin', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ key }),
-            });
+            // Fetch the key securely on the client side since API routes are disabled in static export
+            const docRef = doc(db, 'admin_keys', 'config');
+            const docSnap = await getDoc(docRef);
 
-            const data = await response.json();
-
-            if (response.ok && data.success) {
+            if (docSnap.exists() && docSnap.data().value === key) {
                 verifyAdmin();
                 onVerified();
             } else {
-                setError(data.message || 'Invalid Admin Key. Please try again.');
+                setError('Invalid Admin Key. Please try again.');
             }
         } catch (err) {
             console.error('Verification error:', err);

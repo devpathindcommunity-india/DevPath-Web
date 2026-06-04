@@ -28,8 +28,6 @@ return ( <section
    className="relative py-24 overflow-hidden"
  >
 {/* Background Glow */} <div className="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent pointer-events-none" />
-
-```
   <div className="container mx-auto px-4 max-w-7xl relative z-10">
 
     {/* Heading */}
@@ -44,7 +42,7 @@ return ( <section
 
       <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
         Discover how learners, contributors, and developers are growing
-        together through DevPath's collaborative community.
+        together through DevPath&apos;s collaborative community.
       </p>
     </div>
 

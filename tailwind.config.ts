@@ -11,6 +11,24 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
+                // Dark surface hierarchy
+                'surface-deep': '#0a0a0a',
+                'surface-dark': '#0f1419',
+                'surface-elevated': '#1a1f35',
+
+                // GitHub-themed palette
+                'github-dark': '#161b22',
+                'github-surface': '#24292e',
+                'github-border': '#30363d',
+                'github-green': '#238636',
+                'github-muted': '#8b949e',
+
+                // Social brand colors
+                'brand-linkedin': '#0077b5',
+                'brand-linkedin-light': '#7cc5ff',
+                'brand-instagram': '#E1306C',
+                'brand-instagram-light': '#ff8ab1',
+
                 background: 'hsl(var(--background))',
                 foreground: 'hsl(var(--foreground))',
                 card: {

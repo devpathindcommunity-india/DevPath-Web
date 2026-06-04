@@ -67,7 +67,7 @@ export function PremiumCard({ children, className = "", hoverScale = true, bookm
             )}
 
             {/* Card content */}
-            <div className="relative bg-white/70 dark:bg-[#0f1419]/70 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-8 transition-all duration-300 group-hover:border-cyan-500/50 group-hover:shadow-[0_0_40px_rgba(0,212,255,0.2)] overflow-hidden h-full">
+            <div className="relative bg-white/70 dark:bg-surface-dark/70 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl p-8 transition-all duration-300 group-hover:border-cyan-500/50 group-hover:shadow-[0_0_40px_rgba(0,212,255,0.2)] overflow-hidden h-full">
                 {/* Inner glow */}
                 <div className="absolute inset-0 bg-gradient-to-br from-black/5 dark:from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 

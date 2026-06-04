@@ -107,7 +107,7 @@ function EventCard({ event, index, isCompleted = false }: { event: any, index: n
                             priority={index === 0 && !isCompleted}
                         />
                     ) : (
-                        <div className="w-full h-full bg-[#1a1f35]" />
+                        <div className="w-full h-full bg-surface-elevated" />
                     )}
                 </div>
 

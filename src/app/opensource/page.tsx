@@ -296,7 +296,7 @@ export default function OpenSourcePage() {
                             <button aria-label="Action button" 
                                 onClick={handleConnectGitHub}
                                 disabled={connecting}
-                                className="flex items-center gap-2 px-6 py-3 bg-[#24292e] text-white rounded-full hover:bg-[#2f363d] transition-colors font-medium disabled:opacity-50"
+                                className="flex items-center gap-2 px-6 py-3 bg-github-surface text-white rounded-full hover:bg-github-border transition-colors font-medium disabled:opacity-50"
                             >
                                 <Github size={20} />
                                 {connecting ? 'Connecting...' : 'Connect GitHub Account'}

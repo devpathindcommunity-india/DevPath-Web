@@ -199,7 +199,7 @@ export default function SignupPage() {
                                             rel="noopener noreferrer"
                                             className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/12"
                                         >
-                                            <div className="rounded-2xl bg-[#0077b5]/15 p-2 text-[#7cc5ff] transition-colors group-hover:bg-[#0077b5] group-hover:text-white">
+                                            <div className="rounded-2xl bg-brand-linkedin/15 p-2 text-brand-linkedin-light transition-colors group-hover:bg-brand-linkedin group-hover:text-white">
                                                 <Linkedin size={18} />
                                             </div>
                                             <div className="min-w-0">
@@ -215,7 +215,7 @@ export default function SignupPage() {
                                             rel="noopener noreferrer"
                                             className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30 hover:bg-white/12"
                                         >
-                                            <div className="rounded-2xl bg-[#E1306C]/15 p-2 text-[#ff8ab1] transition-colors group-hover:bg-[#E1306C] group-hover:text-white">
+                                            <div className="rounded-2xl bg-brand-instagram/15 p-2 text-brand-instagram-light transition-colors group-hover:bg-brand-instagram group-hover:text-white">
                                                 <Instagram size={18} />
                                             </div>
                                             <div className="min-w-0">

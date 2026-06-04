@@ -5,6 +5,10 @@ import { X, Loader2 } from 'lucide-react';
 import { db } from '@/lib/firebase';
 import {writeBatch, doc, collection, serverTimestamp, increment } from 'firebase/firestore';
 import { POINTS } from '@/lib/points';
+import ReactMarkdown from 'react-markdown';
+import DOMPurify from 'dompurify';
+import rehypeRaw from 'rehype-raw';
+import remarkGfm from 'remark-gfm';
 
 interface CreateDiscussionModalProps {
     isOpen: boolean;
@@ -17,6 +21,7 @@ interface CreateDiscussionModalProps {
 export default function CreateDiscussionModal({ isOpen, onClose, userId, userName, onSuccess }: CreateDiscussionModalProps) {
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [contentTab, setContentTab] = useState<'write' | 'preview'>('write');
     const [tags, setTags] = useState('');
     const [loading, setLoading] = useState(false);
 
@@ -48,6 +53,7 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
             await batch.commit();
             setTitle('');
             setContent('');
+            setContentTab('write');
             setTags('');
             onSuccess();
             onClose();
@@ -83,14 +89,45 @@ export default function CreateDiscussionModal({ isOpen, onClose, userId, userNam
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium mb-1">Content (Markdown supported)</label>
-                        <textarea
-                            value={content}
-                            onChange={(e) => setContent(e.target.value)}
-                            className="w-full bg-background border border-border rounded-lg px-4 py-2 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y"
-                            placeholder="Share your thoughts, ask questions, or showcase your work..."
-                            required
-                        />
+                        <div className="flex justify-between items-center mb-2">
+                            <label className="block text-sm font-medium">Content</label>
+                            <div className="flex bg-secondary border border-border/30 rounded-lg p-1">
+                                <button aria-label="Action button" 
+                                    type="button"
+                                    onClick={() => setContentTab('write')}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${contentTab === 'write' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Write
+                                </button>
+                                <button aria-label="Action button" 
+                                    type="button"
+                                    onClick={() => setContentTab('preview')}
+                                    className={`px-3 py-1 text-xs rounded-md transition-all ${contentTab === 'preview' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                >
+                                    Preview
+                                </button>
+                            </div>
+                        </div>
+
+                        {contentTab === 'write' ? (
+                            <textarea
+                                value={content}
+                                onChange={(e) => setContent(e.target.value)}
+                                className="w-full bg-background border border-border rounded-lg px-4 py-2 min-h-[200px] focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y"
+                                placeholder="Share your thoughts, ask questions, or showcase your work... (Markdown supported)"
+                                required
+                            />
+                        ) : (
+                            <div className="w-full bg-background border border-border rounded-lg px-4 py-2 min-h-[200px] markdown-body overflow-y-auto">
+                                {content ? (
+                                    <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
+                                        {DOMPurify.sanitize(content)}
+                                    </ReactMarkdown>
+                                ) : (
+                                    <span className="text-muted-foreground italic">Nothing to preview</span>
+                                )}
+                            </div>
+                        )}
                     </div>
 
                     <div>

@@ -134,7 +134,7 @@ export default function Hero() {
                         </Button>
                     </Link>
                     <Link href="https://linkly.link/2WCTY" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                        <Button aria-label="Join Community" variant="secondary" icon={<ArrowRight size={20} />} className="w-full sm:w-auto justify-center">
+                        <Button aria-label="Join Community" variant="primary" icon={<ArrowRight size={20} />} className="w-full sm:w-auto justify-center">
                             Join Community
                         </Button>
                     </Link>

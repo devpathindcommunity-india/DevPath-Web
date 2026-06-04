@@ -6,8 +6,8 @@ export default function MaintenanceOverlay() {
   const { maintenanceMessage } = useMaintenance();
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0a0a0a] text-white p-4">
-      <div className="max-w-md text-center space-y-6 p-8 border border-gray-800 bg-[#111] rounded-2xl shadow-2xl">
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-surface-deep text-white p-4">
+      <div className="max-w-md text-center space-y-6 p-8 border border-gray-800 bg-surface-deep rounded-2xl shadow-2xl">
         <div className="animate-pulse flex justify-center">
           {/* A simple glowing icon */}
           <div className="h-16 w-16 bg-blue-500/20 rounded-full flex items-center justify-center border border-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]">

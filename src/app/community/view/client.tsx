@@ -33,6 +33,7 @@ export default function DiscussionViewClient() {
     const [replies, setReplies] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [newReply, setNewReply] = useState('');
+    const [replyTab, setReplyTab] = useState<'write' | 'preview'>('write');
     const [submitting, setSubmitting] = useState(false);
     const [reactions, setReactions] = useState<Record<string, string[]>>({}); // { emoji: [userIds] }
     const [showReactionPicker, setShowReactionPicker] = useState(false);
@@ -46,6 +47,19 @@ export default function DiscussionViewClient() {
 
         const fetchDiscussion = async () => {
             try {
+                if (!db || discussionId === 'mock-discussion-1') {
+                    setDiscussion({
+                        id: 'mock-discussion-1',
+                        title: 'Welcome to DevPath community!',
+                        authorName: 'Admin',
+                        createdAt: { seconds: Date.now() / 1000 },
+                        content: 'This is a mock discussion content to test Markdown formatting: \n\n- List item\n- **Bold text**\n- `inline code`',
+                        tags: ['General', 'Help'],
+                        reactions: {}
+                    });
+                    setLoading(false);
+                    return;
+                }
                 const docRef = doc(db, 'discussions', discussionId);
                 const docSnap = await getDoc(docRef);
                 if (docSnap.exists()) {
@@ -57,12 +71,26 @@ export default function DiscussionViewClient() {
                 }
             } catch (error) {
                 console.error("Error fetching discussion:", error);
+                setDiscussion({
+                    id: 'mock-discussion-1',
+                    title: 'Welcome to DevPath community!',
+                    authorName: 'Admin',
+                    createdAt: { seconds: Date.now() / 1000 },
+                    content: 'This is a mock discussion content to test Markdown formatting: \n\n- List item\n- **Bold text**\n- `inline code`',
+                    tags: ['General', 'Help'],
+                    reactions: {}
+                });
+                setReplies([]);
             } finally {
                 setLoading(false);
             }
         };
 
         fetchDiscussion();
+
+        if (!db || discussionId === 'mock-discussion-1') {
+            return;
+        }
 
         // Real-time listener for discussion updates (reactions)
         const unsubDiscussion = onSnapshot(doc(db, 'discussions', discussionId), (doc) => {
@@ -91,6 +119,18 @@ export default function DiscussionViewClient() {
 
         setSubmitting(true);
         try {
+            if (!db || discussionId === 'mock-discussion-1') {
+                setReplies(prev => [...prev, {
+                    id: `mock-reply-${Date.now()}`,
+                    authorName: user.name || 'Anonymous',
+                    content: newReply,
+                    createdAt: { seconds: Date.now() / 1000 }
+                }]);
+                setNewReply('');
+                setReplyTab('write');
+                setSubmitting(false);
+                return;
+            }
             // Add reply
             await addDoc(collection(db, 'discussions', discussionId, 'replies'), {
                 authorId: user.uid,
@@ -106,6 +146,7 @@ export default function DiscussionViewClient() {
             });
 
             setNewReply('');
+            setReplyTab('write');
         } catch (error) {
             console.error("Error adding reply:", error);
             alert("Failed to post reply.");
@@ -193,7 +234,7 @@ export default function DiscussionViewClient() {
                         <span>{discussion.createdAt?.seconds ? new Date(discussion.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}</span>
                     </div>
 
-                    <div className="prose prose-invert max-w-none">
+                    <div className="markdown-body">
                         <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
                             {DOMPurify.sanitize(discussion.content)}
                         </ReactMarkdown>
@@ -275,7 +316,7 @@ export default function DiscussionViewClient() {
                                     {reply.createdAt?.seconds ? new Date(reply.createdAt.seconds * 1000).toLocaleDateString() : 'Just now'}
                                 </span>
                             </div>
-                            <div className="prose prose-invert max-w-none text-sm">
+                            <div className="markdown-body">
                                 <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
                                     {DOMPurify.sanitize(reply.content)}
                                 </ReactMarkdown>
@@ -286,14 +327,44 @@ export default function DiscussionViewClient() {
                     {/* Reply Input */}
                     {user ? (
                         <form onSubmit={handleReply} className="bg-card border border-border rounded-xl p-4 mt-8">
-                            <h4 className="font-semibold mb-4">Leave a reply</h4>
-                            <textarea
-                                value={newReply}
-                                onChange={(e) => setNewReply(e.target.value)}
-                                className="w-full bg-background border border-border rounded-lg px-4 py-3 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y mb-4"
-                                placeholder="Write your reply... (Markdown supported)"
-                                required
-                            />
+                            <div className="flex justify-between items-center mb-4">
+                                <h4 className="font-semibold">Leave a reply</h4>
+                                <div className="flex bg-secondary border border-border/30 rounded-lg p-1">
+                                    <button aria-label="Action button" 
+                                        type="button"
+                                        onClick={() => setReplyTab('write')}
+                                        className={`px-3 py-1 text-xs rounded-md transition-all ${replyTab === 'write' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                    >
+                                        Write
+                                    </button>
+                                    <button aria-label="Action button" 
+                                        type="button"
+                                        onClick={() => setReplyTab('preview')}
+                                        className={`px-3 py-1 text-xs rounded-md transition-all ${replyTab === 'preview' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+                                    >
+                                        Preview
+                                    </button>
+                                </div>
+                            </div>
+                            {replyTab === 'write' ? (
+                                <textarea
+                                    value={newReply}
+                                    onChange={(e) => setNewReply(e.target.value)}
+                                    className="w-full bg-background border border-border rounded-lg px-4 py-3 min-h-[100px] focus:outline-none focus:ring-2 focus:ring-primary/50 resize-y mb-4"
+                                    placeholder="Write your reply... (Markdown supported)"
+                                    required
+                                />
+                            ) : (
+                                <div className="w-full bg-background border border-border rounded-lg px-4 py-3 min-h-[100px] mb-4 markdown-body overflow-y-auto">
+                                    {newReply ? (
+                                        <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
+                                            {DOMPurify.sanitize(newReply)}
+                                        </ReactMarkdown>
+                                    ) : (
+                                        <span className="text-muted-foreground italic">Nothing to preview</span>
+                                    )}
+                                </div>
+                            )}
                             <div className="flex justify-end">
                                 <button aria-label="Action button" 
                                     type="submit"

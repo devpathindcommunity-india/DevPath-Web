@@ -10,6 +10,7 @@ import FooterWrapper from '@/components/layout/FooterWrapper';
 import PageWrapper from '@/components/layout/PageWrapper';
 import { FloatingAssistant } from '@/components/assistant/floating-assistant';
 import { ToastContainer } from '@/components/ui/ToastContainer';
+import SearchModal from '@/components/layout/SearchModal';
 
 export default function RouteAwareChrome({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
@@ -30,6 +31,7 @@ export default function RouteAwareChrome({ children }: { children: React.ReactNo
             {!isAuthRoute && <FooterWrapper />}
             {!isAuthRoute && <FloatingAssistant />}
             <ToastContainer />
+            <SearchModal />
         </>
     );
 }

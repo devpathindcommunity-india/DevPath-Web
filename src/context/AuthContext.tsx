@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
-import { auth, db, firebaseAvailable } from '@/lib/firebase';
+import { auth, db, firebaseAvailable, firebaseConfig } from '@/lib/firebase';
 import { onAuthStateChanged, signInWithEmailAndPassword, signOut, User as FirebaseUser, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { leaderboardSyncErrorEmitter } from '@/lib/leaderboard-sync-error';
@@ -107,6 +107,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     useEffect(() => {
         if (!firebaseReady) {
+            setUser({
+                uid: 'mock-user-123',
+                email: 'developer@example.com',
+                name: 'Local Developer',
+                photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+                role: 'member',
+                points: 120,
+                streak: 5,
+                loginDates: [],
+                achievements: [],
+                followers: [],
+                following: []
+            });
             setIsLoading(false);
             return;
         }
@@ -338,7 +351,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 }
                 setIsLoading(false);
             } else {
-                setUser(null);
+                if (firebaseConfig && firebaseConfig.apiKey === "mock-api-key-for-local-testing-only-123456") {
+                    setUser({
+                        uid: 'mock-user-123',
+                        email: 'developer@example.com',
+                        name: 'Local Developer',
+                        photoURL: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+                        role: 'member',
+                        points: 120,
+                        streak: 5,
+                        loginDates: [],
+                        achievements: [],
+                        followers: [],
+                        following: []
+                    });
+                } else {
+                    setUser(null);
+                }
                 setIsLoading(false);
             }
         });

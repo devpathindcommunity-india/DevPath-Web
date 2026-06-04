@@ -242,7 +242,7 @@ const TeamTile = ({ member, index, stepClass = '' }: { member: TeamMember; index
                 whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-20px' }}
                 transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.35, delay: (index % 12) * 0.03 }}
-                className="group relative aspect-[5/4] sm:aspect-[6/5] overflow-hidden bg-[#111a34]"
+                className="group relative aspect-[5/4] sm:aspect-[6/5] overflow-hidden bg-surface-dark"
                 style={{
                     clipPath: 'polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%)'
                 }}
@@ -267,7 +267,7 @@ const TeamTile = ({ member, index, stepClass = '' }: { member: TeamMember; index
                     </div>
                 )}
 
-                <div className="absolute inset-0 bg-gradient-to-t from-[#050915]/95 via-[#050915]/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-deep/95 via-surface-deep/40 to-transparent" />
 
                 <div className="absolute bottom-0 left-0 right-0 p-3">
                     <p className="text-white text-sm font-semibold leading-tight truncate">{member.name}</p>
@@ -310,10 +310,10 @@ const CoreRoleCard = ({ member, index }: { member: TeamMember; index: number }) 
             whileInView={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={shouldReduceMotion ? { duration: 0 } : { duration: 0.28, delay: (index % 6) * 0.04 }}
-            className="relative overflow-hidden bg-[#13213f]"
+            className="relative overflow-hidden bg-surface-dark"
             style={{ clipPath: 'polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 0 100%)' }}
         >
-            <div className="relative h-48 sm:h-52 bg-[#0b1430] overflow-hidden">
+            <div className="relative h-48 sm:h-52 bg-surface-deep overflow-hidden">
                 {!imageReady && (
                     <div className="absolute inset-0 z-10 animate-pulse bg-slate-400/25" aria-hidden="true" />
                 )}
@@ -333,7 +333,7 @@ const CoreRoleCard = ({ member, index }: { member: TeamMember; index: number }) 
                         <span className="text-5xl sm:text-6xl font-semibold text-black/90 tracking-tight">{getInitials(member.name)}</span>
                     </div>
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0b1226]/80 via-[#0b1226]/15 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-surface-deep/80 via-surface-deep/15 to-transparent" />
             </div>
 
             <div className="p-3 sm:p-4">
@@ -373,7 +373,7 @@ export default function TeamPage() {
 
     return (
         <>
-            <section className="min-h-screen bg-[#090f1f]">
+            <section className="min-h-screen bg-surface-deep">
                 <div className="relative overflow-hidden">
                     <div className="absolute inset-0 pointer-events-none">
                     <div
@@ -531,7 +531,7 @@ export default function TeamPage() {
                             <Link href="/community" className="inline-block mt-5 text-sm font-semibold text-sky-700 hover:text-sky-800">Read more</Link>
                         </article>
 
-                        <article className="rounded-2xl border border-slate-200 p-6 bg-gradient-to-br from-[#0f1731] to-[#17254a] text-white">
+                        <article className="rounded-2xl border border-slate-200 p-6 bg-gradient-to-br from-surface-deep to-surface-elevated text-white">
                             <p className="text-xs uppercase tracking-[0.16em] text-cyan-200/80">Opportunities</p>
                             <h3 className="mt-2 text-2xl font-semibold">Join the team</h3>
                             <p className="mt-2 text-cyan-50/80 text-sm">We are continuously expanding with volunteer and leadership roles in multiple cities.</p>

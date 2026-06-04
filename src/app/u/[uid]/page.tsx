@@ -3,8 +3,10 @@ import ProfileClient from '../client';
 import { db } from '@/lib/firebase';
 import { doc, getDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
-export function generateStaticParams() {
-    return [];
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+    return [{ uid: 'dummy' }];
 }
 
 export async function generateMetadata(

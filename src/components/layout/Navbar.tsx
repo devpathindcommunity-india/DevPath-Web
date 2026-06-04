@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Flame, Github, LogIn, Menu, X, LogOut, Lock, Bookmark } from 'lucide-react';
+import { Flame, Github, LogIn, Menu, X, LogOut, Lock, Bookmark, Search } from 'lucide-react';
 import logo from '@/assets/logo.webp';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
@@ -15,6 +15,7 @@ import styles from './Navbar.module.css';
 import { calculateStreak } from '@/lib/streakUtils';
 import { useScroll, useSpring } from 'framer-motion';
 import { useMaintenance } from '@/hooks/useMaintenance';
+import { useSetSearchOpen } from '@/stores/ui-store';
 
 
 const navLinks = [
@@ -33,6 +34,7 @@ export default function Navbar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [bookmarkDrawerOpen, setBookmarkDrawerOpen] = useState(false);
     const { isMaintenanceMode } = useMaintenance();
+    const setSearchOpen = useSetSearchOpen();
     console.log("Navbar Render: isMaintenanceMode =", isMaintenanceMode);
 
     const toggleMobileMenu = () => {
@@ -121,6 +123,15 @@ export default function Navbar() {
                                 <span className="text-sm font-bold" aria-hidden="true">{currentStreak}</span>
                             </div>
                         )}
+                        <button
+                            type="button"
+                            onClick={() => setSearchOpen(true)}
+                            className={styles.iconButton}
+                            aria-label="Search"
+                            title="Search (Ctrl+K)"
+                        >
+                            <Search size={20} />
+                        </button>
                         <ThemeToggle />
                         <button
                             type="button"
@@ -239,11 +250,24 @@ export default function Navbar() {
                                     ))}
                                 </nav>
 
-                                <div className={styles.mobileActions}>
-                                    <div className={styles.mobileActionRow}>
-                                        <ThemeToggle />
-                                        <span>Toggle Theme</span>
-                                    </div>
+                                 <div className={styles.mobileActions}>
+                                     <button
+                                         type="button"
+                                         onClick={() => {
+                                             setSearchOpen(true);
+                                             closeMobileMenu();
+                                         }}
+                                         className={styles.mobileProfileButton}
+                                         aria-label="Open Search"
+                                     >
+                                         <Search size={20} />
+                                         <span>Search</span>
+                                     </button>
+
+                                     <div className={styles.mobileActionRow}>
+                                         <ThemeToggle />
+                                         <span>Toggle Theme</span>
+                                     </div>
 
                                     {user ? (
                                         <Link

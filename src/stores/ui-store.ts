@@ -27,6 +27,8 @@ interface UIStore {
     showSuccess: (message: string, duration?: number) => string;
     showWarning: (message: string, duration?: number) => string;
     showInfo: (message: string, duration?: number) => string;
+    isSearchOpen: boolean;
+    setSearchOpen: (open: boolean) => void;
 }
 
 const noopApplyTheme = () => undefined;
@@ -36,6 +38,8 @@ export const useUIStore = create<UIStore>((set, get) => ({
     resolvedTheme: "dark",
     isThemeMounted: false,
     applyTheme: noopApplyTheme,
+    isSearchOpen: false,
+    setSearchOpen: (open) => set({ isSearchOpen: open }),
     syncTheme: (theme, resolvedTheme) => {
         const nextResolvedTheme: ThemePreference = resolvedTheme === "light" ? "light" : "dark";
 
@@ -110,3 +114,6 @@ export const useNotificationStore = () =>
             showInfo: state.showInfo,
         }))
     );
+
+export const useSearchOpen = () => useUIStore((state) => state.isSearchOpen);
+export const useSetSearchOpen = () => useUIStore((state) => state.setSearchOpen);

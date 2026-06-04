@@ -1,61 +1,41 @@
-import Hero from '@/components/home/Hero';
+﻿import Hero from '@/components/home/Hero';
 import { SectionDivider } from '@/components/SectionDivider';
 import { SectionEntrance } from '@/components/ui/SectionEntrance';
 import { FloatingParticles } from '@/components/FloatingParticles';
-
 import dynamic from 'next/dynamic';
-
+import BackToTop from '@/components/BackToTop';
+import ErrorBoundary from '@/components/ErrorBoundary';
+import NextBestActionWidget from '@/components/NextBestActionWidget';
 const Sponsors = dynamic(() => import('@/components/home/Sponsors'));
 const Mission = dynamic(() => import('@/components/home/Mission'));
 const CodingNews = dynamic(() => import('@/components/home/CodingNews'));
 const PastCollaborations = dynamic(() => import('@/components/home/PastCollaborations'));
-
-import BackToTop from '@/components/BackToTop';
-
-import ErrorBoundary from '@/components/ErrorBoundary';
-
 export default function Home() {
   return (
     <>
       <main className="min-h-screen bg-background">
         <FloatingParticles />
-
-        <ErrorBoundary>
-          <Hero />
-        </ErrorBoundary>
-
-        <SectionEntrance delay={0.1}>
-          <ErrorBoundary>
-            <CodingNews />
-          </ErrorBoundary>
-        </SectionEntrance>
-
-        <SectionEntrance>
-          <SectionDivider />
-        </SectionEntrance>
-
-        <div id="sponsors-section">
-          <SectionEntrance delay={0.2}>
-            <ErrorBoundary>
-              <Sponsors />
-            </ErrorBoundary>
-          </SectionEntrance>
+        <div className="max-w-6xl mx-auto px-4 pt-8">
+          <NextBestActionWidget />
         </div>
-
-        <SectionEntrance delay={0.2}>
-          <ErrorBoundary>
-            <PastCollaborations />
-          </ErrorBoundary>
-        </SectionEntrance>
-
-        <SectionEntrance delay={0.2}>
-          <ErrorBoundary>
+        <Hero />
+        <SectionDivider />
+        <ErrorBoundary>
+          <SectionEntrance>
+            <Sponsors />
+          </SectionEntrance>
+          <SectionEntrance>
             <Mission />
-          </ErrorBoundary>
-        </SectionEntrance>
+          </SectionEntrance>
+          <SectionEntrance>
+            <CodingNews />
+          </SectionEntrance>
+          <SectionEntrance>
+            <PastCollaborations />
+          </SectionEntrance>
+        </ErrorBoundary>
+        <BackToTop />
       </main>
-
-      <BackToTop />
     </>
   );
 }

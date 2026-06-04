@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { collection, getDocs, query, orderBy } from 'firebase/firestore';
 import { LEVELS, POINTS, calculateLevel } from '@/lib/points';
 import Image from 'next/image';
-import { Flame, Trophy, Star, Users, Award, Shield, Gift, Calendar } from 'lucide-react';
+import { Flame, Trophy, Star, Users, Award, Shield, Gift, Calendar, ChartNoAxesCombined } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface LeaderboardEntry {
@@ -28,6 +28,9 @@ export default function PathwayPage() {
         estimateSize: () => 72,
         overscan: 8,
     });
+    const chipsRef = useRef<HTMLDivElement | null>(null);
+    const [activeDot, setActiveDot] = useState(0)
+    const totalDots = LEVELS.slice(0, -1).length;
 
     useEffect(() => {
         const fetchLeaderboard = async () => {
@@ -87,6 +90,23 @@ export default function PathwayPage() {
 
         fetchLeaderboard();
     }, []);
+
+    const handleChipScroll = () => {
+        const el = chipsRef.current
+        if (!el) return
+
+        const maxScroll = el.scrollWidth - el.clientWidth
+
+        if (maxScroll <= 0) {
+            setActiveDot(0)
+            return
+        }
+
+        const progress = el.scrollLeft / maxScroll
+        const index = Math.round(progress * (totalDots - 1))
+
+        setActiveDot(index)
+    }
 
     return (
         <div className="min-h-screen bg-background pt-24 pb-12 px-4 md:px-8">
@@ -232,7 +252,11 @@ export default function PathwayPage() {
                     </div>
 
                     {/* Sidebar: Levels & Rules */}
-                    <div className="space-y-8">
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-2">
+                            <ChartNoAxesCombined className="text-yellow-500" />
+                            <h2 className="text-2xl font-bold">Progression System</h2>
+                        </div>
 
                         {/* Levels Guide */}
                         <div className="bg-card border border-border rounded-xl p-6 space-y-6">
@@ -272,15 +296,38 @@ export default function PathwayPage() {
                             </div>
 
                             {/* Other Levels - Horizontal Scroll */}
-                            <div className="flex gap-3 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide">
-                                {LEVELS.slice(0, -1).map((lvl) => (
-                                    <div key={lvl.name} className={`flex-shrink-0 w-48 p-4 rounded-lg border ${lvl.border} ${lvl.bg} flex flex-col justify-between items-center hover:scale-[1.02] transition-transform duration-200 snap-center`}>
-                                        <span className={`font-bold text-lg ${lvl.color}`}>{lvl.name}</span>
-                                        <span className="text-xs font-mono text-muted-foreground mt-2">
-                                            {lvl.max === Infinity ? `${lvl.min}+` : `${lvl.min} - ${lvl.max}`} pts
-                                        </span>
-                                    </div>
-                                ))}
+                            <div>
+                                <div
+                                    ref={chipsRef}
+                                    onScroll={handleChipScroll}
+                                    className="flex gap-3 overflow-x-auto py-4 snap-x snap-mandatory scrollbar-hide"
+                                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                                >
+                                    {LEVELS.slice(0, -1).map((lvl) => (
+                                        <div
+                                            key={lvl.name}
+                                            style={{ borderColor: lvl.border, borderWidth: '1px', borderStyle: 'solid' }}
+                                            className={`flex-shrink-0 w-44 p-3 rounded-lg ${lvl.bg} flex flex-col justify-between items-center hover:scale-[1.02] transition-transform duration-200 snap-center`}
+                                        >
+                                            <span className={`font-bold text-lg ${lvl.color}`}>{lvl.name}</span>
+                                            <span className="text-xs font-mono text-muted-foreground mt-1">
+                                                {lvl.max === Infinity ? `${lvl.min}+` : `${lvl.min} - ${lvl.max}`} pts
+                                            </span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex items-center justify-center gap-1.5 my-3">
+                                    {Array.from({ length: totalDots }).map((_, i) => (
+                                        <div
+                                            key={i}
+                                            className={`rounded-full transition-all duration-300 ${i === activeDot
+                                                ? 'w-5 h-1.5 bg-primary'
+                                                : 'w-1.5 h-1.5 bg-muted-foreground/30'
+                                                }`}
+                                        />
+                                    ))}
+                                </div>
+
                             </div>
                         </div>
 
@@ -357,7 +404,7 @@ export default function PathwayPage() {
                                     </div>
                                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-border">
                                         <span className="font-mono font-bold text-primary">{reward.cost.toLocaleString()} pts</span>
-                                        <button aria-label="Action button"  className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
+                                        <button aria-label="Action button" className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                                             Redeem
                                         </button>
                                     </div>
@@ -385,7 +432,7 @@ export default function PathwayPage() {
                                     </div>
                                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-border">
                                         <span className="font-mono font-bold text-primary">{reward.cost.toLocaleString()} pts</span>
-                                        <button aria-label="Action button"  className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
+                                        <button aria-label="Action button" className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                                             Redeem
                                         </button>
                                     </div>
@@ -414,7 +461,7 @@ export default function PathwayPage() {
                                     </div>
                                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-border">
                                         <span className="font-mono font-bold text-primary">{reward.cost.toLocaleString()} pts</span>
-                                        <button aria-label="Action button"  className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
+                                        <button aria-label="Action button" className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                                             Redeem
                                         </button>
                                     </div>
@@ -440,7 +487,7 @@ export default function PathwayPage() {
                                     </div>
                                     <div className="mt-auto pt-4 flex items-center justify-between border-t border-border">
                                         <span className="font-mono font-bold text-primary">{reward.cost.toLocaleString()} pts</span>
-                                        <button aria-label="Action button"  className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
+                                        <button aria-label="Action button" className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                                             Redeem
                                         </button>
                                     </div>

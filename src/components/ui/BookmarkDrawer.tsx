@@ -28,7 +28,7 @@ export default function BookmarkDrawer({ isOpen, onClose }: BookmarkDrawerProps)
 
                     {/* Drawer Panel */}
                     <motion.div
-                        className="fixed top-0 right-0 bottom-0 z-[1600] w-full max-w-md bg-white/95 dark:bg-[#0f1419]/95 backdrop-blur-xl border-l border-black/5 dark:border-white/10 shadow-2xl flex flex-col"
+                        className="fixed top-0 right-0 bottom-0 z-[1600] w-full max-w-md bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border-l border-black/5 dark:border-white/10 shadow-2xl flex flex-col"
                         initial={{ x: '100%' }}
                         animate={{ x: 0 }}
                         exit={{ x: '100%' }}

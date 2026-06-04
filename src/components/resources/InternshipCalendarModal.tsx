@@ -114,7 +114,7 @@ export function InternshipCalendarModal({ isOpen, onClose }: InternshipCalendarM
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
                         className="fixed inset-0 z-[2000] flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden">
+                        <div className="bg-surface-deep border border-white/10 w-full max-w-5xl h-[85vh] rounded-2xl shadow-2xl flex flex-col pointer-events-auto overflow-hidden">
                             {/* Header */}
                             <div className="p-6 border-b border-white/10 flex items-center justify-between bg-white/5">
                                 <div className="flex-1">

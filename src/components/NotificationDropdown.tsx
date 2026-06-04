@@ -159,7 +159,7 @@ export function NotificationDropdown() {
                             initial={{ opacity: 0, y: 10, scale: 0.95 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                            className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full mt-4 sm:mt-2 w-auto sm:w-96 origin-top sm:origin-top-right bg-white/95 dark:bg-[#0f1419]/95 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl z-50 max-h-[600px] overflow-hidden"
+                            className="absolute left-0 right-0 sm:left-auto sm:right-0 top-full mt-4 sm:mt-2 w-auto sm:w-96 origin-top sm:origin-top-right bg-white/95 dark:bg-surface-dark/95 backdrop-blur-xl border border-black/5 dark:border-white/10 rounded-2xl shadow-2xl z-50 max-h-[600px] overflow-hidden"
                             role="region"
                             aria-label="Notifications"
                             aria-live="polite"

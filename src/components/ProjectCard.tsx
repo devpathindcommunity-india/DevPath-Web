@@ -3,6 +3,12 @@ import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Star, GitFork, Eye, ExternalLink, Github } from "lucide-react"
 import { PremiumCard } from "./ui/PremiumCard"
+import {
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+  TooltipProvider,
+} from "./ui/tooltip";
 
 interface Project {
     author: string
@@ -53,16 +59,24 @@ export function ProjectCard({ project }: { project: Project }) {
                     </h3>
 
                     {/* Tech Stack */}
-                    <div className="flex flex-wrap gap-2 mb-auto">
+                     <div className="flex flex-wrap gap-2 mb-auto">
                         {project.technologies.map((tech) => (
-                            <span
-                                key={tech}
-                                className="px-3 py-1 text-xs rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/20 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-300"
-                            >
-                                {tech}
-                            </span>
-                        ))}
-                    </div>
+                    <TooltipProvider key={tech}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                  <span
+                   className="px-3 py-1 text-xs rounded-full bg-cyan-500/10 dark:bg-cyan-500/20 border border-cyan-500/20 dark:border-cyan-500/30 text-cyan-700 dark:text-cyan-300 cursor-default"
+                   >
+                  {tech}
+                   </span>
+                     </TooltipTrigger>
+                       <TooltipContent side="top">
+                         <p>{tech}</p>
+                      </TooltipContent>
+                        </Tooltip>
+                       </TooltipProvider>
+                     ))}
+                  </div>
 
                     {/* Stats */}
                     <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mt-4 pt-4 border-t border-black/5 dark:border-white/10">
@@ -108,7 +122,7 @@ export function ProjectCard({ project }: { project: Project }) {
                             initial={{ opacity: 0, scale: 0.95, y: 20 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-[#0f1419] border border-black/10 dark:border-white/10 rounded-2xl p-8 z-[2000] shadow-2xl"
+                            className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-white dark:bg-surface-dark border border-black/10 dark:border-white/10 rounded-2xl p-8 z-[2000] shadow-2xl"
                         >
                             {/* Close button */}
                             <button aria-label="Action button" 

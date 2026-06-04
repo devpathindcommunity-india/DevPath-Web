@@ -5,7 +5,7 @@ import RankingsTable from '@/components/certificate/RankingsTable';
 
 export default function CertificatePage() {
     return (
-        <div className="min-h-screen bg-[#0B0F19] text-white relative flex flex-col items-center">
+        <div className="min-h-screen bg-surface-deep text-white relative flex flex-col items-center">
             {/* Background Gradients */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
                 <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px]" />

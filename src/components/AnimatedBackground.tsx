@@ -22,7 +22,7 @@ export function AnimatedBackground() {
     return (
         <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
             {/* Base gradient */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-[#0a0e27] dark:via-black dark:to-black" />
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-surface-deep dark:via-black dark:to-black" />
 
             {/* Floating orbs - reduced blur on mobile */}
             <motion.div
