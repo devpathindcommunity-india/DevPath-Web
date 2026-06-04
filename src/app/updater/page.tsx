@@ -1,68 +1,90 @@
 "use client";
 
-import { useState } from 'react';
-import { CheckCircle, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, CheckCircle, ExternalLink, RefreshCw } from 'lucide-react';
 import Button from '@/components/ui/Button';
+import { fetchGithubReleaseHistory, type GithubReleaseHistoryItem } from '@/lib/github';
 import styles from './Updater.module.css';
 
-const releases = [
-    {
-        version: "v2.4.1",
-        date: "December 14, 2025",
-        type: "Stable",
-        notes: [
-            "Added new Wiki documentation system",
-            "Implemented Coming Soon badges for learning paths",
-            "Performance improvements for dashboard rendering",
-            "Fixed layout issues on mobile devices"
-        ]
-    },
-    {
-        version: "v2.4.0",
-        date: "December 10, 2025",
-        type: "Major",
-        notes: [
-            "Launched new Gamification engine",
-            "Added Real-time activity feed",
-            "Redesigned User Profile page",
-            "Introduced Dark Mode support"
-        ]
-    },
-    {
-        version: "v2.3.5",
-        date: "November 28, 2025",
-        type: "Patch",
-        notes: [
-            "Hotfix for login authentication flow",
-            "Updated dependency packages",
-            "Minor UI tweaks to Navbar"
-        ]
+const formatReleaseDate = (date: string) => {
+    if (!date) return 'Recently updated';
+    const releaseDate = new Date(date);
+
+    if (Number.isNaN(releaseDate.getTime())) {
+        return 'Recently updated';
     }
-];
+
+    return new Intl.DateTimeFormat('en', {
+        month: 'long',
+        day: 'numeric',
+        year: 'numeric'
+    }).format(releaseDate);
+};
 
 export default function UpdaterPage() {
     const [autoUpdate, setAutoUpdate] = useState(true);
     const [notifications, setNotifications] = useState(true);
     const [isChecking, setIsChecking] = useState(false);
+    const [releases, setReleases] = useState<GithubReleaseHistoryItem[]>([]);
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
+
+    const latestRelease = releases[0];
+
+    const loadReleaseHistory = useCallback(async () => {
+        setIsChecking(true);
+        setError('');
+
+        try {
+            const releaseHistory = await fetchGithubReleaseHistory();
+            setReleases(releaseHistory);
+
+            if (releaseHistory.length === 0) {
+                setError('No recent GitHub releases or merged pull requests were found.');
+            }
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'Unable to load GitHub release history.');
+        } finally {
+            setIsLoading(false);
+            setIsChecking(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadReleaseHistory();
+    }, [loadReleaseHistory]);
 
     const handleCheckUpdate = () => {
-        setIsChecking(true);
-        setTimeout(() => setIsChecking(false), 2000);
+        loadReleaseHistory();
     };
 
     return (
         <div className={styles.container}>
             <div className={styles.content}>
                 <div className={styles.statusCard}>
-                    <div className={styles.version}>v2.4.1</div>
-                    <div className={styles.channel}>Stable Channel</div>
-
-                    <div className={styles.message}>
-                        <CheckCircle size={20} color="#10b981" />
-                        You&apos;re up to date!
+                    <div className={styles.version}>Live Changelog</div>
+                    <div className={styles.channel}>
+                        {latestRelease?.source === 'pull-request' ? 'Merged Pull Requests' : 'GitHub Releases'}
                     </div>
 
-                    <Button aria-label="Action button" 
+                    <div className={styles.message}>
+                        {error ? (
+                            <>
+                                <AlertCircle size={20} color="#f59e0b" />
+                                {error}
+                            </>
+                        ) : (
+                            <>
+                                <CheckCircle size={20} color="#10b981" />
+                                {isLoading
+                                    ? 'Fetching the latest GitHub updates...'
+                                    : `Latest GitHub update: ${formatReleaseDate(latestRelease?.publishedAt ?? '')}.`}
+                            </>
+                        )}
+                    </div>
+
+                    <Button
+                        aria-label="Action button"
                         variant="primary"
                         icon={<RefreshCw size={18} className={isChecking ? 'animate-spin' : ''} />}
                         onClick={handleCheckUpdate}
@@ -96,25 +118,51 @@ export default function UpdaterPage() {
                     </div>
                 </div>
 
-                <h2 style={{ fontSize: '24px', fontWeight: '700', marginBottom: '32px' }}>Release History</h2>
+                <h2 className={styles.sectionTitle}>Release History</h2>
 
-                <div className={styles.timeline}>
-                    {releases.map((release, index) => (
-                        <div key={index} className={styles.release}>
-                            <div className={styles.releaseDot} />
-                            <div className={styles.releaseHeader}>
-                                <div className={styles.releaseVersion}>{release.version}</div>
-                                <div className={styles.releaseDate}>{release.date}</div>
+                <div className={styles.timeline} aria-live="polite">
+                    {isLoading ? (
+                        Array.from({ length: 3 }).map((_, index) => (
+                            <div key={index} className={styles.release}>
+                                <div className={styles.releaseDot} />
+                                <div className={styles.releaseHeader}>
+                                    <div className={`${styles.skeleton} ${styles.skeletonTitle}`} />
+                                    <div className={`${styles.skeleton} ${styles.skeletonDate}`} />
+                                </div>
+                                <div className={styles.releaseNotes}>
+                                    <div className={`${styles.skeleton} ${styles.skeletonLine}`} />
+                                    <div className={`${styles.skeleton} ${styles.skeletonLineShort}`} />
+                                </div>
                             </div>
-                            <div className={styles.releaseNotes}>
-                                <ul className={styles.noteList}>
-                                    {release.notes.map((note, i) => (
-                                        <li key={i} className={styles.noteItem}>{note}</li>
-                                    ))}
-                                </ul>
+                        ))
+                    ) : releases.length > 0 ? (
+                        releases.map(release => (
+                            <div key={release.id} className={styles.release}>
+                                <div className={styles.releaseDot} />
+                                <div className={styles.releaseHeader}>
+                                    <a
+                                        className={styles.releaseVersion}
+                                        href={release.url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                    >
+                                        {release.title}
+                                        <ExternalLink size={16} />
+                                    </a>
+                                    <div className={styles.releaseDate}>{formatReleaseDate(release.publishedAt)}</div>
+                                </div>
+                                <div className={styles.releaseNotes}>
+                                    <ul className={styles.noteList}>
+                                        <li className={styles.noteItem}>{release.description}</li>
+                                    </ul>
+                                </div>
                             </div>
+                        ))
+                    ) : (
+                        <div className={styles.emptyState}>
+                            GitHub did not return any release history yet. Check back after the next release or merged pull request.
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
         </div>

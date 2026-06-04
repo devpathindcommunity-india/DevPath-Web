@@ -1,8 +1,136 @@
 const GITHUB_API = process.env.NEXT_PUBLIC_GITHUB_API_BASE_URL ?? 'https://api.github.com';
 const DEVPATH_REPO = process.env.NEXT_PUBLIC_GITHUB_REPO ?? 'devpathindcommunity-india/DevPath-Web';
 const PER_PAGE = process.env.NEXT_PUBLIC_GITHUB_PER_PAGE ?? '100';
+
+export type GithubReleaseHistoryItem = {
+    id: string;
+    title: string;
+    publishedAt: string;
+    description: string;
+    url: string;
+    source: 'release' | 'pull-request';
+};
+
+type GithubReleaseResponse = {
+    id: number;
+    name: string | null;
+    tag_name: string;
+    published_at: string | null;
+    body: string | null;
+    html_url: string;
+};
+
+type GithubPullRequestResponse = {
+    id: number;
+    number: number;
+    title: string;
+    merged_at: string | null;
+    body: string | null;
+    html_url: string;
+};
+
+type GithubContributorStats = {
+    total?: number;
+    author?: {
+        login?: string | null;
+    } | null;
+    weeks?: Array<{
+        a?: number;
+        d?: number;
+    }>;
+};
+
+const changelogHeaders = {
+    Accept: 'application/vnd.github+json',
+    'X-GitHub-Api-Version': '2022-11-28'
+};
+
+const cleanGithubBody = (body?: string | null) => {
+    if (!body) return '';
+
+    return body
+        .replace(/<!--[\s\S]*?-->/g, '')
+        .replace(/```[\s\S]*?```/g, '')
+        .replace(/`([^`]+)`/g, '$1')
+        .replace(/\[(.*?)\]\([^)]*\)/g, '$1')
+        .replace(/[#>*_~]/g, '')
+        .split('\n')
+        .map(line => line.replace(/^[-+*]\s+/, '').trim())
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(' ');
+};
+
+const getFallbackDescription = (source: GithubReleaseHistoryItem['source']) =>
+    source === 'release'
+        ? 'Published release notes are available on GitHub.'
+        : 'Merged pull request from the DevPath repository.';
+
+const parseGithubResponse = async <T>(response: Response, failureMessage: string): Promise<T> => {
+    if (response.ok) {
+        return response.json();
+    }
+
+    if (response.status === 403 || response.status === 429) {
+        throw new Error('GitHub rate limit reached. Please try again in a few minutes.');
+    }
+
+    throw new Error(failureMessage);
+};
+
+export const fetchGithubReleaseHistory = async (limit = 5): Promise<GithubReleaseHistoryItem[]> => {
+    const releasesResponse = await fetch(
+        `${GITHUB_API}/repos/${DEVPATH_REPO}/releases?per_page=${limit}`,
+        { headers: changelogHeaders }
+    );
+    const releases = await parseGithubResponse<GithubReleaseResponse[]>(
+        releasesResponse,
+        'Unable to load GitHub releases.'
+    );
+
+    if (releases.length > 0) {
+        return releases.map(release => {
+            const description = cleanGithubBody(release.body);
+
+            return {
+                id: `release-${release.id}`,
+                title: release.name || release.tag_name,
+                publishedAt: release.published_at || '',
+                description: description || getFallbackDescription('release'),
+                url: release.html_url,
+                source: 'release'
+            };
+        });
+    }
+
+    const pullRequestsResponse = await fetch(
+        `${GITHUB_API}/repos/${DEVPATH_REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=20`,
+        { headers: changelogHeaders }
+    );
+    const pullRequests = await parseGithubResponse<GithubPullRequestResponse[]>(
+        pullRequestsResponse,
+        'Unable to load recently merged pull requests.'
+    );
+
+    return pullRequests
+        .filter(pullRequest => Boolean(pullRequest.merged_at))
+        .slice(0, limit)
+        .map(pullRequest => {
+            const description = cleanGithubBody(pullRequest.body);
+
+            return {
+                id: `pull-request-${pullRequest.id}`,
+                title: `#${pullRequest.number} ${pullRequest.title}`,
+                publishedAt: pullRequest.merged_at || '',
+                description: description || getFallbackDescription('pull-request'),
+                url: pullRequest.html_url,
+                source: 'pull-request'
+            };
+        });
+};
+
 export const fetchUserProfile = async (token: string) => {
-    const res = await fetch('${GITHUB_API}/user', {
+    const res = await fetch(`${GITHUB_API}/user`, {
         headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/vnd.github.v3+json'
@@ -13,7 +141,7 @@ export const fetchUserProfile = async (token: string) => {
 };
 
 export const fetchUserRepos = async (token: string) => {
-    const res = await fetch('${GITHUB_API}/user/repos?sort=updated&per_page=${PER_PAGE}&type=all', {
+    const res = await fetch(`${GITHUB_API}/user/repos?sort=updated&per_page=${PER_PAGE}&type=all`, {
         headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/vnd.github.v3+json'
@@ -59,13 +187,13 @@ export const fetchRepoContributorStats = async (token?: string) => {
             headers['Authorization'] = `Bearer ${token}`;
         }
         
-        let res = await fetch('${GITHUB_API}/repos/${DEVPATH_REPO}/stats/contributors', { headers });
+        let res = await fetch(`${GITHUB_API}/repos/${DEVPATH_REPO}/stats/contributors`, { headers });
         
         // Handle 202 status code by doing a brief retry loop
         let retries = 0;
         while (res.status === 202 && retries < 3) {
             await new Promise(resolve => setTimeout(resolve, 1500));
-            res = await fetch('${GITHUB_API}/repos/${DEVPATH_REPO}/stats/contributors', { headers });
+            res = await fetch(`${GITHUB_API}/repos/${DEVPATH_REPO}/stats/contributors`, { headers });
             retries++;
         }
         
@@ -74,14 +202,14 @@ export const fetchRepoContributorStats = async (token?: string) => {
         }
         
         const data = await res.json();
-        return Array.isArray(data) ? data : null;
+        return Array.isArray(data) ? data as GithubContributorStats[] : null;
     } catch (e) {
         console.error('Error fetching repo contributor stats:', e);
         return null;
     }
 };
 
-export const calculateUserLinesContributed = (stats: any[] | null, username: string) => {
+export const calculateUserLinesContributed = (stats: GithubContributorStats[] | null, username: string) => {
     let additions = 0;
     let deletions = 0;
     let commits = 0;
@@ -94,7 +222,8 @@ export const calculateUserLinesContributed = (stats: any[] | null, username: str
     if (stats && Array.isArray(stats)) {
         for (const contributor of stats) {
             if (!contributor || !contributor.author) continue;
-            const login = contributor.author.login.toLowerCase();
+            const login = contributor.author.login?.toLowerCase();
+            if (!login) continue;
             let match = false;
             
             if (isAdityaOrCommunity) {
