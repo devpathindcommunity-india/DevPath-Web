@@ -1,5 +1,5 @@
-import Link from "next/link";
-import Image from "next/image";
+import Link from 'next/link';
+import Image from 'next/image';
 import {
   Github,
   Book,
@@ -8,12 +8,13 @@ import {
   RefreshCw,
   Code,
   MessageSquare,
-} from "lucide-react";
-import logo from "@/assets/logo.webp";
-import styles from "./Footer.module.css";
-import { MagneticText } from "../ui/magnetic-text";
-import { siteConfig } from "@/config/siteConfig";
-import AppStoreButtons from "../ui/AppStoreButtons";
+  Shield,
+} from 'lucide-react';
+import logo from '@/assets/logo.webp';
+import styles from './Footer.module.css';
+import { MagneticText } from '../ui/magnetic-text';
+import { siteConfig } from '@/config/siteConfig';
+import AppStoreButtons from '../ui/AppStoreButtons';
 
 export default function Footer() {
   return (
@@ -29,7 +30,7 @@ export default function Footer() {
                 width={34}
                 height={34}
                 className="rounded-full"
-                style={{ marginRight: "12px" }}
+                style={{ marginRight: '12px' }}
               />
               <p className="font-bold text-3xl text-gray-900 dark:text-white">
                 {siteConfig.name}
