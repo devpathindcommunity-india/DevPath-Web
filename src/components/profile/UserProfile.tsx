@@ -344,6 +344,21 @@ useEffect(() => {
         linkedin: getSafeSocialUrl(user.linkedin, 'linkedin'),
         instagram: getSafeSocialUrl(user.instagram, 'instagram')
     };
+    const devCardProfileKey = [
+        user.uid,
+        user.name,
+        user.photoURL,
+        user.city,
+        user.state,
+        user.github,
+        user.linkedin,
+        user.instagram,
+        user.points,
+        user.streak,
+        user.achievements?.join('|') || '',
+        user.githubStats?.username,
+        user.githubStats?.totalStars,
+    ].join(':');
 
     return (
         <div className="min-h-screen bg-background text-foreground pb-8 px-4 md:px-8">
@@ -717,7 +732,7 @@ useEffect(() => {
                             <h3 className="text-xl font-bold">Your Dev Card</h3>
                             <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold ml-1">New</span>
                         </div>
-                        <DevCard user={user} />
+                        <DevCard key={devCardProfileKey} user={user} />
                     </div>
 
 

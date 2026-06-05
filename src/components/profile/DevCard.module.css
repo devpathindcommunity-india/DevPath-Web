@@ -263,6 +263,30 @@
   background: linear-gradient(180deg, rgba(0, 212, 255, 0.03) 0%, transparent 100%);
 }
 
+.brandLockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  padding: 5px 10px 5px 6px;
+  border: 1px solid var(--devcard-panel-border);
+  border-radius: 999px;
+  background: var(--devcard-panel);
+  color: var(--devcard-text-muted);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.brandLogo {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.16);
+}
+
 .avatarRing {
   position: relative;
   width: 84px;
@@ -357,6 +381,43 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.socialRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  min-height: 30px;
+  width: 100%;
+}
+
+.socialLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: var(--devcard-panel);
+  border: 1px solid var(--devcard-panel-border);
+  color: var(--devcard-text-muted);
+  transition: color 0.2s ease, border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.socialLink:hover {
+  color: #00d4ff;
+  background: rgba(0, 212, 255, 0.08);
+  border-color: rgba(0, 212, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+.socialHint {
+  color: var(--devcard-text-faint);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
 }
 
 /* ── Level progress ────────────────────────────────────────────────── */
@@ -612,11 +673,21 @@
 }
 
 .footerBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: rgba(0, 212, 255, 0.75);
   text-transform: uppercase;
+}
+
+.footerLogo {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  object-fit: cover;
 }
 
 .footerUrl {
@@ -699,6 +770,14 @@
     align-items: flex-start;
     flex-wrap: wrap;
     gap: 12px;
+  }
+
+  .brandLockup {
+    order: -2;
+  }
+
+  .socialRow {
+    justify-content: flex-start;
   }
 
   .meta {

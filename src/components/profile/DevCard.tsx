@@ -7,10 +7,11 @@ import {
   Download, Link2, Check, MapPin, Calendar,
   Trophy, Zap, Flame, Star, Award, Github,
   Layers, Code2, Globe, Users, Brain,
-  ChevronRight, Sparkles, Medal,
+  ChevronRight, Sparkles, Medal, Instagram, Linkedin,
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
+import { getSafeSocialUrl } from '@/lib/safe-social-url';
 import { collection, query, where, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useNotificationActions } from '@/stores/ui-store';
@@ -165,6 +166,12 @@ export default function DevCard({ user }: { user: any }) {
   const profileUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/u/${user?.uid}`
     : `devpath.in/u/${user?.uid}`;
+  const socialLinks = {
+    github: getSafeSocialUrl(user?.github, 'github'),
+    linkedin: getSafeSocialUrl(user?.linkedin, 'linkedin'),
+    instagram: getSafeSocialUrl(user?.instagram, 'instagram'),
+  };
+  const hasSocialLinks = Boolean(socialLinks.github || socialLinks.linkedin || socialLinks.instagram);
 
   const waitForCardImages = async (root: HTMLElement) => {
     const imgs = Array.from(root.querySelectorAll('img'));
@@ -296,6 +303,16 @@ export default function DevCard({ user }: { user: any }) {
       >
         <div className={styles.cardInner}>
           <motion.div className={styles.leftPanel} variants={container} initial="hidden" animate="show">
+            <motion.div className={styles.brandLockup} variants={item}>
+              <Image
+                src="/DevPath-logo.webp"
+                alt="DevPath Community"
+                width={34}
+                height={34}
+                className={styles.brandLogo}
+              />
+              <span>DevPath</span>
+            </motion.div>
             <motion.div className={styles.avatarRing} variants={item}>
               <div className={styles.avatarRingInner} />
               {user?.photoURL && !avatarLoadFailed ? (
@@ -325,6 +342,26 @@ export default function DevCard({ user }: { user: any }) {
               )}
               <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
               {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
+            </motion.div>
+            <motion.div className={styles.socialRow} variants={item} aria-label="Dev card social links">
+              {socialLinks.github && (
+                <a href={socialLinks.github} target="_blank" rel="noopener noreferrer" aria-label="GitHub profile" className={styles.socialLink}>
+                  <Github size={12} />
+                </a>
+              )}
+              {socialLinks.linkedin && (
+                <a href={socialLinks.linkedin} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn profile" className={styles.socialLink}>
+                  <Linkedin size={12} />
+                </a>
+              )}
+              {socialLinks.instagram && (
+                <a href={socialLinks.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram profile" className={styles.socialLink}>
+                  <Instagram size={12} />
+                </a>
+              )}
+              {!hasSocialLinks && (
+                <span className={styles.socialHint}>Add social links</span>
+              )}
             </motion.div>
             <motion.div className={styles.progressSection} variants={item}>
               <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
@@ -375,7 +412,17 @@ export default function DevCard({ user }: { user: any }) {
           </motion.div>
 
           <div className={styles.footer}>
-            <span className={styles.footerBrand}>DevPath · Developer Network</span>
+            <span className={styles.footerBrand}>
+              <Image
+                src="/DevPath-logo.webp"
+                alt=""
+                width={18}
+                height={18}
+                className={styles.footerLogo}
+                aria-hidden="true"
+              />
+              DevPath · Developer Network
+            </span>
             <span className={styles.footerUrl}><ChevronRight size={11} style={{ opacity: 0.5 }} />devpath.in</span>
           </div>
         </div>
