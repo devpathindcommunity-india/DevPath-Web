@@ -7,6 +7,7 @@ import {
   Users,
   RefreshCw,
   Code,
+  Shield,
   MessageSquare,
 } from "lucide-react";
 import logo from "@/assets/logo.webp";

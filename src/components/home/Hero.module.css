@@ -4,7 +4,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 120px 24px 80px;
+    padding: calc(64px + 20px + 20px) 24px 80px;
     position: relative;
     overflow: hidden;
     background: transparent;

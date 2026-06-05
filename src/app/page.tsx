@@ -13,7 +13,7 @@ const PastCollaborations = dynamic(() => import('@/components/home/PastCollabora
 export default function Home() {
   return (
     <>
-      <main className="min-h-screen bg-background">
+  <main className="min-h-screen bg-background pt-28">
         <FloatingParticles />
         <div className="max-w-6xl mx-auto px-4 pt-8">
           <NextBestActionWidget />
