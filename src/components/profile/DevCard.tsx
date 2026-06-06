@@ -7,7 +7,7 @@ import {
   Download, Link2, Check, MapPin, Calendar,
   Trophy, Zap, Flame, Star, Award, Github,
   Layers, Code2, Globe, Users, Brain,
-  ChevronRight, Sparkles, Medal,
+  ChevronRight, Sparkles, Medal, Linkedin, Instagram,
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -209,11 +209,28 @@ export default function DevCard({ user }: { user: any }) {
   };
 
   const handleDownload = async () => {
-    // Download functionality temporarily disabled in build environment.
-    // Restoring this requires bundler-compatible html2canvas integration.
-    // For now, show a friendly message to the user.
-    if (typeof window !== 'undefined') {
-      alert('DevCard download is temporarily disabled.');
+    if (!cardRef.current) return;
+    setDownloading(true);
+    try {
+      await waitForCardImages(cardRef.current);
+      const html2canvas = (await import('html2canvas')).default;
+      const canvas = await html2canvas(cardRef.current, {
+        useCORS: true,
+        allowTaint: false,
+        backgroundColor: null,
+        scale: 2,
+        logging: false,
+      });
+      const url = canvas.toDataURL('image/png');
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `devcard-${user?.name?.replace(/\s+/g, '-').toLowerCase() ?? 'devcard'}.png`;
+      a.click();
+      showSuccess('DevCard downloaded successfully.');
+    } catch {
+      showError('Failed to download DevCard. Please try again.');
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -325,6 +342,16 @@ export default function DevCard({ user }: { user: any }) {
               )}
               <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
               {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
+              {user?.linkedin && (
+                <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
+                  <Linkedin size={10} />LinkedIn
+                </a>
+              )}
+              {user?.instagram && (
+                <a href={user.instagram} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
+                  <Instagram size={10} />Instagram
+                </a>
+              )}
             </motion.div>
             <motion.div className={styles.progressSection} variants={item}>
               <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
@@ -375,7 +402,17 @@ export default function DevCard({ user }: { user: any }) {
           </motion.div>
 
           <div className={styles.footer}>
-            <span className={styles.footerBrand}>DevPath · Developer Network</span>
+            <span className={styles.footerBrand}>
+              <Image
+                src="/DevPath-logo.webp"
+                alt="DevPath"
+                width={18}
+                height={18}
+                className={styles.footerLogo}
+                unoptimized
+              />
+              DevPath · Developer Network
+            </span>
             <span className={styles.footerUrl}><ChevronRight size={11} style={{ opacity: 0.5 }} />devpath.in</span>
           </div>
         </div>
