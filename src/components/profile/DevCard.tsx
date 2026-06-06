@@ -8,6 +8,7 @@ import {
   Trophy, Zap, Flame, Star, Award, Github,
   Layers, Code2, Globe, Users, Brain,
   ChevronRight, Sparkles, Medal, Linkedin, Instagram, ExternalLink,
+  type LucideIcon,
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
@@ -18,7 +19,39 @@ import { getSafeSocialUrl } from '@/lib/safe-social-url';
 import styles from './DevCard.module.css';
 
 // ── Badge registry ────────────────────────────────────────────────────────────
-const BADGE_REGISTRY: Record<string, { name: string; Icon: any; color: string }> = {
+type BadgeInfo = { name: string; Icon: LucideIcon; color: string };
+type TimestampLike = { toDate: () => Date };
+type TopLanguage = { language: string; count: number };
+type MaybeString = string | null | undefined;
+type DevCardUser = {
+  uid?: MaybeString;
+  name?: MaybeString;
+  photoURL?: MaybeString;
+  points?: number;
+  streak?: number;
+  achievements?: string[];
+  github?: MaybeString;
+  linkedin?: MaybeString;
+  instagram?: MaybeString;
+  bio?: MaybeString;
+  aboutMarkdown?: MaybeString;
+  city?: MaybeString;
+  state?: MaybeString;
+  createdAt?: string | number | Date | TimestampLike;
+  completedQuizzes?: unknown[];
+  followers?: unknown[];
+  githubStats?: {
+    connected?: boolean;
+    username?: MaybeString;
+    topLanguages?: TopLanguage[];
+    totalStars?: number;
+    stars?: number;
+  };
+};
+
+const EASE_OUT: [number, number, number, number] = [0.19, 1, 0.22, 1];
+
+const BADGE_REGISTRY: Record<string, BadgeInfo> = {
   'early-adopter':     { name: 'Early Adopter',     Icon: Sparkles,    color: '#60a5fa' },
   'profile-perfect':   { name: 'Profile Perfect',   Icon: Check,       color: '#34d399' },
   'builder-1':         { name: 'Builder',            Icon: Layers,      color: '#fb923c' },
@@ -73,7 +106,10 @@ function resolveLevelBg(bgClass: string): string {
 function useAnimatedCount(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    if (target === 0) { setCount(0); return; }
+    if (target === 0) {
+      const resetTimer = window.setTimeout(() => setCount(0), 0);
+      return () => clearTimeout(resetTimer);
+    }
     let current = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
@@ -91,23 +127,25 @@ function fmtPoints(n: number) {
   if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
-function fmtDate(raw: any): string {
+function fmtDate(raw: DevCardUser['createdAt']): string {
   if (raw === null || raw === undefined) return 'Recent Member';
   try {
     let d: Date;
     if (typeof raw === 'string' || typeof raw === 'number') {
       d = new Date(raw);
-    } else if (typeof raw.toDate === 'function') {
+    } else if (raw instanceof Date) {
+      d = raw;
+    } else if ('toDate' in raw && typeof raw.toDate === 'function') {
       d = raw.toDate();
     } else {
-      d = new Date(raw);
+      return 'Recent Member';
     }
     if (isNaN(d.getTime())) return 'Recent Member';
     return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
   } catch { return 'Recent Member'; }
 }
 
-function resolveSocialUrl(value: string | undefined, platform: 'github' | 'linkedin' | 'instagram'): string | null {
+function resolveSocialUrl(value: MaybeString, platform: 'github' | 'linkedin' | 'instagram'): string | null {
   const trimmed = value?.trim();
   if (!trimmed) return null;
 
@@ -122,14 +160,12 @@ function resolveSocialUrl(value: string | undefined, platform: 'github' | 'linke
   return null;
 }
 
-export default function DevCard({ user }: { user: any }) {
-  const IMAGE_WAIT_TIMEOUT_MS = 5000;
+export default function DevCard({ user }: { user: DevCardUser }) {
   const cardRef = useRef<HTMLDivElement>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [rank, setRank]             = useState<number | null>(null);
   const [rankLoading, setRankLoading] = useState(true);
   const [copied, setCopied]         = useState(false);
-  const [downloading, setDownloading] = useState(false);
   const [langMounted, setLangMounted] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const { showSuccess, showError } = useNotificationActions();
@@ -148,9 +184,12 @@ export default function DevCard({ user }: { user: any }) {
   }, [user?.points]);
 
   useEffect(() => {
-    setShowSkeleton(true);
-    const timer = setTimeout(() => setShowSkeleton(false), 650);
-    return () => clearTimeout(timer);
+    const resetTimer = window.setTimeout(() => setShowSkeleton(true), 0);
+    const doneTimer = window.setTimeout(() => setShowSkeleton(false), 650);
+    return () => {
+      clearTimeout(resetTimer);
+      clearTimeout(doneTimer);
+    };
   }, [user?.uid]);
 
   useEffect(() => {
@@ -159,7 +198,8 @@ export default function DevCard({ user }: { user: any }) {
   }, []);
 
   useEffect(() => {
-    setAvatarLoadFailed(false);
+    const resetTimer = window.setTimeout(() => setAvatarLoadFailed(false), 0);
+    return () => clearTimeout(resetTimer);
   }, [user?.photoURL]);
 
   const levelInfo   = calculateLevel(user?.points ?? 0);
@@ -173,7 +213,7 @@ export default function DevCard({ user }: { user: any }) {
 
   const topBadges  = earnedBadges.slice(0, 4);
   const extraCount = Math.max(0, earnedBadges.length - 4);
-  const topLangs = ((user?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
+  const topLangs = (user?.githubStats?.topLanguages ?? []).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
   const socialLinks = {
     github: resolveSocialUrl(user?.github ?? user?.githubStats?.username, 'github'),
@@ -197,48 +237,6 @@ export default function DevCard({ user }: { user: any }) {
   const profileUrl = typeof window !== 'undefined'
     ? `${window.location.origin}/u/${user?.uid}`
     : `devpath.in/u/${user?.uid}`;
-
-  const waitForCardImages = async (root: HTMLElement) => {
-    const imgs = Array.from(root.querySelectorAll('img'));
-    await Promise.all(
-      imgs.map(async (img) => {
-        if (img.complete) {
-          // complete + naturalWidth 0 means a failed image; treat as terminal.
-          if (img.naturalWidth === 0) return;
-          return;
-        }
-        if (typeof img.decode === 'function') {
-          try {
-            await Promise.race([
-              img.decode(),
-              new Promise<void>((resolve) => {
-                setTimeout(resolve, IMAGE_WAIT_TIMEOUT_MS);
-              }),
-            ]);
-            return;
-          } catch {
-            // Fallback to load/error listeners if decode rejects.
-          }
-        }
-
-        await new Promise<void>((resolve) => {
-          const timeoutId = setTimeout(() => {
-            done();
-          }, IMAGE_WAIT_TIMEOUT_MS);
-
-          const done = () => {
-            img.removeEventListener('load', done);
-            img.removeEventListener('error', done);
-            clearTimeout(timeoutId);
-            resolve();
-          };
-
-          img.addEventListener('load', done, { once: true });
-          img.addEventListener('error', done, { once: true });
-        });
-      })
-    );
-  };
 
   const handleDownload = async () => {
     // Download functionality temporarily disabled in build environment.
@@ -323,7 +321,7 @@ export default function DevCard({ user }: { user: any }) {
         className={styles.card}
         initial={{ opacity: 0, y: 28, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.65, ease: [0.19, 1, 0.22, 1] as any }}
+        transition={{ duration: 0.65, ease: EASE_OUT }}
         id="devcard-render"
       >
         <div className={styles.cardInner}>
@@ -398,7 +396,7 @@ export default function DevCard({ user }: { user: any }) {
             <motion.div className={styles.progressSection} variants={item}>
               <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
               <div className={styles.progressTrack}>
-                <motion.div className={styles.progressFill} initial={{ width: 0 }} animate={{ width: `${levelInfo.progress}%` }} transition={{ delay: 0.6, duration: 1.2, ease: [0.19, 1, 0.22, 1] as any }} style={{ background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)` }} />
+                <motion.div className={styles.progressFill} initial={{ width: 0 }} animate={{ width: `${levelInfo.progress}%` }} transition={{ delay: 0.6, duration: 1.2, ease: EASE_OUT }} style={{ background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)` }} />
               </div>
             </motion.div>
           </motion.div>
@@ -418,7 +416,7 @@ export default function DevCard({ user }: { user: any }) {
                   <Award size={11} /> Top Achievements
                 </span>
                 <div className={styles.badgesRow}>
-                  {topBadges.map((b: { id: string; name: string; Icon: any; color: string }) => {
+                  {topBadges.map((b: { id: string } & BadgeInfo) => {
                     const BadgeIcon = b.Icon;
                     return (
                       <span key={b.id} className={styles.badge} style={{ borderColor: `${b.color}33` }}>
@@ -450,8 +448,8 @@ export default function DevCard({ user }: { user: any }) {
         </div>
       </motion.div>
 
-      <motion.div className={styles.actions} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: [0.19, 1, 0.22, 1] as any }}>
-        <button id="devcard-download-btn" className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleDownload} disabled={downloading} aria-label="Download Dev Card as PNG"><Download size={15} />{downloading ? 'Generating...' : 'Download Card'}</button>
+      <motion.div className={styles.actions} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: EASE_OUT }}>
+        <button id="devcard-download-btn" className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleDownload} aria-label="Download Dev Card as PNG"><Download size={15} />Download Card</button>
         <button id="devcard-copy-btn" className={`${styles.btn} ${copied ? styles.btnSuccess : styles.btnSecondary}`} onClick={handleCopy} aria-label="Copy profile link">{copied ? <Check size={15} /> : <Link2 size={15} />}{copied ? 'Copied!' : 'Copy Profile Link'}</button>
       </motion.div>
     </div>
