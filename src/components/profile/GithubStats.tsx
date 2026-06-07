@@ -144,7 +144,7 @@ export default function GithubStats({ user }: { user: any }) {
                                             {event.type.replace('Event', '').replace(/([A-Z])/g, ' $1').trim()}
                                         </span>
                                         {' '}on{' '}
-                                        <a href={event.repo.url} target="_blank" className="text-primary hover:underline font-medium">
+                                        <a href={event.repo.url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline font-medium">
                                             {event.repo.name}
                                         </a>
                                     </p>
