@@ -13,6 +13,7 @@
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/stargazers"><img src="https://img.shields.io/github/stars/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="Stargazers"></a>
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/issues"><img src="https://img.shields.io/github/issues/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="Issues"></a>
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/blob/main/LICENSE"><img src="https://img.shields.io/github/license/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="License"></a>
+  <a href="https://github.com/devpathindcommunity-india/DevPath-Web/actions/workflows/ci.yml"><img src="https://github.com/devpathindcommunity-india/DevPath-Web/actions/workflows/ci.yml/badge.svg" alt="CI Build Status"></a>
 </p>
 
 <p align="center">
