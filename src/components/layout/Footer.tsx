@@ -47,7 +47,7 @@ export default function Footer() {
               <MagneticText
                 text="RESOURCES"
                 hoverText="EXPLORE"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
@@ -69,7 +69,7 @@ export default function Footer() {
               <MagneticText
                 text="LINKS"
                 hoverText="VISIT"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
@@ -91,7 +91,7 @@ export default function Footer() {
               <MagneticText
                 text="LEGAL"
                 hoverText="POLICIES"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
@@ -110,7 +110,7 @@ export default function Footer() {
 
           {/* Contact us */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter">CONTACT US</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">CONTACT US</p>
             <a
               aria-label="Link"
               href={`mailto:${siteConfig.contact.email}`}
@@ -122,7 +122,7 @@ export default function Footer() {
 
           {/* Get the app */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter">GET THE APP</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">GET THE APP</p>
             <AppStoreButtons
               variant="footer"
               className="flex-col !items-start"
