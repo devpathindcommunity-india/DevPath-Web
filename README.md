@@ -5,6 +5,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/devpathindcommunity-india/DevPath-Web/actions/workflows/nextjs.yml">
+    <img src="https://img.shields.io/github/actions/workflow/status/devpathindcommunity-india/DevPath-Web/nextjs.yml?branch=master&style=for-the-badge" alt="CI Build Status">
+  </a>
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/graphs/contributors"><img src="https://img.shields.io/github/contributors/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="Contributors"></a>
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/network/members"><img src="https://img.shields.io/github/forks/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="Forks"></a>
   <a href="https://github.com/devpathindcommunity-india/DevPath-Web/stargazers"><img src="https://img.shields.io/github/stars/devpathindcommunity-india/DevPath-Web.svg?style=for-the-badge" alt="Stargazers"></a>
