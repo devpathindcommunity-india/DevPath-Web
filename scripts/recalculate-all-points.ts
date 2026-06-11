@@ -1,19 +1,25 @@
-
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, getDocs, doc, updateDoc, writeBatch } from "firebase/firestore";
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { initializeApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  writeBatch,
+} from 'firebase/firestore';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 
 import * as dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
 const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID
+  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 const app = initializeApp(firebaseConfig);
@@ -24,107 +30,120 @@ const SUPER_ADMIN_EMAIL = process.env.SUPER_ADMIN_EMAIL;
 const SUPER_ADMIN_PASSWORD = process.env.SUPER_ADMIN_PASSWORD;
 
 const POINTS = {
-    DAILY_LOGIN: 0,
-    WEEKLY_STREAK_BONUS: 50,
-    FOLLOW_COMMUNITY: 500,
-    BADGE_EARNED: 20,
-    SOCIAL_BADGE_EARNED: 50,
-    FOLLOWER_GAINED: 10,
-    PROJECT_STAR: 50,
-    CREATE_PROJECT: 200,
-    EVENT_PARTICIPATION: 500,
-    HACKATHON_WIN: 5000,
-    STREAK_BONUS_PER_DAY: 1
+  DAILY_LOGIN: 0,
+  WEEKLY_STREAK_BONUS: 50,
+  FOLLOW_COMMUNITY: 500,
+  BADGE_EARNED: 20,
+  SOCIAL_BADGE_EARNED: 50,
+  FOLLOWER_GAINED: 10,
+  PROJECT_STAR: 50,
+  CREATE_PROJECT: 200,
+  EVENT_PARTICIPATION: 500,
+  HACKATHON_WIN: 5000,
+  STREAK_BONUS_PER_DAY: 1,
 };
 
 const SOCIAL_BADGES = ['social-github', 'social-linkedin', 'social-instagram'];
 
 async function recalculatePoints() {
-    if (!SUPER_ADMIN_EMAIL || !SUPER_ADMIN_PASSWORD) {
-        console.error("Error: SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD environment variables are not configured.");
-        return;
-    }
-    console.log("Starting Point Recalculation (Original Values)...");
-    try {
-        await signInWithEmailAndPassword(auth, SUPER_ADMIN_EMAIL, SUPER_ADMIN_PASSWORD);
-        console.log("Signed in as Super Admin.");
+  if (!SUPER_ADMIN_EMAIL || !SUPER_ADMIN_PASSWORD) {
+    console.error(
+      'Error: SUPER_ADMIN_EMAIL or SUPER_ADMIN_PASSWORD environment variables are not configured.'
+    );
+    return;
+  }
+  console.log('Starting Point Recalculation (Original Values)...');
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      SUPER_ADMIN_EMAIL,
+      SUPER_ADMIN_PASSWORD
+    );
+    console.log('Signed in as Super Admin.');
 
-        const membersRef = collection(db, 'members');
-        const snapshot = await getDocs(membersRef);
-        let batch = writeBatch(db);
-        let count = 0;
+    const membersRef = collection(db, 'members');
+    const snapshot = await getDocs(membersRef);
+    let batch = writeBatch(db);
+    let count = 0;
 
-        console.log(`Found ${snapshot.size} members.`);
+    console.log(`Found ${snapshot.size} members.`);
 
-        for (const memberDoc of snapshot.docs) {
-            const data = memberDoc.data();
-            const uid = memberDoc.id;
-            const name = data.name || 'Unknown';
+    for (const memberDoc of snapshot.docs) {
+      const data = memberDoc.data();
+      const uid = memberDoc.id;
+      const name = data.name || 'Unknown';
 
-            // 1. Calculate Badge Points
-            let badgePoints = 0;
-            const achievements = data.achievements || [];
-            achievements.forEach((badgeId: string) => {
-                if (SOCIAL_BADGES.includes(badgeId)) {
-                    badgePoints += POINTS.SOCIAL_BADGE_EARNED;
-                } else {
-                    badgePoints += POINTS.BADGE_EARNED;
-                }
-            });
-
-            // 2. Calculate Follower Points
-            const followers = data.followers || [];
-            const followerPoints = followers.length * POINTS.FOLLOWER_GAINED;
-
-            // 3. Calculate Project Points
-            // Fetch projects subcollection
-            const projectsRef = collection(db, 'members', uid, 'projects');
-            const projectsSnap = await getDocs(projectsRef);
-            let projectCount = projectsSnap.size;
-            let totalStars = 0;
-            projectsSnap.forEach(p => {
-                totalStars += (p.data().stars || []).length;
-            });
-
-            const projectPoints = (projectCount * 50) + (totalStars * POINTS.PROJECT_STAR);
-
-            // 4. Calculate Streak Points
-            const streak = data.streak || 0;
-            const streakPoints = streak * POINTS.STREAK_BONUS_PER_DAY;
-            const weeklyBonuses = Math.floor(streak / 7) * POINTS.WEEKLY_STREAK_BONUS;
-
-            const calculatedPoints = badgePoints + followerPoints + projectPoints + streakPoints + weeklyBonuses;
-
-            console.log(`User: ${name} (${uid})`);
-            console.log(`  Old Points: ${data.points} -> New Points: ${calculatedPoints}`);
-
-            // Update Member
-            const memberRef = doc(db, 'members', uid);
-            batch.update(memberRef, { points: calculatedPoints });
-
-            // Update Leaderboard
-            const leaderboardRef = doc(db, 'leaderboard', uid);
-            batch.set(leaderboardRef, { points: calculatedPoints }, { merge: true });
-
-            count++;
-            if (count % 400 === 0) {
-                await batch.commit();
-                console.log("Batch committed.");
-                batch = writeBatch(db);
-            }
+      // 1. Calculate Badge Points
+      let badgePoints = 0;
+      const achievements = data.achievements || [];
+      achievements.forEach((badgeId: string) => {
+        if (SOCIAL_BADGES.includes(badgeId)) {
+          badgePoints += POINTS.SOCIAL_BADGE_EARNED;
+        } else {
+          badgePoints += POINTS.BADGE_EARNED;
         }
+      });
 
-        if (count % 400 !== 0) {
-            await batch.commit();
-            console.log("Final batch committed.");
-        }
+      // 2. Calculate Follower Points
+      const followers = data.followers || [];
+      const followerPoints = followers.length * POINTS.FOLLOWER_GAINED;
 
-        console.log("Recalculation Complete.");
+      // 3. Calculate Project Points
+      // Fetch projects subcollection
+      const projectsRef = collection(db, 'members', uid, 'projects');
+      const projectsSnap = await getDocs(projectsRef);
+      let projectCount = projectsSnap.size;
+      let totalStars = 0;
+      projectsSnap.forEach((p) => {
+        totalStars += (p.data().stars || []).length;
+      });
 
-    } catch (error) {
-        console.error("Error recalculating points:", error);
+      const projectPoints =
+        projectCount * 50 + totalStars * POINTS.PROJECT_STAR;
+
+      // 4. Calculate Streak Points
+      const streak = data.streak || 0;
+      const streakPoints = streak * POINTS.STREAK_BONUS_PER_DAY;
+      const weeklyBonuses = Math.floor(streak / 7) * POINTS.WEEKLY_STREAK_BONUS;
+
+      const calculatedPoints =
+        badgePoints +
+        followerPoints +
+        projectPoints +
+        streakPoints +
+        weeklyBonuses;
+
+      console.log(`User: ${name} (${uid})`);
+      console.log(
+        `  Old Points: ${data.points} -> New Points: ${calculatedPoints}`
+      );
+
+      // Update Member
+      const memberRef = doc(db, 'members', uid);
+      batch.update(memberRef, { points: calculatedPoints });
+
+      // Update Leaderboard
+      const leaderboardRef = doc(db, 'leaderboard', uid);
+      batch.set(leaderboardRef, { points: calculatedPoints }, { merge: true });
+
+      count++;
+      if (count % 400 === 0) {
+        await batch.commit();
+        console.log('Batch committed.');
+        batch = writeBatch(db);
+      }
     }
-    process.exit(0);
+
+    if (count % 400 !== 0) {
+      await batch.commit();
+      console.log('Final batch committed.');
+    }
+
+    console.log('Recalculation Complete.');
+  } catch (error) {
+    console.error('Error recalculating points:', error);
+  }
+  process.exit(0);
 }
 
 recalculatePoints();

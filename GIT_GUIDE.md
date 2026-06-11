@@ -11,6 +11,7 @@ If you're making your first contribution, follow the steps carefully.
 Forking creates a copy of the repository under your GitHub account.
 
 ### Steps
+
 1. Open the original repository.
 2. Click the **Fork** button on the top-right corner.
 3. GitHub will create a copy in your account.
@@ -106,6 +107,7 @@ git checkout -b bug/login-error-fix
 # 6. Make Your Changes
 
 Now you can:
+
 - Add new files
 - Modify existing files
 - Fix bugs
@@ -257,6 +259,7 @@ Replace `3` with the number of commits you want to combine.
 # 15. Need Help?
 
 If you get stuck:
+
 - Read the project documentation
 - Ask maintainers politely
 - Search GitHub Discussions or Issues

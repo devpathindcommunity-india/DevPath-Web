@@ -1,234 +1,238 @@
 .container {
-    padding-top: 120px;
-    padding-bottom: 80px;
-    min-height: 100vh;
-    background: var(--bg-primary);
-    padding-left: 24px;
-    padding-right: 24px;
+  padding-top: 120px;
+  padding-bottom: 80px;
+  min-height: 100vh;
+  background: var(--bg-primary);
+  padding-left: 24px;
+  padding-right: 24px;
 }
 
 .hero {
-    text-align: center;
-    margin-bottom: 80px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+  text-align: center;
+  margin-bottom: 80px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .title {
-    font-size: 56px;
-    font-weight: 800;
-    margin-bottom: 24px;
-    background: var(--gradient-primary);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  font-size: 56px;
+  font-weight: 800;
+  margin-bottom: 24px;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    font-size: 20px;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 40px;
+  font-size: 20px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 40px;
 }
 
 .stats {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
+  display: flex;
+  justify-content: center;
+  gap: 60px;
 }
 
 .statItem {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .statValue {
-    font-size: 36px;
-    font-weight: 700;
-    color: #00d4ff;
-    margin-bottom: 8px;
+  font-size: 36px;
+  font-weight: 700;
+  color: #00d4ff;
+  margin-bottom: 8px;
 }
 
 .statLabel {
-    font-size: 14px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 .podium {
-    display: flex;
-    justify-content: center;
-    align-items: flex-end;
-    gap: 40px;
-    margin-bottom: 100px;
-    padding-top: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 40px;
+  margin-bottom: 100px;
+  padding-top: 40px;
 }
 
 .podiumPlace {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
 }
 
 .podiumPlace.first {
-    transform: scale(1.1);
-    z-index: 2;
+  transform: scale(1.1);
+  z-index: 2;
 }
 
 .avatarWrapper {
-    position: relative;
-    margin-bottom: 20px;
+  position: relative;
+  margin-bottom: 20px;
 }
 
 .avatar {
-    width: 120px;
-    height: 120px;
-    border-radius: 50%;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    background: var(--glass-bg);
-    overflow: hidden;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  background: var(--glass-bg);
+  overflow: hidden;
 }
 
 .crown {
-    position: absolute;
-    top: -24px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
+  position: absolute;
+  top: -24px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
 .podiumName {
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 8px;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 8px;
 }
 
 .podiumContributions {
-    font-size: 14px;
-    color: #00d4ff;
-    font-weight: 600;
+  font-size: 14px;
+  color: #00d4ff;
+  font-weight: 600;
 }
 
 .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 32px;
-    max-width: 1400px;
-    margin: 0 auto 80px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 1400px;
+  margin: 0 auto 80px;
 }
 
 .card {
-    background: var(--card);
-    border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 32px 24px;
-    text-align: center;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
 }
 
 .card:hover {
-    transform: translateY(-8px);
-    border-color: rgba(255, 255, 255, 0.2);
-    box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-8px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
 }
 
 .cardAvatar {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: var(--glass-bg);
-    margin: 0 auto 20px;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: var(--glass-bg);
+  margin: 0 auto 20px;
+  border: 2px solid rgba(255, 255, 255, 0.1);
 }
 
 .cardName {
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 4px;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
 }
 
 .cardHandle {
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin-bottom: 16px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
 }
 
 .cardStats {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    margin-bottom: 24px;
-    font-size: 14px;
-    color: var(--text-secondary);
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
 }
 
 .types {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 }
 
 .typeIcon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
-    background: var(--glass-highlight);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--text-secondary);
-    transition: all 0.2s;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--glass-highlight);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: all 0.2s;
 }
 
 .typeIcon:hover {
-    background: var(--glass-highlight);
-    color: white;
+  background: var(--glass-highlight);
+  color: white;
 }
 
 .cta {
-    background: linear-gradient(180deg, rgba(0, 212, 255, 0.1) 0%, transparent 100%);
-    border: 1px solid rgba(0, 212, 255, 0.2);
-    border-radius: 24px;
-    padding: 60px;
-    text-align: center;
-    max-width: 800px;
-    margin: 0 auto;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 212, 255, 0.1) 0%,
+    transparent 100%
+  );
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 24px;
+  padding: 60px;
+  text-align: center;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .ctaTitle {
-    font-size: 32px;
-    font-weight: 700;
-    color: white;
-    margin-bottom: 24px;
+  font-size: 32px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 24px;
 }
 
 .ctaButtons {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
 }
 
 @media (max-width: 768px) {
-    .podium {
-        flex-direction: column;
-        align-items: center;
-        gap: 60px;
-    }
+  .podium {
+    flex-direction: column;
+    align-items: center;
+    gap: 60px;
+  }
 
-    .podiumPlace.first {
-        order: -1;
-    }
+  .podiumPlace.first {
+    order: -1;
+  }
 
-    .stats {
-        flex-direction: column;
-        gap: 32px;
-    }
+  .stats {
+    flex-direction: column;
+    gap: 32px;
+  }
 }

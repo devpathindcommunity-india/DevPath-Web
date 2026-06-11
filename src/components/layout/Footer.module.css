@@ -1,98 +1,70 @@
 .footer {
-    background: var(--bg-secondary);
-    /* Slightly lighter than main bg */
-    border-top: 1px solid var(--glass-border);
-    padding: 40px 0 20px;
-    margin-top: auto;
-}
-
-.content {
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr;
-    gap: 60px;
-    margin-bottom: 20px;
-}
-
-.brand h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 24px;
-    margin-bottom: 16px;
-    color: var(--text-primary);
+  background: var(--bg-secondary);
+  /* Slightly lighter than main bg */
+  border-top: 1px solid var(--glass-border);
+  padding: 40px 0 20px;
+  margin-top: auto;
 }
 
 .tagline {
-    color: var(--text-secondary);
-    line-height: 1.6;
-    max-width: 300px;
-    margin-bottom: 24px;
-}
-
-.column h4 {
-    color: var(--text-primary);
-    font-size: 16px;
-    font-weight: 600;
-    margin-bottom: 24px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 300px;
+  margin-bottom: 24px;
 }
 
 .links {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .link {
-    color: var(--text-secondary);
-    font-size: 14px;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .link:hover {
-    color: var(--accent-cyan);
-    transform: translateX(4px);
+  color: var(--accent-cyan);
+  transform: translateX(4px);
 }
 
 .bottom {
-    padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  padding-top: 20px;
+  border-top: 1px solid var(--glass-border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 .copyright {
-    color: var(--text-secondary);
-    font-size: 14px;
+  color: var(--text-secondary);
+  font-size: 14px;
 }
 
 .socials {
-    display: flex;
-    gap: 20px;
+  display: flex;
+  gap: 20px;
 }
 
 .socialIcon {
-    color: var(--text-secondary);
-    transition: all 0.2s ease;
+  color: var(--text-secondary);
+  transition: all 0.2s ease;
 }
 
 .socialIcon:hover {
-    color: var(--text-primary);
-    transform: scale(1.1);
+  color: var(--text-primary);
+  transform: scale(1.1);
 }
 
 @media (max-width: 768px) {
-    .content {
-        grid-template-columns: 1fr;
-        gap: 40px;
-    }
-
-    .bottom {
-        flex-direction: column;
-        gap: 20px;
-        text-align: center;
-    }
+  .bottom {
+    flex-direction: column;
+    gap: 20px;
+    text-align: center;
+  }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Video, Code, Terminal, Book, Star, Calendar, Brain, Briefcase, Users, Building2, MessageSquare, Map, GraduationCap, Layout, Rocket, Database } from 'lucide-react';
@@ -330,6 +330,9 @@ export default function ResourcesTabs() {
     ];
 
     const [activeMainTab, setActiveMainTab] = useState('roadmaps');
+    useEffect(() => {
+    setVisibleCount(ITEMS_PER_PAGE);
+}, [activeMainTab]);
     const [activeSubTab, setActiveSubTab] = useState(aiPromptsCategories[0]);
     const [isInternshipModalOpen, setIsInternshipModalOpen] = useState(false);
     const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
@@ -338,8 +341,34 @@ export default function ResourcesTabs() {
 
     // Progress State mapping roadmap IDs to completion percentages
     const [progressData, setProgressData] = useState<Record<string, number>>({});
-
+    const ITEMS_PER_PAGE = 2;
+    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+    const [isLoading, setIsLoading] = useState(false);
+    const observerRef = useRef<HTMLDivElement>(null);
     const searchParams = useSearchParams();
+
+    useEffect(() => {
+    if (activeMainTab !== 'roadmaps') return;
+    
+    const observer = new IntersectionObserver(
+        (entries) => {
+            if (entries[0].isIntersecting && !isLoading) {
+                const roadmaps = originalResources.roadmaps;
+                if (visibleCount < roadmaps.length) {
+                    setIsLoading(true);
+                    setTimeout(() => {
+                        setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, roadmaps.length));
+                        setIsLoading(false);
+                    }, 800);
+                }
+            }
+        },
+        { threshold: 1.0 }
+    );
+
+    if (observerRef.current) observer.observe(observerRef.current);
+    return () => observer.disconnect();
+}, [visibleCount, isLoading, activeMainTab]);
 
     useEffect(() => {
         const openParam = searchParams.get('open');
@@ -349,6 +378,16 @@ export default function ResourcesTabs() {
         } else if (openParam === 'developer-mindset') {
             setActiveMainTab('learning');
             setIsMindsetModalOpen(true);
+        } else if (openParam === 'roadmap') {
+            const titleParam = searchParams.get('title');
+            if (titleParam) {
+                const found = originalResources.roadmaps.find(r => r.title === titleParam);
+                if (found && found.isDetailed) {
+                    setActiveMainTab('roadmaps');
+                    setActiveRoadmap(found.details);
+                    setIsRoadmapModalOpen(true);
+                }
+            }
         }
     }, [searchParams]);
 
@@ -417,28 +456,17 @@ export default function ResourcesTabs() {
                 isOpen={isMindsetModalOpen}
                 onClose={() => setIsMindsetModalOpen(false)}
             />
-
-            {/* Header */}
-            <div className="text-center mb-10">
-                <h2 className="text-3xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400">
-                    Developer Resources
-                </h2>
-                <p className="text-muted-foreground max-w-2xl mx-auto">
-                    Curated tools, prompts, and roadmaps to accelerate your career.
-                </p>
-            </div>
-
             {/* Main Navigation (Top Level) */}
             <div className="flex flex-wrap justify-center gap-4 mb-10">
                 {mainSections.map((section) => {
                     const isActive = activeMainTab === section.id;
                     return (
-                        <button
+                        <button aria-label="Action button" 
                             key={section.id}
                             onClick={() => setActiveMainTab(section.id)}
                             className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all border ${isActive
                                 ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25'
-                                : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-white'
+                                : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-blue-400 dark:hover:text-white'
                                 }`}
                         >
                             {section.icon}
@@ -460,12 +488,12 @@ export default function ResourcesTabs() {
                                 const isActive = activeSubTab === catKey;
 
                                 return (
-                                    <button
+                                    <button aria-label="Action button" 
                                         key={catKey}
                                         onClick={() => setActiveSubTab(catKey)}
                                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${isActive
                                             ? 'text-white shadow-md'
-                                            : 'text-muted-foreground hover:text-white hover:bg-white/5'
+                                            : 'text-muted-foreground hover:text-blue-400 dark:hover:text-white hover:bg-white/5'
                                             }`}
                                     >
                                         {isActive && (
@@ -521,7 +549,7 @@ export default function ResourcesTabs() {
                                                     </div>
                                                     {prompt.example}
                                                 </div>
-                                                <button className="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-lg transition-colors border border-white/10 hover:border-white/20 flex items-center justify-center gap-2 group/btn">
+                                                <button aria-label="Action button"  className="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-lg transition-colors border border-white/10 hover:border-white/20 flex items-center justify-center gap-2 group/btn">
                                                     Try this Prompt
                                                     <Terminal size={14} className="group-hover/btn:text-primary transition-colors" />
                                                 </button>
@@ -536,7 +564,10 @@ export default function ResourcesTabs() {
                     // --- Other Sections (Standard Cards & Roadmaps) ---
                     <div className={styles.grid}>
                         <AnimatePresence mode="popLayout">
-                            {originalResources[activeMainTab as keyof typeof originalResources]?.map((resource, index) => {
+                            {(activeMainTab === 'roadmaps' 
+                            ? originalResources.roadmaps.slice(0, visibleCount) 
+                            : originalResources[activeMainTab as keyof typeof originalResources]
+                            )?.map((resource, index) => {
                                 // Calculate Progress for Roadmaps
                                 const roadmapId = resource.details?.id || resource.title.toLowerCase().replace(/\s+/g, '-');
                                 const progress = progressData[roadmapId] || 0;
@@ -550,7 +581,21 @@ export default function ResourcesTabs() {
                                         transition={{ duration: 0.3, delay: index * 0.1 }}
                                         className="h-full"
                                     >
-                                        <PremiumCard className={`${styles.resourceCard} h-full group flex flex-col relative overflow-hidden`}>
+                                        <PremiumCard 
+                                            className={`${styles.resourceCard} h-full group flex flex-col relative overflow-hidden`}
+                                            bookmarkItem={
+                                                activeMainTab === 'roadmaps' && resource.status !== 'coming_soon'
+                                                    ? {
+                                                          id: resource.title,
+                                                          title: resource.title,
+                                                          description: resource.description,
+                                                          type: 'roadmap',
+                                                          color: resource.color,
+                                                          path: `/resources?open=roadmap&title=${encodeURIComponent(resource.title)}`
+                                                      }
+                                                    : undefined
+                                            }
+                                        >
                                             {/* Coming Soon Overlay */}
                                             {resource.status === 'coming_soon' && (
                                                 <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
@@ -594,7 +639,7 @@ export default function ResourcesTabs() {
                                                         <Star size={16} fill="currentColor" />
                                                         {resource.rating}
                                                     </div>
-                                                    <button
+                                                    <button aria-label="Action button" 
                                                         className={`${styles.action} ${resource.status === 'coming_soon' ? 'opacity-50 cursor-not-allowed' : ''}`}
                                                         onClick={() => resource.status !== 'coming_soon' && handleAccessNow(resource)}
                                                         disabled={resource.status === 'coming_soon'}
@@ -608,6 +653,18 @@ export default function ResourcesTabs() {
                                 );
                             })}
                         </AnimatePresence>
+                        
+                        {/* Infinite Scroll Observer */}
+                        {activeMainTab === 'roadmaps' && (
+                            <div ref={observerRef} className="w-full py-4 flex justify-center">
+                                {isLoading && (
+                                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                        Loading more...
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

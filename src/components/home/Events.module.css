@@ -1,114 +1,118 @@
 .events {
-    padding: 2rem 0;
-    overflow: hidden;
+  padding: 2rem 0;
+  overflow: hidden;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 0 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 2rem;
 }
 
 .title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #fff, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    color: var(--muted-foreground);
-    font-size: 1.1rem;
+  color: var(--muted-foreground);
+  font-size: 1.1rem;
 }
 
 .scrollContainer {
-    width: 100%;
-    overflow-x: auto;
-    padding: 2rem 0;
-    perspective: 1000px;
-    /* Hide scrollbar */
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+  width: 100%;
+  overflow-x: auto;
+  padding: 2rem 0;
+  perspective: 1000px;
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollContainer::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .timeline {
-    display: flex;
-    gap: 2rem;
-    padding: 0 4rem;
-    /* Add padding to sides so first/last items aren't cut off */
-    width: max-content;
+  display: flex;
+  gap: 2rem;
+  padding: 0 4rem;
+  /* Add padding to sides so first/last items aren't cut off */
+  width: max-content;
 }
 
 .eventCard {
-    width: 350px;
-    flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    cursor: pointer;
+  width: 350px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
 
 .cardContent {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .thumbnail {
-    height: 200px;
-    width: 100%;
-    position: relative;
+  height: 200px;
+  width: 100%;
+  position: relative;
 }
 
 .details {
-    padding: 1.5rem;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
+  padding: 1.5rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .dateBadge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--primary);
-    margin-bottom: 0.75rem;
-    font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--primary);
+  margin-bottom: 0.75rem;
+  font-weight: 500;
 }
-
 .eventTitle {
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 0.75rem;
-    line-height: 1.4;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  word-break: break-word;
 }
 
 .meta {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    color: var(--muted-foreground);
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  color: var(--muted-foreground);
 }
 
 @media (max-width: 768px) {
-    .eventCard {
-        width: 300px;
-    }
+  .eventCard {
+    width: 300px;
+  }
 
-    .timeline {
-        padding: 0 2rem;
-    }
+  .timeline {
+    padding: 0 2rem;
+  }
 }

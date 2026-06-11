@@ -1,11 +1,8 @@
-import type { NextConfig } from "next";
-
-const isProd = process.env.NODE_ENV === 'production';
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-
-  output: 'export',
   /* config options here */
+  output: 'export',
   devIndicators: {
     // @ts-ignore - buildActivity is valid but missing in type definition
     buildActivity: false,
@@ -18,5 +15,4 @@ const nextConfig: NextConfig = {
     unoptimized: true,
   },
 };
-
 export default nextConfig;

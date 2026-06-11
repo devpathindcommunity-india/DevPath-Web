@@ -2,19 +2,26 @@
   "hosting": {
     "public": "out",
     "cleanUrls": true,
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
       {
         "source": "/u/**",
-        "destination": "/u/public.html"
+        "destination": "/u.html"
       },
       {
         "source": "**",
         "destination": "/index.html"
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "X-Powered-By",
+            "value": ""
+          }
+        ]
       }
     ]
   },
