@@ -1,4 +1,4 @@
-const rateLimit = require("express-rate-limit");
+const rateLimit = require('express-rate-limit');
 
 const assistantRateLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -8,8 +8,8 @@ const assistantRateLimiter = rateLimit({
   message: {
     success: false,
     error: {
-      code: "RATE_LIMIT_EXCEEDED",
-      message: "Too many assistant requests. Please try again shortly.",
+      code: 'RATE_LIMIT_EXCEEDED',
+      message: 'Too many assistant requests. Please try again shortly.',
     },
   },
 });

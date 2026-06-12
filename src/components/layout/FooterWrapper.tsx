@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
 import { usePathname } from 'next/navigation';
 import Footer from './Footer';
 
 export default function FooterWrapper() {
-    const pathname = usePathname();
-    const isWiki = pathname?.startsWith('/wiki');
+  const pathname = usePathname();
+  const isWiki = pathname?.startsWith('/wiki');
 
-    if (isWiki) return null;
+  if (isWiki) return null;
 
-    return <Footer />;
+  return <Footer />;
 }

@@ -1,0 +1,45 @@
+@media print {
+  body {
+    background: none !important;
+    color: #000 !important;
+    font-size: 12pt;
+  }
+
+  /* Hide all UI chrome when printing */
+  .no-print {
+    display: none !important;
+  }
+
+  /* Show the hidden resume template */
+  #resume-print-root {
+    display: block !important;
+  }
+
+  /* Ensure white background on print */
+  #resume-print-root {
+    background: #fff !important;
+    color: #000 !important;
+    font-family: 'Georgia', serif !important;
+    padding: 20mm 15mm !important;
+  }
+
+  /* Force page breaks where needed */
+  .page-break {
+    page-break-before: always;
+    break-before: always;
+  }
+
+  /* Avoid widows / orphans in project descriptions */
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Ensure links print with their URL visible */
+  a[href]::after {
+    content: ' (' attr(href) ')';
+    font-size: 8pt;
+    color: #666;
+  }
+}

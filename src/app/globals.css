@@ -46,7 +46,11 @@
     --accent-orange: #ff6b35;
 
     /* Gradients */
-    --gradient-primary: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+    --gradient-primary: linear-gradient(
+      135deg,
+      var(--accent-cyan),
+      var(--accent-purple)
+    );
 
     /* Glassmorphism Premium */
     /* Glassmorphism Premium (Light) */
@@ -126,8 +130,6 @@
   }
 }
 
-
-
 html,
 body {
   max-width: 100vw;
@@ -159,14 +161,11 @@ a {
   text-decoration: none;
 }
 
-
-
 .container {
   max-width: 1400px;
   margin: 0 auto;
   padding: 0 24px;
 }
-
 
 /* Scrollbar */
 ::-webkit-scrollbar {
@@ -267,48 +266,48 @@ a {
 }
 
 /* Legacy HTML Attribute Support for Markdown */
-.markdown-body [align="center"] {
+.markdown-body [align='center'] {
   text-align: center;
   margin-left: auto;
   margin-right: auto;
 }
 
-.markdown-body [align="left"] {
+.markdown-body [align='left'] {
   text-align: left;
 }
 
-.markdown-body [align="right"] {
+.markdown-body [align='right'] {
   text-align: right;
 }
 
-.markdown-body [valign="top"] {
+.markdown-body [valign='top'] {
   vertical-align: top;
 }
 
-.markdown-body [valign="middle"] {
+.markdown-body [valign='middle'] {
   vertical-align: middle;
 }
 
-.markdown-body [valign="bottom"] {
+.markdown-body [valign='bottom'] {
   vertical-align: bottom;
 }
 
-.markdown-body table[align="center"] {
+.markdown-body table[align='center'] {
   margin-left: auto;
   margin-right: auto;
 }
 
-.markdown-body img[align="center"] {
+.markdown-body img[align='center'] {
   display: block;
   margin: 0 auto;
 }
 
-.markdown-body img[align="left"] {
+.markdown-body img[align='left'] {
   float: left;
   margin-right: 1em;
 }
 
-.markdown-body img[align="right"] {
+.markdown-body img[align='right'] {
   float: right;
   margin-left: 1em;
 }

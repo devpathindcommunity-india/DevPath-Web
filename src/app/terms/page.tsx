@@ -1,11 +1,11 @@
 // app/terms-and-conditions/page.tsx
 
-import { Metadata } from "next";
+import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: "Terms & Conditions | DevPath",
+  title: 'Terms & Conditions | DevPath',
   description:
-    "Terms and Conditions governing the use of DevPath and its services.",
+    'Terms and Conditions governing the use of DevPath and its services.',
 };
 
 export default function TermsAndConditionsPage() {

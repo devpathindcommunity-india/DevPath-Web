@@ -1,8 +1,8 @@
-﻿"use client";
+﻿'use client';
 
-import { useEffect } from "react";
-import { usePathname } from "next/navigation";
-import { trackVisit } from "@/utils/activityTracker";
+import { useEffect } from 'react';
+import { usePathname } from 'next/navigation';
+import { trackVisit } from '@/utils/activityTracker';
 
 export function usePageTracker() {
   const pathname = usePathname();

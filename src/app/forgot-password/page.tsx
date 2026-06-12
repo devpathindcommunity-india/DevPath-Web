@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "@/lib/firebase";
-import Link from "next/link";
+import { useState } from 'react';
+import { sendPasswordResetEmail } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import Link from 'next/link';
 
 export default function ForgotPasswordPage() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
+  const [error, setError] = useState('');
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    setError("");
-    setMessage("");
+    setError('');
+    setMessage('');
 
     try {
       await sendPasswordResetEmail(auth, email);
 
-      setMessage("Password reset instructions have been sent to your email.");
+      setMessage('Password reset instructions have been sent to your email.');
     } catch (err: any) {
       console.error(err);
 
       setError(
-        err.code === "auth/user-not-found"
-          ? "No account found with this email."
-          : "Failed to send reset email.",
+        err.code === 'auth/user-not-found'
+          ? 'No account found with this email.'
+          : 'Failed to send reset email.'
       );
     }
   };

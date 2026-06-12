@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState } from "react";
 import styles from "./SkillTreeVisualizer.module.css";
@@ -18,17 +18,73 @@ type SkillNode = {
 
 const pathsData: Record<string, SkillNode[]> = {
   Frontend: [
-    { id: "1", label: "HTML/CSS", x: 50, y: 10, desc: "Building blocks of the web.", connections: ["2", "3"] },
-    { id: "2", label: "JavaScript", x: 30, y: 35, desc: "Adding logic and interactivity.", connections: ["4"] },
-    { id: "3", label: "Version Ctrl", x: 70, y: 35, desc: "Git and GitHub for collaboration.", connections: ["4"] },
-    { id: "4", label: "React", x: 50, y: 65, desc: "Component based UI library.", connections: ["5"] },
-    { id: "5", label: "Next.js", x: 50, y: 90, desc: "React framework for production.", connections: [] },
+    {
+      id: '1',
+      label: 'HTML/CSS',
+      x: 50,
+      y: 10,
+      desc: 'Building blocks of the web.',
+      connections: ['2', '3'],
+    },
+    {
+      id: '2',
+      label: 'JavaScript',
+      x: 30,
+      y: 35,
+      desc: 'Adding logic and interactivity.',
+      connections: ['4'],
+    },
+    {
+      id: '3',
+      label: 'Version Ctrl',
+      x: 70,
+      y: 35,
+      desc: 'Git and GitHub for collaboration.',
+      connections: ['4'],
+    },
+    {
+      id: '4',
+      label: 'React',
+      x: 50,
+      y: 65,
+      desc: 'Component based UI library.',
+      connections: ['5'],
+    },
+    {
+      id: '5',
+      label: 'Next.js',
+      x: 50,
+      y: 90,
+      desc: 'React framework for production.',
+      connections: [],
+    },
   ],
   Backend: [
-    { id: "1", label: "Databases", x: 50, y: 10, desc: "SQL vs NoSQL architectures.", connections: ["2"] },
-    { id: "2", label: "Node.js", x: 50, y: 40, desc: "JavaScript runtime environment.", connections: ["3"] },
-    { id: "3", label: "APIs", x: 50, y: 70, desc: "REST and GraphQL endpoint creation.", connections: [] },
-  ]
+    {
+      id: '1',
+      label: 'Databases',
+      x: 50,
+      y: 10,
+      desc: 'SQL vs NoSQL architectures.',
+      connections: ['2'],
+    },
+    {
+      id: '2',
+      label: 'Node.js',
+      x: 50,
+      y: 40,
+      desc: 'JavaScript runtime environment.',
+      connections: ['3'],
+    },
+    {
+      id: '3',
+      label: 'APIs',
+      x: 50,
+      y: 70,
+      desc: 'REST and GraphQL endpoint creation.',
+      connections: [],
+    },
+  ],
 };
 
 export default function SkillTreeVisualizer() {
@@ -85,21 +141,17 @@ export default function SkillTreeVisualizer() {
 
       {/* Path Selector Controls */}
       <div className={styles.controls}>
-        <button aria-label="Action button"  
-          className={`${styles.pathBtn} ${activePath === "Frontend" ? styles.active : ""}`}
-          onClick={() => {
-            setActivePath("Frontend");
-            setSelectedNode(null);
-          }}
+        <button
+          aria-label="Action button"
+          className={`${styles.pathBtn} ${activePath === 'Frontend' ? styles.active : ''}`}
+          onClick={() => setActivePath('Frontend')}
         >
           Frontend Path
         </button>
-        <button aria-label="Action button"  
-          className={`${styles.pathBtn} ${activePath === "Backend" ? styles.active : ""}`}
-          onClick={() => {
-            setActivePath("Backend");
-            setSelectedNode(null);
-          }}
+        <button
+          aria-label="Action button"
+          className={`${styles.pathBtn} ${activePath === 'Backend' ? styles.active : ''}`}
+          onClick={() => setActivePath('Backend')}
         >
           Backend Path
         </button>
@@ -109,9 +161,9 @@ export default function SkillTreeVisualizer() {
       <div className={styles.treeArea}>
         {/* SVG Lines connecting nodes */}
         <svg className={styles.svgLines}>
-          {nodes.map(node => 
-            node.connections.map(targetId => {
-              const targetNode = nodes.find(n => n.id === targetId);
+          {nodes.map((node) =>
+            node.connections.map((targetId) => {
+              const targetNode = nodes.find((n) => n.id === targetId);
               if (!targetNode) return null;
               
               const isSourceCompleted = isNodeCompleted(activePath, node.id);
@@ -119,16 +171,13 @@ export default function SkillTreeVisualizer() {
               const isActiveLine = isSourceCompleted && isTargetCompleted;
 
               return (
-                <line 
+                <line
                   key={`${node.id}-${targetId}`}
-                  x1={`${node.x}%`} 
-                  y1={`${node.y}%`} 
-                  x2={`${targetNode.x}%`} 
-                  y2={`${targetNode.y}%`} 
-                  className={`${styles.line} ${isActiveLine ? styles.active : ""}`}
-                  style={{
-                    stroke: isActiveLine ? "#2ea043" : undefined
-                  }}
+                  x1={`${node.x}%`}
+                  y1={`${node.y}%`}
+                  x2={`${targetNode.x}%`}
+                  y2={`${targetNode.y}%`}
+                  className={`${styles.line} ${selectedNode?.id === node.id || selectedNode?.id === targetId ? styles.active : ''}`}
                 />
               );
             })
@@ -136,6 +185,16 @@ export default function SkillTreeVisualizer() {
         </svg>
 
         {/* Nodes */}
+        {nodes.map((node) => (
+          <div
+            key={node.id}
+            className={`${styles.node} ${selectedNode?.id === node.id ? styles.completed : ''}`}
+            style={{ left: `${node.x}%`, top: `${node.y}%` }}
+            onClick={() => setSelectedNode(node)}
+          >
+            {node.label}
+          </div>
+        ))}
         {nodes.map(node => {
           const isCompleted = isNodeCompleted(activePath, node.id);
           const isSelected = selectedNode?.id === node.id;
@@ -177,44 +236,19 @@ export default function SkillTreeVisualizer() {
         })}
 
         {/* Side Drawer */}
-        <div className={`${styles.drawer} ${selectedNode ? styles.open : ""}`}>
+        <div className={`${styles.drawer} ${selectedNode ? styles.open : ''}`}>
           {selectedNode && (
-            <div className="flex flex-col h-full justify-between">
-              <div>
-                <button aria-label="Action button" className={styles.closeBtn} onClick={() => setSelectedNode(null)}>✖</button>
-                <h2 className={`${styles.drawerTitle} flex items-center gap-2`}>
-                  <Target size={20} className="text-blue-400" />
-                  {selectedNode.label}
-                </h2>
-                <p className={styles.drawerDesc}>{selectedNode.desc}</p>
-              </div>
-
-              {user && (
-                <div className="mt-auto pt-6 border-t border-slate-800/80">
-                  <button
-                    aria-label="Toggle node completion from drawer"
-                    onClick={() => toggleNode(activePath, selectedNode.id)}
-                    className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg border font-semibold text-sm transition-all duration-200 ${
-                      isNodeCompleted(activePath, selectedNode.id)
-                        ? "bg-emerald-950/20 text-emerald-400 border-emerald-500/30 hover:bg-emerald-950/40"
-                        : "bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800 hover:text-white"
-                    }`}
-                  >
-                    {isNodeCompleted(activePath, selectedNode.id) ? (
-                      <>
-                        <CheckSquare size={18} className="text-emerald-400" />
-                        <span>Mark as Incomplete</span>
-                      </>
-                    ) : (
-                      <>
-                        <Square size={18} className="text-slate-400" />
-                        <span>Mark as Completed</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-              )}
-            </div>
+            <>
+              <button
+                aria-label="Action button"
+                className={styles.closeBtn}
+                onClick={() => setSelectedNode(null)}
+              >
+                ✖
+              </button>
+              <h2 className={styles.drawerTitle}>{selectedNode.label}</h2>
+              <p className={styles.drawerDesc}>{selectedNode.desc}</p>
+            </>
           )}
         </div>
       </div>

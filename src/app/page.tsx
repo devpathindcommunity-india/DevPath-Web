@@ -6,11 +6,12 @@ import dynamic from 'next/dynamic';
 import BackToTop from '@/components/BackToTop';
 import ErrorBoundary from '@/components/ErrorBoundary';
 
-
 const Sponsors = dynamic(() => import('@/components/home/Sponsors'));
 const Mission = dynamic(() => import('@/components/home/Mission'));
 const CodingNews = dynamic(() => import('@/components/home/CodingNews'));
-const PastCollaborations = dynamic(() => import('@/components/home/PastCollaborations'));
+const PastCollaborations = dynamic(
+  () => import('@/components/home/PastCollaborations')
+);
 
 export default function Home() {
   return (

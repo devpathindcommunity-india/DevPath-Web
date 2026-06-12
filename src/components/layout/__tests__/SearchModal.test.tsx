@@ -16,7 +16,9 @@ jest.mock('framer-motion', () => {
   return {
     motion: {
       div: React.forwardRef(({ children, ...props }: any, ref: any) => (
-        <div {...props} ref={ref}>{children}</div>
+        <div {...props} ref={ref}>
+          {children}
+        </div>
       )),
     },
     AnimatePresence: ({ children }: any) => <>{children}</>,
@@ -38,22 +40,30 @@ describe('SearchModal', () => {
   it('renders and focuses input when opened via Ctrl+K', () => {
     render(<SearchModal />);
     fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    expect(screen.getByPlaceholderText(/Search wiki articles/)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Search wiki articles/)
+    ).toBeInTheDocument();
   });
 
   it('renders and focuses input when opened via Cmd+K', () => {
     render(<SearchModal />);
     fireEvent.keyDown(window, { metaKey: true, key: 'k' });
-    expect(screen.getByPlaceholderText(/Search wiki articles/)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Search wiki articles/)
+    ).toBeInTheDocument();
   });
 
   it('closes when pressing Escape', () => {
     render(<SearchModal />);
     fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    expect(screen.getByPlaceholderText(/Search wiki articles/)).toBeInTheDocument();
+    expect(
+      screen.getByPlaceholderText(/Search wiki articles/)
+    ).toBeInTheDocument();
 
     fireEvent.keyDown(window, { key: 'Escape' });
-    expect(screen.queryByPlaceholderText(/Search wiki articles/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/Search wiki articles/)
+    ).not.toBeInTheDocument();
   });
 
   it('closes when clicking backdrop', () => {
@@ -63,13 +73,15 @@ describe('SearchModal', () => {
     if (backdrop) {
       fireEvent.click(backdrop);
     }
-    expect(screen.queryByPlaceholderText(/Search wiki articles/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/Search wiki articles/)
+    ).not.toBeInTheDocument();
   });
 
   it('filters results based on query', () => {
     render(<SearchModal />);
     fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    
+
     const input = screen.getByPlaceholderText(/Search wiki articles/);
     fireEvent.change(input, { target: { value: 'react' } });
 
@@ -79,16 +91,20 @@ describe('SearchModal', () => {
   it('navigates and closes modal when result is clicked', () => {
     render(<SearchModal />);
     fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    
+
     const input = screen.getByPlaceholderText(/Search wiki articles/);
     fireEvent.change(input, { target: { value: 'react' } });
 
-    const resultButton = screen.getByText('Full Stack React Guide').closest('button');
+    const resultButton = screen
+      .getByText('Full Stack React Guide')
+      .closest('button');
     if (resultButton) {
       fireEvent.click(resultButton);
     }
 
     expect(mockPush).toHaveBeenCalledWith('/wiki?article=react');
-    expect(screen.queryByPlaceholderText(/Search wiki articles/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByPlaceholderText(/Search wiki articles/)
+    ).not.toBeInTheDocument();
   });
 });

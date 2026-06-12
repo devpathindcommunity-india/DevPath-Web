@@ -1,7 +1,7 @@
-import { StreakCalendar } from "@/components/gamification/StreakCalendar";
-import { BadgeGrid } from "@/components/gamification/BadgeGrid";
-import { XPBar } from "@/components/gamification/XPBar";
-import { Leaderboard } from "@/components/gamification/Leaderboard";
+import { StreakCalendar } from '@/components/gamification/StreakCalendar';
+import { BadgeGrid } from '@/components/gamification/BadgeGrid';
+import { XPBar } from '@/components/gamification/XPBar';
+import { Leaderboard } from '@/components/gamification/Leaderboard';
 
 // This would get real data from auth + firestore
 export default function ProgressPage() {

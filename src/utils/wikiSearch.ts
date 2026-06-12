@@ -1,21 +1,21 @@
 export type SearchableArticle = {
-    id: string;
-    title: string;
-    description: string;
-    keywords: string[];
-    category: string;
+  id: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  category: string;
 };
 
 export type SearchResult = {
-    id: string;
-    title: string;
-    description: string;
-    keywords: string[];
-    category: string;
-    score: number;
-    titleMatch: boolean;
-    descriptionMatch: boolean;
-    keywordMatches: string[];
+  id: string;
+  title: string;
+  description: string;
+  keywords: string[];
+  category: string;
+  score: number;
+  titleMatch: boolean;
+  descriptionMatch: boolean;
+  keywordMatches: string[];
 };
 
 /**
@@ -23,9 +23,9 @@ export type SearchResult = {
  * appears somewhere in the target string (case-insensitive).
  */
 function fuzzyMatch(query: string, target: string): boolean {
-    const words = query.toLowerCase().trim().split(/\s+/);
-    const t = target.toLowerCase();
-    return words.every(word => t.includes(word));
+  const words = query.toLowerCase().trim().split(/\s+/);
+  const t = target.toLowerCase();
+  return words.every((word) => t.includes(word));
 }
 
 /**
@@ -33,53 +33,59 @@ function fuzzyMatch(query: string, target: string): boolean {
  * Title matches are worth more than keyword or description matches.
  */
 function scoreArticle(article: SearchableArticle, query: string): number {
-    let score = 0;
-    const q = query.toLowerCase().trim();
+  let score = 0;
+  const q = query.toLowerCase().trim();
 
-    if (article.title.toLowerCase().includes(q)) score += 10;
-    else if (fuzzyMatch(query, article.title)) score += 6;
+  if (article.title.toLowerCase().includes(q)) score += 10;
+  else if (fuzzyMatch(query, article.title)) score += 6;
 
-    const keywordMatchCount = article.keywords.filter(k =>
-        k.toLowerCase().includes(q) || fuzzyMatch(query, k)
-    ).length;
-    score += keywordMatchCount * 4;
+  const keywordMatchCount = article.keywords.filter(
+    (k) => k.toLowerCase().includes(q) || fuzzyMatch(query, k)
+  ).length;
+  score += keywordMatchCount * 4;
 
-    if (article.description.toLowerCase().includes(q)) score += 3;
-    else if (fuzzyMatch(query, article.description)) score += 1;
+  if (article.description.toLowerCase().includes(q)) score += 3;
+  else if (fuzzyMatch(query, article.description)) score += 1;
 
-    return score;
+  return score;
 }
 
 /**
  * Search articles and return scored, sorted results.
  */
 export function searchArticles(
-    articles: SearchableArticle[],
-    query: string
+  articles: SearchableArticle[],
+  query: string
 ): SearchResult[] {
-    if (!query.trim()) return [];
+  if (!query.trim()) return [];
 
-    return articles
-        .map(article => {
-            const score = scoreArticle(article, query);
-            const q = query.toLowerCase().trim();
+  return articles
+    .map((article) => {
+      const score = scoreArticle(article, query);
+      const q = query.toLowerCase().trim();
 
-            const titleMatch =
-                article.title.toLowerCase().includes(q) ||
-                fuzzyMatch(query, article.title);
+      const titleMatch =
+        article.title.toLowerCase().includes(q) ||
+        fuzzyMatch(query, article.title);
 
-            const descriptionMatch =
-                article.description.toLowerCase().includes(q) ||
-                fuzzyMatch(query, article.description);
+      const descriptionMatch =
+        article.description.toLowerCase().includes(q) ||
+        fuzzyMatch(query, article.description);
 
-            const keywordMatches = article.keywords.filter(
-                k => k.toLowerCase().includes(q) || fuzzyMatch(query, k)
-            );
+      const keywordMatches = article.keywords.filter(
+        (k) => k.toLowerCase().includes(q) || fuzzyMatch(query, k)
+      );
 
-            return { ...article, score, titleMatch, descriptionMatch, keywordMatches };
-        })
-        .filter(r => r.score > 0)
-        .sort((a, b) => b.score - a.score);
+      return {
+        ...article,
+        score,
+        titleMatch,
+        descriptionMatch,
+        keywordMatches,
+      };
+    })
+    .filter((r) => r.score > 0)
+    .sort((a, b) => b.score - a.score);
 }
 
 /**
@@ -87,17 +93,17 @@ export function searchArticles(
  * Returns an array of { text, highlight } segments.
  */
 export function highlightText(
-    text: string,
-    query: string
+  text: string,
+  query: string
 ): { text: string; highlight: boolean }[] {
-    if (!query.trim()) return [{ text, highlight: false }];
+  if (!query.trim()) return [{ text, highlight: false }];
 
-    const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const regex = new RegExp(`(${escaped})`, 'gi');
-    const parts = text.split(regex);
+  const escaped = query.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(${escaped})`, 'gi');
+  const parts = text.split(regex);
 
-    return parts.map(part => ({
-        text: part,
-        highlight: regex.test(part),
-    }));
+  return parts.map((part) => ({
+    text: part,
+    highlight: regex.test(part),
+  }));
 }

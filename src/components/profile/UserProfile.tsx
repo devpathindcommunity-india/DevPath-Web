@@ -1,11 +1,40 @@
-"use client";
-const AVATAR_FALLBACK = process.env.NEXT_PUBLIC_AVATAR_FALLBACK_URL ?? 'https://ui-avatars.com/api';
+'use client';
+const AVATAR_FALLBACK =
+  process.env.NEXT_PUBLIC_AVATAR_FALLBACK_URL ?? 'https://ui-avatars.com/api';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { useRouter } from 'next/navigation';
 import { teamMembers } from '@/data/team';
-import { Trophy, Flame, Star, Target, MapPin, Link as LinkIcon, Calendar, Phone, LogOut, Camera, Save, X, Github, Instagram, Linkedin, CheckCircle, Share2, Shield, Copy, Check, Plus, Edit3, Users, Globe, BookOpen, GitMerge, Code2 } from 'lucide-react';
+import {
+  Trophy,
+  Flame,
+  Star,
+  Target,
+  MapPin,
+  Link as LinkIcon,
+  Calendar,
+  Phone,
+  LogOut,
+  Camera,
+  Save,
+  X,
+  Github,
+  Instagram,
+  Linkedin,
+  CheckCircle,
+  Share2,
+  Shield,
+  Copy,
+  Check,
+  Plus,
+  Edit3,
+  Users,
+  Globe,
+  BookOpen,
+  GitMerge,
+  Code2,
+} from 'lucide-react';
 import styles from './Profile.module.css';
 import 'github-markdown-css/github-markdown.css';
 import ProjectUploadModal from '@/components/projects/ProjectUploadModal';
@@ -20,7 +49,17 @@ import ReactMarkdown from 'react-markdown';
 import DOMPurify from 'dompurify';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
-import { collection, query, where, orderBy, getDocs, doc, updateDoc, arrayUnion, increment } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  getDocs,
+  doc,
+  updateDoc,
+  arrayUnion,
+  increment,
+} from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { calculateLevel } from '@/lib/points';
 import { getEmbedUrl } from '@/lib/utils';
@@ -38,939 +77,1214 @@ import { useNotificationActions } from '@/stores/ui-store';
  * - Rendering animated progress rings and privacy toggle modals.
  */
 export default function UserProfile() {
-    const { user, logout, updateUserProfile, awardPoints } = useAuth();
-    const { showSuccess, showError } = useNotificationActions();
-    const router = useRouter();
-    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { user, logout, updateUserProfile, awardPoints } = useAuth();
+  const { showSuccess, showError } = useNotificationActions();
+  const router = useRouter();
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    useEffect(() => {
-        return () => {
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-        };
-    }, []);
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
+  }, []);
 
-    useEffect(() => {
-        if (user?.email === 'devpathind.community@gmail.com') {
-            router.push('/ap');
-        }
-    }, [user, router]);
+  useEffect(() => {
+    if (user?.email === 'devpathind.community@gmail.com') {
+      router.push('/ap');
+    }
+  }, [user, router]);
 
-    const [isEditingPhoto, setIsEditingPhoto] = useState(false);
-    const [mountedProgress, setMountedProgress] = useState(0);
+  const [isEditingPhoto, setIsEditingPhoto] = useState(false);
+  const [mountedProgress, setMountedProgress] = useState(0);
 
-    const levelInfo = calculateLevel(user?.points || 0);
-    const targetProgress = levelInfo.progress;
+  const levelInfo = calculateLevel(user?.points || 0);
+  const targetProgress = levelInfo.progress;
 
-    /**
-     * Triggers animated loading effect for the custom circular progress ring
-     * once the component is mounted.
-     */
-    useEffect(() => {
-        if (user) {
-            const timer = setTimeout(() => {
-                setMountedProgress(targetProgress);
-            }, 100);
-            return () => clearTimeout(timer);
-        }
-    }, [user, targetProgress]);
-    const [newPhotoURL, setNewPhotoURL] = useState('');
-    const [isSaving, setIsSaving] = useState(false);
-    const [showPrivacyModal, setShowPrivacyModal] = useState(false);
-    const [copied, setCopied] = useState(false);
-    const [showProjectModal, setShowProjectModal] = useState(false);
-
-    // Projects State
-    const [projects, setProjects] = useState<any[]>([]);
-    const [loadingProjects, setLoadingProjects] = useState(false);
-    const [projectToEdit, setProjectToEdit] = useState<any>(null);
-    const [selectedProject, setSelectedProject] = useState<any>(null);
-
-    // About / Tech Stack State
-    const [isEditingAbout, setIsEditingAbout] = useState(false);
-    const [aboutContent, setAboutContent] = useState(user?.aboutMarkdown || '');
-    const [aboutTab, setAboutTab] = useState<'write' | 'preview'>('write');
-
-    // Social Links State
-    const [socialLinks, setSocialLinks] = useState({
-        github: user?.github || '',
-        linkedin: user?.linkedin || '',
-        instagram: user?.instagram || ''
-    });
-
-    // Followers/Following Modal State
-    const [showFollowersModal, setShowFollowersModal] = useState(false);
-    const [showFollowingModal, setShowFollowingModal] = useState(false);
-    const [followersList, setFollowersList] = useState<any[]>([]);
-    const [followingList, setFollowingList] = useState<any[]>([]);
-    const [isLoadingFollowers, setIsLoadingFollowers] = useState(false);
-    const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
-
-    // Sync aboutContent when user data loads from AuthContext
-useEffect(() => {
-    if (user?.aboutMarkdown) setAboutContent(user.aboutMarkdown);
-}, [user?.aboutMarkdown]);
-
-// Sync socialLinks when user data loads from AuthContext
-useEffect(() => {
+  /**
+   * Triggers animated loading effect for the custom circular progress ring
+   * once the component is mounted.
+   */
+  useEffect(() => {
     if (user) {
-        setSocialLinks({
-            github: user.github || '',
-            linkedin: user.linkedin || '',
-            instagram: user.instagram || ''
-        });
+      const timer = setTimeout(() => {
+        setMountedProgress(targetProgress);
+      }, 100);
+      return () => clearTimeout(timer);
     }
-}, [user?.github, user?.linkedin, user?.instagram]);
+  }, [user, targetProgress]);
+  const [newPhotoURL, setNewPhotoURL] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+  const [showPrivacyModal, setShowPrivacyModal] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [showProjectModal, setShowProjectModal] = useState(false);
 
-    useEffect(() => {
-        if (user?.uid) {
-            fetchProjects();
-        }
-    }, [user?.uid]);
+  // Projects State
+  const [projects, setProjects] = useState<any[]>([]);
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [projectToEdit, setProjectToEdit] = useState<any>(null);
+  const [selectedProject, setSelectedProject] = useState<any>(null);
 
-    const fetchProjects = async () => {
-        if (!user?.uid) return;
-        setLoadingProjects(true);
-        try {
-            // Try fetching with sort
-            try {
-                const q = query(
-                    collection(db, 'projects'),
-                    where('userId', '==', user.uid),
-                    orderBy('createdAt', 'desc')
-                );
-                const snapshot = await getDocs(q);
-                const fetchedProjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                setProjects(fetchedProjects);
-                checkBadges(fetchedProjects);
-            } catch (err: any) {
-                // Fallback: If index is missing, fetch unsorted and sort client-side
-                if (err.message.includes("index")) {
-                    console.warn("Index missing, falling back to client-side sort", err);
-                    const q = query(
-                        collection(db, 'projects'),
-                        where('userId', '==', user.uid)
-                    );
-                    const snapshot = await getDocs(q);
-                    const fetchedProjects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    // Sort client-side
-                    fetchedProjects.sort((a: any, b: any) => {
-                        const dateA = a.createdAt?.seconds || 0;
-                        const dateB = b.createdAt?.seconds || 0;
-                        return dateB - dateA;
-                    });
-                    setProjects(fetchedProjects);
-                    checkBadges(fetchedProjects);
-                } else {
-                    throw err;
-                }
-            }
-        } catch (error) {
-            console.error("Error fetching projects:", error);
-        } finally {
-            setLoadingProjects(false);
-        }
-    };
+  // About / Tech Stack State
+  const [isEditingAbout, setIsEditingAbout] = useState(false);
+  const [aboutContent, setAboutContent] = useState(user?.aboutMarkdown || '');
+  const [aboutTab, setAboutTab] = useState<'write' | 'preview'>('write');
 
-    const checkBadges = async (currentProjects: any[]) => {
-        if (!user) return;
+  // Social Links State
+  const [socialLinks, setSocialLinks] = useState({
+    github: user?.github || '',
+    linkedin: user?.linkedin || '',
+    instagram: user?.instagram || '',
+  });
 
-        const RISING_STAR_BADGE_ID = 'rising-star';
-        // Safety check: ensure achievements array exists
-        const hasRisingStarBadge = user.achievements?.includes(RISING_STAR_BADGE_ID);
+  // Followers/Following Modal State
+  const [showFollowersModal, setShowFollowersModal] = useState(false);
+  const [showFollowingModal, setShowFollowingModal] = useState(false);
+  const [followersList, setFollowersList] = useState<any[]>([]);
+  const [followingList, setFollowingList] = useState<any[]>([]);
+  const [isLoadingFollowers, setIsLoadingFollowers] = useState(false);
+  const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
 
-        // Check for Rising Star Badge (20+ stars on any project)
-        const earnedRisingStar = currentProjects.some(p => (p.starCount || 0) >= 20);
+  // Sync aboutContent when user data loads from AuthContext
+  useEffect(() => {
+    if (user?.aboutMarkdown) setAboutContent(user.aboutMarkdown);
+  }, [user?.aboutMarkdown]);
 
-        if (earnedRisingStar && !hasRisingStarBadge) {
-            try {
-                await updateUserProfile({
-                    achievements: [...(user.achievements || []), RISING_STAR_BADGE_ID]
-                });
-                await awardPoints(10);
-                alert("🎉 Congratulations! You earned the 'Rising Star' badge and 10 XP!");
-            } catch (error) {
-                console.error("Error awarding badge:", error);
-            }
-        }
-    };
+  // Sync socialLinks when user data loads from AuthContext
+  useEffect(() => {
+    if (user) {
+      setSocialLinks({
+        github: user.github || '',
+        linkedin: user.linkedin || '',
+        instagram: user.instagram || '',
+      });
+    }
+  }, [user?.github, user?.linkedin, user?.instagram]);
 
-    const handlePrivacyToggle = async (setting: 'showMobile' | 'showLocation' | 'showEmail' | 'showProjects' | 'showRewards' | 'isPublic' | 'showInCommunity') => {
-        if (!user) return;
-        const currentSettings = user.privacySettings || { showMobile: false, showLocation: true, showEmail: false };
-        const newSettings = {
-            ...currentSettings,
-            [setting]: !currentSettings[setting]
-        };
-        await updateUserProfile({ privacySettings: newSettings });
-    };
+  useEffect(() => {
+    if (user?.uid) {
+      fetchProjects();
+    }
+  }, [user?.uid]);
 
-    const handleShareProfile = async () => {
-        if (!user) return;
-        const url = `${window.location.origin}/u/${user.uid}`;
-        const copied = await copyToClipboard(url);
-
-        if (copied) {
-            setCopied(true);
-            if (timeoutRef.current) clearTimeout(timeoutRef.current);
-            timeoutRef.current = setTimeout(() => setCopied(false), 2000);
-            showSuccess('Profile link copied to clipboard.');
-        } else {
-            showError('Copying the profile link is not supported in this browser.');
-        }
-    };
-
-    const handleSavePhoto = async () => {
-        if (!newPhotoURL.trim()) return;
-        setIsSaving(true);
-        try {
-            await updateUserProfile({ photoURL: newPhotoURL });
-            setIsEditingPhoto(false);
-            setNewPhotoURL('');
-        } catch (error) {
-            console.error("Failed to update photo:", error);
-            alert("Failed to update profile picture. Please try again.");
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleSaveAbout = async () => {
-        setIsSaving(true);
-        try {
-            const safeSocialLinks = sanitizeSocialLinks(socialLinks);
-            const trimmedAbout = aboutContent.trim();
-            await updateUserProfile({
-                aboutMarkdown: trimmedAbout,
-                ...safeSocialLinks
-            });
-            setSocialLinks(safeSocialLinks);
-            setIsEditingAbout(false);
-        } catch (error) {
-            console.error("Failed to update profile:", error);
-            alert(error instanceof Error ? error.message : "Failed to update profile. Please try again.");
-        } finally {
-            setIsSaving(false);
-        }
-    };
-
-    const handleEditProject = (project: any) => {
-        setProjectToEdit(project);
-        setShowProjectModal(true);
-    };
-
-    const fetchModalUsers = async (uids: string[]) => {
-        if (!uids || uids.length === 0) {
-            return [];
-        }
-        try {
-            // Fetch users one by one (optimization: use 'in' query for batches of 10 if needed)
-            const { getDoc } = await import('firebase/firestore');
-            const users = await Promise.all(uids.map(async (uid) => {
-                // Try members first
-                let docRef = doc(db, 'members', uid);
-                let snap = await getDoc(docRef);
-
-                if (snap.exists()) {
-                    return { uid: snap.id, ...snap.data() };
-                }
-
-                // Try admins if not found
-                // Admins are keyed by email usually, but let's check if we can find by UID query or if UID is the key (unlikely for admins)
-                // Actually, for admins, the doc ID is email. But the 'followers' array stores UIDs.
-                // So we need to query admins where uid == uid.
-                const { query, collection, where, getDocs } = await import('firebase/firestore');
-                const q = query(collection(db, 'admins'), where('uid', '==', uid));
-                const querySnapshot = await getDocs(q);
-
-                if (!querySnapshot.empty) {
-                    return { uid: querySnapshot.docs[0].id, ...querySnapshot.docs[0].data() };
-                }
-
-                return null;
-            }));
-            return users.filter(u => u !== null);
-        } catch (error) {
-            console.error("Error fetching modal users:", error);
-            return [];
-        }
-    };
-
-    const openFollowers = async () => {
-        setIsLoadingFollowers(true);
-        try {
-            const users = await fetchModalUsers(user?.followers || []);
-            setFollowersList(users);
-            setShowFollowersModal(true);
-        } catch (error) {
-            console.error("Failed to load followers:", error);
-        } finally {
-            setIsLoadingFollowers(false);
-        }
-    };
-
-    const openFollowing = async () => {
-        setIsLoadingFollowing(true);
-        try {
-            const users = await fetchModalUsers(user?.following || []);
-            setFollowingList(users);
-            setShowFollowingModal(true);
-        } catch (error) {
-            console.error("Failed to load following:", error);
-        } finally {
-            setIsLoadingFollowing(false);
-        }
-    };
-
-    const closeFollowersModal = () => {
-        setShowFollowersModal(false);
-        setFollowersList([]);
-    };
-
-    const closeFollowingModal = () => {
-        setShowFollowingModal(false);
-        setFollowingList([]);
-    };
-
-    if (!user) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <p>Please login to view your profile.</p>
-            </div>
+  const fetchProjects = async () => {
+    if (!user?.uid) return;
+    setLoadingProjects(true);
+    try {
+      // Try fetching with sort
+      try {
+        const q = query(
+          collection(db, 'projects'),
+          where('userId', '==', user.uid),
+          orderBy('createdAt', 'desc')
         );
+        const snapshot = await getDocs(q);
+        const fetchedProjects = snapshot.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setProjects(fetchedProjects);
+        checkBadges(fetchedProjects);
+      } catch (err: any) {
+        // Fallback: If index is missing, fetch unsorted and sort client-side
+        if (err.message.includes('index')) {
+          console.warn('Index missing, falling back to client-side sort', err);
+          const q = query(
+            collection(db, 'projects'),
+            where('userId', '==', user.uid)
+          );
+          const snapshot = await getDocs(q);
+          const fetchedProjects = snapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          // Sort client-side
+          fetchedProjects.sort((a: any, b: any) => {
+            const dateA = a.createdAt?.seconds || 0;
+            const dateB = b.createdAt?.seconds || 0;
+            return dateB - dateA;
+          });
+          setProjects(fetchedProjects);
+          checkBadges(fetchedProjects);
+        } else {
+          throw err;
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoadingProjects(false);
     }
+  };
 
-    const safeSocialLinks = {
-        github: getSafeSocialUrl(user.github, 'github'),
-        linkedin: getSafeSocialUrl(user.linkedin, 'linkedin'),
-        instagram: getSafeSocialUrl(user.instagram, 'instagram')
+  const checkBadges = async (currentProjects: any[]) => {
+    if (!user) return;
+
+    const RISING_STAR_BADGE_ID = 'rising-star';
+    // Safety check: ensure achievements array exists
+    const hasRisingStarBadge =
+      user.achievements?.includes(RISING_STAR_BADGE_ID);
+
+    // Check for Rising Star Badge (20+ stars on any project)
+    const earnedRisingStar = currentProjects.some(
+      (p) => (p.starCount || 0) >= 20
+    );
+
+    if (earnedRisingStar && !hasRisingStarBadge) {
+      try {
+        await updateUserProfile({
+          achievements: [...(user.achievements || []), RISING_STAR_BADGE_ID],
+        });
+        await awardPoints(10);
+        alert(
+          "🎉 Congratulations! You earned the 'Rising Star' badge and 10 XP!"
+        );
+      } catch (error) {
+        console.error('Error awarding badge:', error);
+      }
+    }
+  };
+
+  const handlePrivacyToggle = async (
+    setting:
+      | 'showMobile'
+      | 'showLocation'
+      | 'showEmail'
+      | 'showProjects'
+      | 'showRewards'
+      | 'isPublic'
+      | 'showInCommunity'
+  ) => {
+    if (!user) return;
+    const currentSettings = user.privacySettings || {
+      showMobile: false,
+      showLocation: true,
+      showEmail: false,
     };
+    const newSettings = {
+      ...currentSettings,
+      [setting]: !currentSettings[setting],
+    };
+    await updateUserProfile({ privacySettings: newSettings });
+  };
 
+  const handleShareProfile = async () => {
+    if (!user) return;
+    const url = `${window.location.origin}/u/${user.uid}`;
+    const copied = await copyToClipboard(url);
+
+    if (copied) {
+      setCopied(true);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      timeoutRef.current = setTimeout(() => setCopied(false), 2000);
+      showSuccess('Profile link copied to clipboard.');
+    } else {
+      showError('Copying the profile link is not supported in this browser.');
+    }
+  };
+
+  const handleSavePhoto = async () => {
+    if (!newPhotoURL.trim()) return;
+    setIsSaving(true);
+    try {
+      await updateUserProfile({ photoURL: newPhotoURL });
+      setIsEditingPhoto(false);
+      setNewPhotoURL('');
+    } catch (error) {
+      console.error('Failed to update photo:', error);
+      alert('Failed to update profile picture. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleSaveAbout = async () => {
+    setIsSaving(true);
+    try {
+      const safeSocialLinks = sanitizeSocialLinks(socialLinks);
+      const trimmedAbout = aboutContent.trim();
+      await updateUserProfile({
+        aboutMarkdown: trimmedAbout,
+        ...safeSocialLinks,
+      });
+      setSocialLinks(safeSocialLinks);
+      setIsEditingAbout(false);
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      alert(
+        error instanceof Error
+          ? error.message
+          : 'Failed to update profile. Please try again.'
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleEditProject = (project: any) => {
+    setProjectToEdit(project);
+    setShowProjectModal(true);
+  };
+
+  const fetchModalUsers = async (uids: string[]) => {
+    if (!uids || uids.length === 0) {
+      return [];
+    }
+    try {
+      // Fetch users one by one (optimization: use 'in' query for batches of 10 if needed)
+      const { getDoc } = await import('firebase/firestore');
+      const users = await Promise.all(
+        uids.map(async (uid) => {
+          // Try members first
+          let docRef = doc(db, 'members', uid);
+          let snap = await getDoc(docRef);
+
+          if (snap.exists()) {
+            return { uid: snap.id, ...snap.data() };
+          }
+
+          // Try admins if not found
+          // Admins are keyed by email usually, but let's check if we can find by UID query or if UID is the key (unlikely for admins)
+          // Actually, for admins, the doc ID is email. But the 'followers' array stores UIDs.
+          // So we need to query admins where uid == uid.
+          const { query, collection, where, getDocs } =
+            await import('firebase/firestore');
+          const q = query(collection(db, 'admins'), where('uid', '==', uid));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            return {
+              uid: querySnapshot.docs[0].id,
+              ...querySnapshot.docs[0].data(),
+            };
+          }
+
+          return null;
+        })
+      );
+      return users.filter((u) => u !== null);
+    } catch (error) {
+      console.error('Error fetching modal users:', error);
+      return [];
+    }
+  };
+
+  const openFollowers = async () => {
+    setIsLoadingFollowers(true);
+    try {
+      const users = await fetchModalUsers(user?.followers || []);
+      setFollowersList(users);
+      setShowFollowersModal(true);
+    } catch (error) {
+      console.error('Failed to load followers:', error);
+    } finally {
+      setIsLoadingFollowers(false);
+    }
+  };
+
+  const openFollowing = async () => {
+    setIsLoadingFollowing(true);
+    try {
+      const users = await fetchModalUsers(user?.following || []);
+      setFollowingList(users);
+      setShowFollowingModal(true);
+    } catch (error) {
+      console.error('Failed to load following:', error);
+    } finally {
+      setIsLoadingFollowing(false);
+    }
+  };
+
+  const closeFollowersModal = () => {
+    setShowFollowersModal(false);
+    setFollowersList([]);
+  };
+
+  const closeFollowingModal = () => {
+    setShowFollowingModal(false);
+    setFollowingList([]);
+  };
+
+  if (!user) {
     return (
-        <div className="min-h-screen bg-background text-foreground pb-8 px-4 md:px-8">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="flex items-center justify-center min-h-screen">
+        <p>Please login to view your profile.</p>
+      </div>
+    );
+  }
 
-                {/* LEFT SIDEBAR */}
-                <aside className="lg:col-span-1 space-y-6">
-                    {/* Profile Card */}
-                    <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
-                        <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:h-auto lg:aspect-square mb-4 group">
-                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl relative">
-                                <Image
-                                    src={user.photoURL || `${AVATAR_FALLBACK}/?name=${user.name}&background=random`}
-                                    alt={user.name || 'User'}
-                                    fill
-                                    className="object-cover"
-                                />
-                            </div>
-                            <button aria-label="Action button"
-                                onClick={() => setIsEditingPhoto(!isEditingPhoto)}
-                                className="absolute bottom-2 right-2 md:bottom-4 md:right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 z-10"
-                                title="Change Avatar"
-                            >
-                                <Camera size={18} />
-                            </button>
-                        </div>
+  const safeSocialLinks = {
+    github: getSafeSocialUrl(user.github, 'github'),
+    linkedin: getSafeSocialUrl(user.linkedin, 'linkedin'),
+    instagram: getSafeSocialUrl(user.instagram, 'instagram'),
+  };
 
-                        {isEditingPhoto && (
-                            <div className="w-full mb-4 p-3 bg-card border border-border rounded-lg animate-in fade-in slide-in-from-top-2">
-                                <input
-                                    type="url"
-                                    value={newPhotoURL}
-                                    onChange={(e) => setNewPhotoURL(e.target.value)}
-                                    placeholder="Image URL..."
-                                    name="photoURL"
-                                    id="photoURL"
-                                    className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md mb-2"
-                                />
-                                <div className="flex gap-2">
-                                    <button aria-label="Action button" onClick={handleSavePhoto} disabled={isSaving} className="flex-1 bg-primary text-primary-foreground py-1 rounded text-sm">Save</button>
-                                    <button aria-label="Action button" onClick={() => setIsEditingPhoto(false)} className="flex-1 bg-muted text-muted-foreground py-1 rounded text-sm">Cancel</button>
-                                </div>
-                            </div>
-                        )}
-
-                        <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
-                        <div className="mb-2 flex flex-wrap gap-2">
-                            {user.role === 'admin' && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-xs font-bold border border-red-500/20">
-                                    <Shield size={12} /> Community Admin
-                                </span>
-                            )}
-
-                            {(user.communityRole || (user.role === 'admin' && teamMembers.find(m => m.name === user.name))) && (
-                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-bold border border-blue-500/20">
-                                    <Shield size={12} /> {user.communityRole || teamMembers.find(m => m.name === user.name)?.role}
-                                </span>
-                            )}
-                        </div>
-                        <p className="text-muted-foreground text-lg mb-4">@{user.email?.split('@')[0]}</p>
-
-                        <div className="w-full mb-6">
-                            <button aria-label="Action button"
-                                onClick={() => setIsEditingAbout(true)}
-                                className="w-full py-2 bg-card border border-border rounded-lg hover:bg-muted transition-colors font-medium text-sm"
-                            >
-                                Edit Profile
-                            </button>
-                        </div>
-
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-                            <button aria-label="Action button" onClick={openFollowers} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
-                                <Users size={16} />
-                                <span className="font-bold text-foreground">{user.followers?.length || 0}</span> followers
-                            </button>
-                            <button aria-label="Action button" onClick={openFollowing} className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors">
-                                <span className="font-bold text-foreground">{user.following?.length || 0}</span> following
-                            </button>
-                        </div>
-
-                        <div className="space-y-3 w-full text-sm">
-                            {(user.city || user.state) && (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <MapPin size={16} />
-                                    <span>{[user.city, user.state].filter(Boolean).join(', ')}</span>
-                                </div>
-                            )}
-                            {user.privacySettings?.showEmail && (
-                                <div className="flex items-center gap-2 text-muted-foreground">
-                                    <LinkIcon size={16} />
-                                    <a aria-label="Email" href={`mailto:${user.email}`} className="hover:text-primary truncate">{user.email}</a>
-                                </div>
-                            )}
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                                <Calendar size={16} />
-                                <span>Joined {(() => {
-                                    if (!user.createdAt) return 'Dec 2023';
-                                    try {
-                                        const d = new Date(user.createdAt.seconds ? user.createdAt.seconds * 1000 : user.createdAt);
-                                        if (isNaN(d.getTime())) return 'Dec 2023';
-                                        return d.toLocaleDateString(undefined, { month: 'short', year: 'numeric' });
-                                    } catch (e) {
-                                        return 'Dec 2023';
-                                    }
-                                })()}</span>
-                            </div>
-                        </div>
-
-                        <div className="flex gap-3 mt-6">
-                            {safeSocialLinks.github && <a aria-label="GitHub" href={safeSocialLinks.github} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Github size={20} /></a>}
-                            {safeSocialLinks.linkedin && <a aria-label="LinkedIn" href={safeSocialLinks.linkedin} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Linkedin size={20} /></a>}
-                            {safeSocialLinks.instagram && <a aria-label="Instagram" href={safeSocialLinks.instagram} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground"><Instagram size={20} /></a>}
-                        </div>
-                    </div>
-
-                    {/* Achievements Sidebar Removed as per request */}
-                    <div className="pt-6 border-t border-border">
-                        <button aria-label="Action button"
-                            onClick={() => setShowPrivacyModal(true)}
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
-                        >
-                            <Shield size={16} /> Privacy Settings
-                        </button>
-                        <button aria-label="Action button"
-                            onClick={handleShareProfile}
-                            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
-                        >
-                            {copied ? <Check size={16} /> : <Share2 size={16} />} Share Profile
-                        </button>
-                        <button aria-label="Action button"
-                            onClick={() => {
-                                logout();
-                                window.location.href = '/';
-                            }}
-                            className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition-colors"
-                        >
-                            <LogOut size={16} /> Sign Out
-                        </button>
-                    </div>
-                </aside>
-
-                {/* MAIN CONTENT */}
-                <main className="lg:col-span-3 space-y-8">
-
-                    {/* Hero / Intro */}
-                    <div className="bg-card border border-border rounded-xl p-8 relative overflow-hidden">
-                        <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
-                            <Target size={120} />
-                        </div>
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-                            {/* Left Content Column */}
-                            <div className="md:col-span-2 space-y-4 text-left">
-                                <h2 className="text-3xl font-bold">Hi 👋, I'm {user.name}</h2>
-                                
-                                {/* Level & Points Display */}
-                                <div className="flex flex-wrap items-center gap-3">
-                                    {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
-                                        <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                                            <Shield size={14} />
-                                            Sanrakshak
-                                        </span>
-                                    ) : (
-                                        <span className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}>
-                                            {calculateLevel(user.points || 0).currentLevel.name}
-                                        </span>
-                                    )}
-                                    <span className="text-muted-foreground text-sm font-mono">
-                                        {user.points || 0} Dev Points
-                                    </span>
-                                </div>
-
-                                <p className="text-muted-foreground text-base leading-relaxed">
-                                    {user.bio || "Passionate developer building amazing things. Welcome to my profile!"}
-                                </p>
-                            </div>
-
-                            {/* Right Progress Ring Column */}
-                            <div className="flex justify-center md:justify-end w-full">
-                                <div className={styles.ringWrapper}>
-                                    <div className={styles.progressContainer}>
-                                        {/* Glowing SVG Filter and Gradient */}
-                                        <svg className={styles.svgRing} width="140" height="140">
-                                            <defs>
-                                                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                    <stop offset="0%" stopColor="#00bfbf" />
-                                                    <stop offset="100%" stopColor="#8b5cf6" />
-                                                </linearGradient>
-                                            </defs>
-                                            
-                                            {/* Background Track Circle */}
-                                            <circle 
-                                                className={styles.circleBg}
-                                                cx="70" 
-                                                cy="70" 
-                                                r="60" 
-                                            />
-                                            
-                                            {/* Active Animated Progress Circle */}
-                                            <circle 
-                                                className={styles.circleProgress}
-                                                cx="70" 
-                                                cy="70" 
-                                                r="60" 
-                                                stroke="url(#progressGradient)"
-                                                strokeDasharray="376.99"
-                                                strokeDashoffset={376.99 * (1 - mountedProgress / 100)}
-                                            />
-                                        </svg>
-                                        
-                                        {/* Content inside the Ring */}
-                                        <div className={styles.centerText}>
-                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? (
-                                                <div className="flex flex-col items-center">
-                                                    <Trophy className="text-yellow-500 h-8 w-8 animate-bounce" />
-                                                    <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mt-1">MAX</span>
-                                                </div>
-                                            ) : (
-                                                <>
-                                                    <span className={styles.percentText}>
-                                                        {Math.round(calculateLevel(user.points || 0).progress)}%
-                                                    </span>
-                                                    <span className={styles.lvlText}>
-                                                        Progress
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                    
-                                    {/* Sub-label under the Ring */}
-                                    <div className="text-center">
-                                        <p className="text-xs font-bold text-foreground mb-0.5">
-                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' ? 'Sanrakshak Rank' : `Level Progress`}
-                                        </p>
-                                        <p className={styles.xpDetails}>
-                                            {calculateLevel(user.points || 0).currentLevel.name === 'Sanrakshak' 
-                                                ? `${(user.points || 0).toLocaleString()} XP`
-                                                : `${(user.points || 0).toLocaleString()} / ${(calculateLevel(user.points || 0).nextLevelPoints).toLocaleString()} XP`
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Login Heatmap */}
-                    <div className="space-y-6">
-                        <LoginHeatmap loginDates={user.loginDates} />
-
-
-                    </div>
-
-                    {/* GitHub Stats Section */}
-                    {user.githubStats?.connected && (
-                        <GithubStats user={user} />
-                    )}
-
-                    {/* About Me & Tech Stack */}
-                    <div className="bg-card border border-border rounded-xl p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-bold flex items-center gap-2">
-                                <Star className="text-yellow-500" size={20} /> About Me
-                            </h3>
-                            {!isEditingAbout && (
-                                <button aria-label="Action button" onClick={() => setIsEditingAbout(true)} className="text-sm text-primary hover:underline">
-                                    <Edit3 size={16} />
-                                </button>
-                            )}
-                        </div>
-
-                        {isEditingAbout ? (
-                            <div className="space-y-4">
-                                <div className="flex bg-muted rounded-lg p-1 w-fit">
-                                    <button aria-label="Action button" onClick={() => setAboutTab('write')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'write' ? 'bg-background shadow-sm' : ''}`}>Write</button>
-                                    <button aria-label="Action button" onClick={() => setAboutTab('preview')} className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'preview' ? 'bg-background shadow-sm' : ''}`}>Preview</button>
-                                </div>
-
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground mb-1 block">GitHub URL</label>
-                                        <div className="relative">
-                                            <Github size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
-                                            <input
-                                                type="url"
-                                                value={socialLinks.github}
-                                                onChange={(e) => setSocialLinks({ ...socialLinks, github: e.target.value })}
-                                                className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
-                                                placeholder="https://github.com/..."
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground mb-1 block">LinkedIn URL</label>
-                                        <div className="relative">
-                                            <Linkedin size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
-                                            <input
-                                                type="url"
-                                                value={socialLinks.linkedin}
-                                                onChange={(e) => setSocialLinks({ ...socialLinks, linkedin: e.target.value })}
-                                                className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
-                                                placeholder="https://linkedin.com/in/..."
-                                            />
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <label className="text-xs font-semibold text-muted-foreground mb-1 block">Instagram URL</label>
-                                        <div className="relative">
-                                            <Instagram size={16} className="absolute left-3 top-2.5 text-muted-foreground" />
-                                            <input
-                                                type="url"
-                                                value={socialLinks.instagram}
-                                                onChange={(e) => setSocialLinks({ ...socialLinks, instagram: e.target.value })}
-                                                className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
-                                                placeholder="https://instagram.com/..."
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                                {aboutTab === 'write' ? (
-                                    <div>
-                                        <textarea
-                                            value={aboutContent}
-                                            onChange={(e) => setAboutContent(e.target.value)}
-                                            maxLength={500}
-                                            className="w-full min-h-[300px] p-4 bg-background border border-border rounded-lg font-mono text-sm"
-                                            placeholder="Markdown supported..."
-                                            name="aboutContent"
-                                            id="aboutContent"
-                                        />
-                                        <p className={`text-xs text-right mt-1 ${aboutContent.length >= 480 ? 'text-red-500' : 'text-muted-foreground'}`}>
-                                            {500 - aboutContent.length} / 500 characters remaining
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <div className="min-h-[300px] p-4 bg-background border border-border rounded-lg">
-                                        <div className="markdown-body">
-                                            <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
-                                                {DOMPurify.sanitize(aboutContent)}
-                                            </ReactMarkdown>
-                                        </div>
-                                    </div>
-                                )}
-                                <div className="flex justify-end gap-2">
-                                    <button aria-label="Action button" onClick={() => setIsEditingAbout(false)} className="px-4 py-2 rounded-lg hover:bg-muted">Cancel</button>
-                                    <button aria-label="Action button" onClick={handleSaveAbout} disabled={isSaving} className="px-4 py-2 bg-primary text-primary-foreground rounded-lg">Save</button>
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="markdown-body">
-                                <ReactMarkdown rehypePlugins={[rehypeRaw]} remarkPlugins={[remarkGfm]}>
-                                    {DOMPurify.sanitize(user.aboutMarkdown || "No description provided yet.")}
-                                </ReactMarkdown>
-                            </div>
-                        )}
-                    </div>
-
-
-
-
-
-
-                    {/* GitHub Stats & Achievements Component */}
-                    <Achievements />
-
-                    {/* Dev Profile Share Card */}
-                    <div>
-                        <div className="flex items-center gap-2 mb-5">
-                            <Share2 size={18} className="text-primary" />
-                            <h3 className="text-xl font-bold">Your Dev Card</h3>
-                            <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold ml-1">New</span>
-                        </div>
-                        <DevCard user={user} />
-                    </div>
-
-
-
-
-
-                    {/* Projects Section */}
-                    <div>
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold flex items-center gap-2">
-                                <Flame className="text-orange-500" size={20} /> Projects
-                            </h3>
-                            <button aria-label="Action button"
-                                onClick={() => {
-                                    setProjectToEdit(null);
-                                    setShowProjectModal(true);
-                                }}
-                                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 text-sm font-medium"
-                            >
-                                <Plus size={16} /> New Project
-                            </button>
-                        </div>
-
-                        {loadingProjects ? (
-                            <div className="flex justify-center py-12"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div></div>
-                        ) : projects.length === 0 ? (
-                            <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
-                                <Target size={48} className="mx-auto mb-4 opacity-50" />
-                                <p>No projects yet. Start building!</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {projects.map(project => (
-                                    <ProjectCard
-                                        key={project.id}
-                                        project={project}
-                                        isOwner={true}
-                                        onEdit={handleEditProject}
-                                        onReadMore={setSelectedProject}
-                                    />
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Rewards Section (Moved to bottom) */}
-                    <Rewards projectCount={projects.length} />
-                </main>
+  return (
+    <div className="min-h-screen bg-background text-foreground pb-8 px-4 md:px-8">
+      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-8">
+        {/* LEFT SIDEBAR */}
+        <aside className="lg:col-span-1 space-y-6">
+          {/* Profile Card */}
+          <div className="flex flex-col items-center lg:items-start text-center lg:text-left">
+            <div className="relative w-64 h-64 md:w-72 md:h-72 lg:w-full lg:h-auto lg:aspect-square mb-4 group">
+              <div className="w-full h-full rounded-full overflow-hidden border-4 border-card shadow-xl relative">
+                <Image
+                  src={
+                    user.photoURL ||
+                    `${AVATAR_FALLBACK}/?name=${user.name}&background=random`
+                  }
+                  alt={user.name || 'User'}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <button
+                aria-label="Action button"
+                onClick={() => setIsEditingPhoto(!isEditingPhoto)}
+                className="absolute bottom-2 right-2 md:bottom-4 md:right-4 p-2 bg-card text-foreground rounded-full border border-border shadow-md hover:bg-muted transition-colors opacity-0 group-hover:opacity-100 z-10"
+                title="Change Avatar"
+              >
+                <Camera size={18} />
+              </button>
             </div>
 
-            {/* Modals */}
-            <ProjectUploadModal
-                isOpen={showProjectModal}
-                onClose={() => {
-                    setShowProjectModal(false);
-                    setProjectToEdit(null);
-                }}
-                userId={user.uid}
-                userEmail={user.email}
-                userName={user.name || 'Anonymous'}
-                initialData={projectToEdit}
-                onSuccess={() => {
-                    fetchProjects();
-                    alert(projectToEdit ? "Project updated!" : "Project created!");
-                }}
-            />
-
-            {showPrivacyModal && (
-                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
-                    <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
-                        <div className="flex justify-between items-center mb-6">
-                            <h3 className="text-xl font-bold">Privacy Settings</h3>
-                            <button aria-label="Action button" onClick={() => setShowPrivacyModal(false)}><X size={24} /></button>
-                        </div>
-                        <div className="space-y-4">
-                            {['showMobile', 'showLocation', 'showEmail', 'showProjects', 'showRewards', 'isPublic', 'showInCommunity'].map((setting) => (
-                                <div key={setting} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                                    <span className="capitalize">{setting.replace('show', 'Show ').replace('isPublic', 'Public Profile').replace('showInCommunity', 'Show in Community')}</span>
-                                    <input
-                                        type="checkbox"
-                                        checked={(user.privacySettings as any)?.[setting] ?? (setting === 'showMobile' || setting === 'showEmail' ? false : true)}
-                                        onChange={() => handlePrivacyToggle(setting as any)}
-                                        className="w-5 h-5 accent-primary"
-                                        name={setting}
-                                        id={setting}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+            {isEditingPhoto && (
+              <div className="w-full mb-4 p-3 bg-card border border-border rounded-lg animate-in fade-in slide-in-from-top-2">
+                <input
+                  type="url"
+                  value={newPhotoURL}
+                  onChange={(e) => setNewPhotoURL(e.target.value)}
+                  placeholder="Image URL..."
+                  name="photoURL"
+                  id="photoURL"
+                  className="w-full px-3 py-2 text-sm bg-background border border-border rounded-md mb-2"
+                />
+                <div className="flex gap-2">
+                  <button
+                    aria-label="Action button"
+                    onClick={handleSavePhoto}
+                    disabled={isSaving}
+                    className="flex-1 bg-primary text-primary-foreground py-1 rounded text-sm"
+                  >
+                    Save
+                  </button>
+                  <button
+                    aria-label="Action button"
+                    onClick={() => setIsEditingPhoto(false)}
+                    className="flex-1 bg-muted text-muted-foreground py-1 rounded text-sm"
+                  >
+                    Cancel
+                  </button>
                 </div>
+              </div>
             )}
 
-            {/* Followers Modal */}
-            {showFollowersModal && (
-                <div 
-                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4"
-                    onClick={closeFollowersModal}
+            <h1 className="text-2xl font-bold mb-1">{user.name}</h1>
+            <div className="mb-2 flex flex-wrap gap-2">
+              {user.role === 'admin' && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-500/10 text-red-500 text-xs font-bold border border-red-500/20">
+                  <Shield size={12} /> Community Admin
+                </span>
+              )}
+
+              {(user.communityRole ||
+                (user.role === 'admin' &&
+                  teamMembers.find((m) => m.name === user.name))) && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-500 text-xs font-bold border border-blue-500/20">
+                  <Shield size={12} />{' '}
+                  {user.communityRole ||
+                    teamMembers.find((m) => m.name === user.name)?.role}
+                </span>
+              )}
+            </div>
+            <p className="text-muted-foreground text-lg mb-4">
+              @{user.email?.split('@')[0]}
+            </p>
+
+            <div className="w-full mb-6">
+              <button
+                aria-label="Action button"
+                onClick={() => setIsEditingAbout(true)}
+                className="w-full py-2 bg-card border border-border rounded-lg hover:bg-muted transition-colors font-medium text-sm"
+              >
+                Edit Profile
+              </button>
+            </div>
+
+            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
+              <button
+                aria-label="Action button"
+                onClick={openFollowers}
+                className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
+              >
+                <Users size={16} />
+                <span className="font-bold text-foreground">
+                  {user.followers?.length || 0}
+                </span>{' '}
+                followers
+              </button>
+              <button
+                aria-label="Action button"
+                onClick={openFollowing}
+                className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
+              >
+                <span className="font-bold text-foreground">
+                  {user.following?.length || 0}
+                </span>{' '}
+                following
+              </button>
+            </div>
+
+            <div className="space-y-3 w-full text-sm">
+              {(user.city || user.state) && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <MapPin size={16} />
+                  <span>
+                    {[user.city, user.state].filter(Boolean).join(', ')}
+                  </span>
+                </div>
+              )}
+              {user.privacySettings?.showEmail && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <LinkIcon size={16} />
+                  <a
+                    aria-label="Email"
+                    href={`mailto:${user.email}`}
+                    className="hover:text-primary truncate"
+                  >
+                    {user.email}
+                  </a>
+                </div>
+              )}
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Calendar size={16} />
+                <span>
+                  Joined{' '}
+                  {(() => {
+                    if (!user.createdAt) return 'Dec 2023';
+                    try {
+                      const d = new Date(
+                        user.createdAt.seconds
+                          ? user.createdAt.seconds * 1000
+                          : user.createdAt
+                      );
+                      if (isNaN(d.getTime())) return 'Dec 2023';
+                      return d.toLocaleDateString(undefined, {
+                        month: 'short',
+                        year: 'numeric',
+                      });
+                    } catch (e) {
+                      return 'Dec 2023';
+                    }
+                  })()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              {safeSocialLinks.github && (
+                <a
+                  aria-label="GitHub"
+                  href={safeSocialLinks.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
                 >
-                    <div 
-                        className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
-                            <h3 className="text-xl font-bold">Followers</h3>
-                            <button aria-label="Action button" onClick={closeFollowersModal}><X size={24} /></button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
-                            {isLoadingFollowers ? (
-                                <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div></div>
-                            ) : followersList.length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">No followers yet.</div>
-                            ) : (
-                                followersList.map(u => (
-                                    <div key={u.uid} className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors">
-                                        <Image
-                                            src={u.photoURL || `${AVATAR_FALLBACK}/?name=${u.name}&background=random`}
-                                            alt={u.name}
-                                            width={40}
-                                            height={40}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div className="flex-1 overflow-hidden">
-                                            <h4 className="font-bold truncate">{u.name}</h4>
-                                            <p className="text-xs text-muted-foreground truncate">@{u.email?.split('@')[0]}</p>
-                                        </div>
-                                        <a aria-label="View user profile" href={`/u?uid=${u.uid}`} className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20">
-                                            View
-                                        </a>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Following Modal */}
-            {showFollowingModal && (
-                <div 
-                    className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4"
-                    onClick={closeFollowingModal}
+                  <Github size={20} />
+                </a>
+              )}
+              {safeSocialLinks.linkedin && (
+                <a
+                  aria-label="LinkedIn"
+                  href={safeSocialLinks.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
                 >
-                    <div 
-                        className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col"
-                        onClick={(e) => e.stopPropagation()}
+                  <Linkedin size={20} />
+                </a>
+              )}
+              {safeSocialLinks.instagram && (
+                <a
+                  aria-label="Instagram"
+                  href={safeSocialLinks.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground"
+                >
+                  <Instagram size={20} />
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* Achievements Sidebar Removed as per request */}
+          <div className="pt-6 border-t border-border">
+            <button
+              aria-label="Action button"
+              onClick={() => setShowPrivacyModal(true)}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
+            >
+              <Shield size={16} /> Privacy Settings
+            </button>
+            <button
+              aria-label="Action button"
+              onClick={handleShareProfile}
+              className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-2"
+            >
+              {copied ? <Check size={16} /> : <Share2 size={16} />} Share
+              Profile
+            </button>
+            <button
+              aria-label="Action button"
+              onClick={() => {
+                logout();
+                window.location.href = '/';
+              }}
+              className="flex items-center gap-2 text-sm text-red-500 hover:text-red-600 transition-colors"
+            >
+              <LogOut size={16} /> Sign Out
+            </button>
+          </div>
+        </aside>
+
+        {/* MAIN CONTENT */}
+        <main className="lg:col-span-3 space-y-8">
+          {/* Hero / Intro */}
+          <div className="bg-card border border-border rounded-xl p-8 relative overflow-hidden">
+            <div className="absolute top-0 right-0 p-4 opacity-10 pointer-events-none">
+              <Target size={120} />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+              {/* Left Content Column */}
+              <div className="md:col-span-2 space-y-4 text-left">
+                <h2 className="text-3xl font-bold">Hi 👋, I'm {user.name}</h2>
+
+                {/* Level & Points Display */}
+                <div className="flex flex-wrap items-center gap-3">
+                  {calculateLevel(user.points || 0).currentLevel.name ===
+                  'Sanrakshak' ? (
+                    <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                      <Shield size={14} />
+                      Sanrakshak
+                    </span>
+                  ) : (
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-bold uppercase tracking-wider ${calculateLevel(user.points || 0).currentLevel.bg} ${calculateLevel(user.points || 0).currentLevel.color} border ${calculateLevel(user.points || 0).currentLevel.border}`}
                     >
-                        <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
-                            <h3 className="text-xl font-bold">Following</h3>
-                            <button aria-label="Action button" onClick={closeFollowingModal}><X size={24} /></button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
-                            {isLoadingFollowing ? (
-                                <div className="flex justify-center py-8"><div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div></div>
-                            ) : followingList.length === 0 ? (
-                                <div className="text-center py-8 text-muted-foreground">Not following anyone yet.</div>
-                            ) : (
-                                followingList.map(u => (
-                                    <div key={u.uid} className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors">
-                                        <Image
-                                            src={u.photoURL || `${AVATAR_FALLBACK}/?name=${u.name}&background=random`}
-                                            alt={u.name}
-                                            width={40}
-                                            height={40}
-                                            className="w-10 h-10 rounded-full object-cover"
-                                        />
-                                        <div className="flex-1 overflow-hidden">
-                                            <h4 className="font-bold truncate">{u.name}</h4>
-                                            <p className="text-xs text-muted-foreground truncate">@{u.email?.split('@')[0]}</p>
-                                        </div>
-                                        <a aria-label="View user profile" href={`/u/${u.uid}`} className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20">
-                                            View
-                                        </a>
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </div>
+                      {calculateLevel(user.points || 0).currentLevel.name}
+                    </span>
+                  )}
+                  <span className="text-muted-foreground text-sm font-mono">
+                    {user.points || 0} Dev Points
+                  </span>
                 </div>
-            )}
 
-            {/* Project Details Modal */}
-            {selectedProject && (
+                <p className="text-muted-foreground text-base leading-relaxed">
+                  {user.bio ||
+                    'Passionate developer building amazing things. Welcome to my profile!'}
+                </p>
+              </div>
+
+              {/* Right Progress Ring Column */}
+              <div className="flex justify-center md:justify-end w-full">
+                <div className={styles.ringWrapper}>
+                  <div className={styles.progressContainer}>
+                    {/* Glowing SVG Filter and Gradient */}
+                    <svg className={styles.svgRing} width="140" height="140">
+                      <defs>
+                        <linearGradient
+                          id="progressGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#00bfbf" />
+                          <stop offset="100%" stopColor="#8b5cf6" />
+                        </linearGradient>
+                      </defs>
+
+                      {/* Background Track Circle */}
+                      <circle
+                        className={styles.circleBg}
+                        cx="70"
+                        cy="70"
+                        r="60"
+                      />
+
+                      {/* Active Animated Progress Circle */}
+                      <circle
+                        className={styles.circleProgress}
+                        cx="70"
+                        cy="70"
+                        r="60"
+                        stroke="url(#progressGradient)"
+                        strokeDasharray="376.99"
+                        strokeDashoffset={376.99 * (1 - mountedProgress / 100)}
+                      />
+                    </svg>
+
+                    {/* Content inside the Ring */}
+                    <div className={styles.centerText}>
+                      {calculateLevel(user.points || 0).currentLevel.name ===
+                      'Sanrakshak' ? (
+                        <div className="flex flex-col items-center">
+                          <Trophy className="text-yellow-500 h-8 w-8 animate-bounce" />
+                          <span className="text-[10px] font-bold text-yellow-500 uppercase tracking-widest mt-1">
+                            MAX
+                          </span>
+                        </div>
+                      ) : (
+                        <>
+                          <span className={styles.percentText}>
+                            {Math.round(
+                              calculateLevel(user.points || 0).progress
+                            )}
+                            %
+                          </span>
+                          <span className={styles.lvlText}>Progress</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Sub-label under the Ring */}
+                  <div className="text-center">
+                    <p className="text-xs font-bold text-foreground mb-0.5">
+                      {calculateLevel(user.points || 0).currentLevel.name ===
+                      'Sanrakshak'
+                        ? 'Sanrakshak Rank'
+                        : `Level Progress`}
+                    </p>
+                    <p className={styles.xpDetails}>
+                      {calculateLevel(user.points || 0).currentLevel.name ===
+                      'Sanrakshak'
+                        ? `${(user.points || 0).toLocaleString()} XP`
+                        : `${(user.points || 0).toLocaleString()} / ${calculateLevel(user.points || 0).nextLevelPoints.toLocaleString()} XP`}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Login Heatmap */}
+          <div className="space-y-6">
+            <LoginHeatmap loginDates={user.loginDates} />
+          </div>
+
+          {/* GitHub Stats Section */}
+          {user.githubStats?.connected && <GithubStats user={user} />}
+
+          {/* About Me & Tech Stack */}
+          <div className="bg-card border border-border rounded-xl p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Star className="text-yellow-500" size={20} /> About Me
+              </h3>
+              {!isEditingAbout && (
+                <button
+                  aria-label="Action button"
+                  onClick={() => setIsEditingAbout(true)}
+                  className="text-sm text-primary hover:underline"
+                >
+                  <Edit3 size={16} />
+                </button>
+              )}
+            </div>
+
+            {isEditingAbout ? (
+              <div className="space-y-4">
+                <div className="flex bg-muted rounded-lg p-1 w-fit">
+                  <button
+                    aria-label="Action button"
+                    onClick={() => setAboutTab('write')}
+                    className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'write' ? 'bg-background shadow-sm' : ''}`}
+                  >
+                    Write
+                  </button>
+                  <button
+                    aria-label="Action button"
+                    onClick={() => setAboutTab('preview')}
+                    className={`px-3 py-1 text-sm rounded-md ${aboutTab === 'preview' ? 'bg-background shadow-sm' : ''}`}
+                  >
+                    Preview
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">
+                      GitHub URL
+                    </label>
+                    <div className="relative">
+                      <Github
+                        size={16}
+                        className="absolute left-3 top-2.5 text-muted-foreground"
+                      />
+                      <input
+                        type="url"
+                        value={socialLinks.github}
+                        onChange={(e) =>
+                          setSocialLinks({
+                            ...socialLinks,
+                            github: e.target.value,
+                          })
+                        }
+                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
+                        placeholder="https://github.com/..."
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">
+                      LinkedIn URL
+                    </label>
+                    <div className="relative">
+                      <Linkedin
+                        size={16}
+                        className="absolute left-3 top-2.5 text-muted-foreground"
+                      />
+                      <input
+                        type="url"
+                        value={socialLinks.linkedin}
+                        onChange={(e) =>
+                          setSocialLinks({
+                            ...socialLinks,
+                            linkedin: e.target.value,
+                          })
+                        }
+                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
+                        placeholder="https://linkedin.com/in/..."
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-muted-foreground mb-1 block">
+                      Instagram URL
+                    </label>
+                    <div className="relative">
+                      <Instagram
+                        size={16}
+                        className="absolute left-3 top-2.5 text-muted-foreground"
+                      />
+                      <input
+                        type="url"
+                        value={socialLinks.instagram}
+                        onChange={(e) =>
+                          setSocialLinks({
+                            ...socialLinks,
+                            instagram: e.target.value,
+                          })
+                        }
+                        className="w-full pl-9 pr-3 py-2 bg-background border border-border rounded-md text-sm"
+                        placeholder="https://instagram.com/..."
+                      />
+                    </div>
+                  </div>
+                </div>
+                {aboutTab === 'write' ? (
+                  <div>
+                    <textarea
+                      value={aboutContent}
+                      onChange={(e) => setAboutContent(e.target.value)}
+                      maxLength={500}
+                      className="w-full min-h-[300px] p-4 bg-background border border-border rounded-lg font-mono text-sm"
+                      placeholder="Markdown supported..."
+                      name="aboutContent"
+                      id="aboutContent"
+                    />
+                    <p
+                      className={`text-xs text-right mt-1 ${aboutContent.length >= 480 ? 'text-red-500' : 'text-muted-foreground'}`}
+                    >
+                      {500 - aboutContent.length} / 500 characters remaining
+                    </p>
+                  </div>
+                ) : (
+                  <div className="min-h-[300px] p-4 bg-background border border-border rounded-lg">
+                    <div className="markdown-body">
+                      <ReactMarkdown
+                        rehypePlugins={[rehypeRaw]}
+                        remarkPlugins={[remarkGfm]}
+                      >
+                        {DOMPurify.sanitize(aboutContent)}
+                      </ReactMarkdown>
+                    </div>
+                  </div>
+                )}
+                <div className="flex justify-end gap-2">
+                  <button
+                    aria-label="Action button"
+                    onClick={() => setIsEditingAbout(false)}
+                    className="px-4 py-2 rounded-lg hover:bg-muted"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    aria-label="Action button"
+                    onClick={handleSaveAbout}
+                    disabled={isSaving}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="markdown-body">
+                <ReactMarkdown
+                  rehypePlugins={[rehypeRaw]}
+                  remarkPlugins={[remarkGfm]}
+                >
+                  {DOMPurify.sanitize(
+                    user.aboutMarkdown || 'No description provided yet.'
+                  )}
+                </ReactMarkdown>
+              </div>
+            )}
+          </div>
+
+          {/* GitHub Stats & Achievements Component */}
+          <Achievements />
+
+          {/* Dev Profile Share Card */}
+          <div>
+            <div className="flex items-center gap-2 mb-5">
+              <Share2 size={18} className="text-primary" />
+              <h3 className="text-xl font-bold">Your Dev Card</h3>
+              <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full font-semibold ml-1">
+                New
+              </span>
+            </div>
+            <DevCard user={user} />
+          </div>
+
+          {/* Projects Section */}
+          <div>
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold flex items-center gap-2">
+                <Flame className="text-orange-500" size={20} /> Projects
+              </h3>
+              <button
+                aria-label="Action button"
+                onClick={() => {
+                  setProjectToEdit(null);
+                  setShowProjectModal(true);
+                }}
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 text-sm font-medium"
+              >
+                <Plus size={16} /> New Project
+              </button>
+            </div>
+
+            {loadingProjects ? (
+              <div className="flex justify-center py-12">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground bg-muted/20 rounded-xl border border-border/50 border-dashed">
+                <Target size={48} className="mx-auto mb-4 opacity-50" />
+                <p>No projects yet. Start building!</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {projects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    isOwner={true}
+                    onEdit={handleEditProject}
+                    onReadMore={setSelectedProject}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Rewards Section (Moved to bottom) */}
+          <Rewards projectCount={projects.length} />
+        </main>
+      </div>
+
+      {/* Modals */}
+      <ProjectUploadModal
+        isOpen={showProjectModal}
+        onClose={() => {
+          setShowProjectModal(false);
+          setProjectToEdit(null);
+        }}
+        userId={user.uid}
+        userEmail={user.email}
+        userName={user.name || 'Anonymous'}
+        initialData={projectToEdit}
+        onSuccess={() => {
+          fetchProjects();
+          alert(projectToEdit ? 'Project updated!' : 'Project created!');
+        }}
+      />
+
+      {showPrivacyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4">
+          <div className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl">
+            <div className="flex justify-between items-center mb-6">
+              <h3 className="text-xl font-bold">Privacy Settings</h3>
+              <button
+                aria-label="Action button"
+                onClick={() => setShowPrivacyModal(false)}
+              >
+                <X size={24} />
+              </button>
+            </div>
+            <div className="space-y-4">
+              {[
+                'showMobile',
+                'showLocation',
+                'showEmail',
+                'showProjects',
+                'showRewards',
+                'isPublic',
+                'showInCommunity',
+              ].map((setting) => (
                 <div
-                    className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
-                    onClick={() => setSelectedProject(null)}
+                  key={setting}
+                  className="flex items-center justify-between p-3 bg-muted/50 rounded-lg"
                 >
-                    <div
-                        className="bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
-                            <h2 className="text-xl font-bold truncate pr-4">{selectedProject.title}</h2>
-                            <button aria-label="Action button"
-                                onClick={() => setSelectedProject(null)}
-                                className="p-2 hover:bg-muted rounded-full transition-colors"
-                            >
-                                <X size={20} />
-                            </button>
-                        </div>
-
-                        <div className="p-6 space-y-6">
-                            {/* Media */}
-                            {selectedProject.videoUrl ? (
-                                <div className="aspect-video rounded-xl overflow-hidden bg-black">
-                                    <iframe
-                                        src={getEmbedUrl(selectedProject.videoUrl)}
-                                        className="w-full h-full"
-                                        allowFullScreen
-                                    />
-                                </div>
-                            ) : selectedProject.screenshots && selectedProject.screenshots.length > 0 && (
-                                <div className="aspect-video rounded-xl overflow-hidden bg-muted relative">
-                                    <Image
-                                        src={selectedProject.screenshots[0]}
-                                        alt={selectedProject.title}
-                                        fill
-                                        className="object-contain"
-                                    />
-                                </div>
-                            )}
-
-                            {/* Description */}
-                            <div className="prose dark:prose-invert max-w-none">
-                                <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(selectedProject.description) }} />
-                            </div>
-
-                            {/* Links & Skills */}
-                            <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
-                                {selectedProject.websiteUrl && (
-                                    <a
-                                        href={selectedProject.websiteUrl}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-                                    >
-                                        <Globe size={16} /> Visit Website
-                                    </a>
-                                )}
-                                <div className="flex flex-wrap gap-2 ml-auto">
-                                    {selectedProject.skills?.map((skill: string) => (
-                                        <span key={skill} className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm">
-                                            {skill}
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                  <span className="capitalize">
+                    {setting
+                      .replace('show', 'Show ')
+                      .replace('isPublic', 'Public Profile')
+                      .replace('showInCommunity', 'Show in Community')}
+                  </span>
+                  <input
+                    type="checkbox"
+                    checked={
+                      (user.privacySettings as any)?.[setting] ??
+                      (setting === 'showMobile' || setting === 'showEmail'
+                        ? false
+                        : true)
+                    }
+                    onChange={() => handlePrivacyToggle(setting as any)}
+                    className="w-5 h-5 accent-primary"
+                    name={setting}
+                    id={setting}
+                  />
                 </div>
-            )}
+              ))}
+            </div>
+          </div>
         </div>
-    );
+      )}
+
+      {/* Followers Modal */}
+      {showFollowersModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4"
+          onClick={closeFollowersModal}
+        >
+          <div
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
+              <h3 className="text-xl font-bold">Followers</h3>
+              <button aria-label="Action button" onClick={closeFollowersModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
+              {isLoadingFollowers ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : followersList.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  No followers yet.
+                </div>
+              ) : (
+                followersList.map((u) => (
+                  <div
+                    key={u.uid}
+                    className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors"
+                  >
+                    <Image
+                      src={
+                        u.photoURL ||
+                        `${AVATAR_FALLBACK}/?name=${u.name}&background=random`
+                      }
+                      alt={u.name}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex-1 overflow-hidden">
+                      <h4 className="font-bold truncate">{u.name}</h4>
+                      <p className="text-xs text-muted-foreground truncate">
+                        @{u.email?.split('@')[0]}
+                      </p>
+                    </div>
+                    <a
+                      aria-label="View user profile"
+                      href={`/u?uid=${u.uid}`}
+                      className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20"
+                    >
+                      View
+                    </a>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Following Modal */}
+      {showFollowingModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-[2000] p-4"
+          onClick={closeFollowingModal}
+        >
+          <div
+            className="bg-card border border-border rounded-xl p-6 w-full max-w-md shadow-2xl max-h-[80vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
+              <h3 className="text-xl font-bold">Following</h3>
+              <button aria-label="Action button" onClick={closeFollowingModal}>
+                <X size={24} />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-4 min-h-[200px]">
+              {isLoadingFollowing ? (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+                </div>
+              ) : followingList.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">
+                  Not following anyone yet.
+                </div>
+              ) : (
+                followingList.map((u) => (
+                  <div
+                    key={u.uid}
+                    className="flex items-center gap-3 p-2 hover:bg-muted rounded-lg transition-colors"
+                  >
+                    <Image
+                      src={
+                        u.photoURL ||
+                        `${AVATAR_FALLBACK}/?name=${u.name}&background=random`
+                      }
+                      alt={u.name}
+                      width={40}
+                      height={40}
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                    <div className="flex-1 overflow-hidden">
+                      <h4 className="font-bold truncate">{u.name}</h4>
+                      <p className="text-xs text-muted-foreground truncate">
+                        @{u.email?.split('@')[0]}
+                      </p>
+                    </div>
+                    <a
+                      aria-label="View user profile"
+                      href={`/u/${u.uid}`}
+                      className="text-xs bg-primary/10 text-primary px-3 py-1 rounded-full hover:bg-primary/20"
+                    >
+                      View
+                    </a>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Project Details Modal */}
+      {selectedProject && (
+        <div
+          className="fixed inset-0 z-[2000] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in"
+          onClick={() => setSelectedProject(null)}
+        >
+          <div
+            className="bg-card w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-2xl border border-border shadow-2xl animate-in zoom-in-95"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-border bg-card/95 backdrop-blur">
+              <h2 className="text-xl font-bold truncate pr-4">
+                {selectedProject.title}
+              </h2>
+              <button
+                aria-label="Action button"
+                onClick={() => setSelectedProject(null)}
+                className="p-2 hover:bg-muted rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              {/* Media */}
+              {selectedProject.videoUrl ? (
+                <div className="aspect-video rounded-xl overflow-hidden bg-black">
+                  <iframe
+                    src={getEmbedUrl(selectedProject.videoUrl)}
+                    className="w-full h-full"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                selectedProject.screenshots &&
+                selectedProject.screenshots.length > 0 && (
+                  <div className="aspect-video rounded-xl overflow-hidden bg-muted relative">
+                    <Image
+                      src={selectedProject.screenshots[0]}
+                      alt={selectedProject.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                )
+              )}
+
+              {/* Description */}
+              <div className="prose dark:prose-invert max-w-none">
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(selectedProject.description),
+                  }}
+                />
+              </div>
+
+              {/* Links & Skills */}
+              <div className="flex flex-wrap gap-4 pt-4 border-t border-border">
+                {selectedProject.websiteUrl && (
+                  <a
+                    href={selectedProject.websiteUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                  >
+                    <Globe size={16} /> Visit Website
+                  </a>
+                )}
+                <div className="flex flex-wrap gap-2 ml-auto">
+                  {selectedProject.skills?.map((skill: string) => (
+                    <span
+                      key={skill}
+                      className="px-2 py-1 bg-secondary text-secondary-foreground rounded-md text-sm"
+                    >
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }

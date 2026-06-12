@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { usePathname } from 'next/navigation';
 
@@ -12,26 +12,28 @@ import { FloatingAssistant } from '@/components/assistant/floating-assistant';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import SearchModal from '@/components/layout/SearchModal';
 
-export default function RouteAwareChrome({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const isAuthRoute = pathname === '/login' || pathname === '/signup';
+export default function RouteAwareChrome({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
 
-    return (
-        <>
-            <OfflineBanner />
-            {!isAuthRoute && <MaintenanceBanner />}
-            <Navbar />
+  return (
+    <>
+      <OfflineBanner />
+      {!isAuthRoute && <MaintenanceBanner />}
+      <Navbar />
 
-            <MaintenanceBlocker>
-                <PageWrapper>
-                    {children}
-                </PageWrapper>
-            </MaintenanceBlocker>
+      <MaintenanceBlocker>
+        <PageWrapper>{children}</PageWrapper>
+      </MaintenanceBlocker>
 
-            {!isAuthRoute && <FooterWrapper />}
-            {!isAuthRoute && <FloatingAssistant />}
-            <ToastContainer />
-            <SearchModal />
-        </>
-    );
+      {!isAuthRoute && <FooterWrapper />}
+      {!isAuthRoute && <FloatingAssistant />}
+      <ToastContainer />
+      <SearchModal />
+    </>
+  );
 }

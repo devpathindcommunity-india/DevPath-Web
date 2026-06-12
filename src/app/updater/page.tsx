@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState } from 'react';
 
 // Types
 interface GitHubRelease {
@@ -26,41 +26,41 @@ interface ParsedRelease {
 // ── Static fallback data ──────────────────────────────────────────────────────
 const FALLBACK_RELEASES: ParsedRelease[] = [
   {
-    version: "v2.4.1",
-    name: "v2.4.1",
-    date: "December 14, 2025",
+    version: 'v2.4.1',
+    name: 'v2.4.1',
+    date: 'December 14, 2025',
     changes: [
-      "Added new Wiki documentation system",
-      "Implemented Coming Soon badges for learning paths",
-      "Performance improvements for dashboard rendering",
-      "Fixed layout issues on mobile devices",
+      'Added new Wiki documentation system',
+      'Implemented Coming Soon badges for learning paths',
+      'Performance improvements for dashboard rendering',
+      'Fixed layout issues on mobile devices',
     ],
-    url: "#",
+    url: '#',
     prerelease: false,
   },
   {
-    version: "v2.4.0",
-    name: "v2.4.0",
-    date: "December 10, 2025",
+    version: 'v2.4.0',
+    name: 'v2.4.0',
+    date: 'December 10, 2025',
     changes: [
-      "Launched new Gamification engine",
-      "Added Real-time activity feed",
-      "Redesigned User Profile page",
-      "Introduced Dark Mode support",
+      'Launched new Gamification engine',
+      'Added Real-time activity feed',
+      'Redesigned User Profile page',
+      'Introduced Dark Mode support',
     ],
-    url: "#",
+    url: '#',
     prerelease: false,
   },
   {
-    version: "v2.3.5",
-    name: "v2.3.5",
-    date: "November 28, 2025",
+    version: 'v2.3.5',
+    name: 'v2.3.5',
+    date: 'November 28, 2025',
     changes: [
-      "Hotfix for login authentication flow",
-      "Updated dependency packages",
-      "Minor UI tweaks to Navbar",
+      'Hotfix for login authentication flow',
+      'Updated dependency packages',
+      'Minor UI tweaks to Navbar',
     ],
-    url: "#",
+    url: '#',
     prerelease: false,
   },
 ];
@@ -74,8 +74,8 @@ async function fetchGitHubReleases(
 
   const response = await fetch(url, {
     headers: {
-      Accept: "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2022-11-28",
+      Accept: 'application/vnd.github+json',
+      'X-GitHub-Api-Version': '2022-11-28',
     },
     next: { revalidate: 3600 }, // cache for 1 hour (Next.js)
   });
@@ -93,10 +93,10 @@ async function fetchGitHubReleases(
     .map((r) => ({
       version: r.tag_name,
       name: r.name || r.tag_name,
-      date: new Date(r.published_at).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
+      date: new Date(r.published_at).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
       }),
       // Parse markdown bullet list from release body
       changes: parseReleaseBody(r.body),
@@ -107,9 +107,9 @@ async function fetchGitHubReleases(
 
 // ── Parse markdown bullet points from release body ────────────────────────────
 function parseReleaseBody(body: string | null): string[] {
-  if (!body) return ["No release notes provided."];
+  if (!body) return ['No release notes provided.'];
 
-  const lines = body.split("\n");
+  const lines = body.split('\n');
   const bullets: string[] = [];
 
   for (const line of lines) {
@@ -125,9 +125,9 @@ function parseReleaseBody(body: string | null): string[] {
   if (bullets.length === 0) {
     const nonEmpty = lines
       .map((l) => l.trim())
-      .filter((l) => l.length > 0 && !l.startsWith("#"))
+      .filter((l) => l.length > 0 && !l.startsWith('#'))
       .slice(0, 3);
-    return nonEmpty.length > 0 ? nonEmpty : ["See release notes on GitHub."];
+    return nonEmpty.length > 0 ? nonEmpty : ['See release notes on GitHub.'];
   }
 
   return bullets;
@@ -146,7 +146,11 @@ function ReleaseSkeleton() {
           </div>
           <div className="skeleton-body">
             {[1, 2, 3].map((j) => (
-              <div key={j} className="skeleton-line" style={{ width: `${70 + j * 8}%` }} />
+              <div
+                key={j}
+                className="skeleton-line"
+                style={{ width: `${70 + j * 8}%` }}
+              />
             ))}
           </div>
         </div>
@@ -164,10 +168,7 @@ function ReleaseCard({
   index: number;
 }) {
   return (
-    <div
-      className="release-card"
-      style={{ animationDelay: `${index * 80}ms` }}
-    >
+    <div className="release-card" style={{ animationDelay: `${index * 80}ms` }}>
       <div className="release-timeline-dot" />
 
       <div className="release-header">
@@ -207,8 +208,8 @@ export default function UpdaterPage() {
   const [isLiveData, setIsLiveData] = useState(false);
 
   // ── Change these to your actual repo ────────────────────────────────────────
-  const GITHUB_OWNER = "devpathindcommunity-india";
-  const GITHUB_REPO = "DevPath-Web";
+  const GITHUB_OWNER = 'devpathindcommunity-india';
+  const GITHUB_REPO = 'DevPath-Web';
   // ────────────────────────────────────────────────────────────────────────────
 
   useEffect(() => {
@@ -234,12 +235,12 @@ export default function UpdaterPage() {
       } catch (err) {
         if (!cancelled) {
           const message =
-            err instanceof Error ? err.message : "Unknown error occurred";
+            err instanceof Error ? err.message : 'Unknown error occurred';
 
           // Check if it's a rate limit error
-          if (message.includes("403") || message.includes("429")) {
+          if (message.includes('403') || message.includes('429')) {
             setError(
-              "GitHub API rate limit reached. Showing cached release data."
+              'GitHub API rate limit reached. Showing cached release data.'
             );
           } else {
             setError(`Could not fetch live data: ${message}`);
@@ -685,7 +686,6 @@ export default function UpdaterPage() {
 
       <div className="updater-page">
         <div className="updater-container">
-
           {/* ── Header ── */}
           <div className="updater-header">
             <h1 className="updater-title">Release History</h1>
@@ -695,9 +695,11 @@ export default function UpdaterPage() {
 
             <div className="status-row">
               {!loading && (
-                <span className={`status-badge ${isLiveData ? "live" : "cached"}`}>
+                <span
+                  className={`status-badge ${isLiveData ? 'live' : 'cached'}`}
+                >
                   <span className="status-dot" />
-                  {isLiveData ? "Live from GitHub" : "Showing cached data"}
+                  {isLiveData ? 'Live from GitHub' : 'Showing cached data'}
                 </span>
               )}
 
@@ -707,7 +709,12 @@ export default function UpdaterPage() {
                 rel="noopener noreferrer"
                 className="github-link"
               >
-                <svg height="14" width="14" viewBox="0 0 16 16" fill="currentColor">
+                <svg
+                  height="14"
+                  width="14"
+                  viewBox="0 0 16 16"
+                  fill="currentColor"
+                >
                   <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z" />
                 </svg>
                 View on GitHub
@@ -737,7 +744,11 @@ export default function UpdaterPage() {
           ) : (
             <div className="releases-timeline">
               {releases.map((release, i) => (
-                <ReleaseCard key={release.version} release={release} index={i} />
+                <ReleaseCard
+                  key={release.version}
+                  release={release}
+                  index={i}
+                />
               ))}
             </div>
           )}
@@ -745,7 +756,7 @@ export default function UpdaterPage() {
           {/* ── Footer ── */}
           {!loading && releases.length > 0 && (
             <div className="updater-footer">
-              {releases.length} release{releases.length !== 1 ? "s" : ""} •{" "}
+              {releases.length} release{releases.length !== 1 ? 's' : ''} •{' '}
               <a
                 href={`https://github.com/${GITHUB_OWNER}/${GITHUB_REPO}/releases`}
                 target="_blank"
@@ -755,7 +766,6 @@ export default function UpdaterPage() {
               </a>
             </div>
           )}
-
         </div>
       </div>
     </>

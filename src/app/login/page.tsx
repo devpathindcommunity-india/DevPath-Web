@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useEffect, useState, type FormEvent } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, type FormEvent } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertCircle,
   AlertTriangle,
@@ -15,30 +15,30 @@ import {
   Mail,
   ShieldCheck,
   Sparkles,
-} from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { doc, getDoc } from "firebase/firestore";
+} from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { doc, getDoc } from 'firebase/firestore';
 import {
   GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
-} from "firebase/auth";
-import AdminKeyModal from "@/components/auth/AdminKeyModal";
-import { useAuth } from "@/context/AuthContext";
-import { useNotificationActions } from "@/stores/ui-store";
-import { useMaintenance } from "@/hooks/useMaintenance";
-import { auth, db } from "@/lib/firebase";
+} from 'firebase/auth';
+import AdminKeyModal from '@/components/auth/AdminKeyModal';
+import { useAuth } from '@/context/AuthContext';
+import { useNotificationActions } from '@/stores/ui-store';
+import { useMaintenance } from '@/hooks/useMaintenance';
+import { auth, db } from '@/lib/firebase';
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [activeProvider, setActiveProvider] = useState<
-    "google" | "github" | null
+    'google' | 'github' | null
   >(null);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
@@ -62,14 +62,14 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      if (user.role === "admin") {
+      if (user.role === 'admin') {
         if (!isAdminVerified && !showAdminKeyModal && !isCheckingAdmin) {
           setShowAdminKeyModal(true);
         } else if (isAdminVerified) {
-          router.push("/profile");
+          router.push('/profile');
         }
       } else {
-        router.push("/profile");
+        router.push('/profile');
       }
     }
   }, [
@@ -91,12 +91,12 @@ export default function LoginPage() {
 
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setError("");
+    setError('');
 
     const normalizedEmail = email.trim().toLowerCase();
 
     if (!normalizedEmail || !password) {
-      const message = "Enter both your email and password.";
+      const message = 'Enter both your email and password.';
       setError(message);
       showError(message);
       return;
@@ -114,17 +114,17 @@ export default function LoginPage() {
 
     try {
       await login(normalizedEmail, password);
-      const adminDoc = await getDoc(doc(db, "admins", normalizedEmail));
+      const adminDoc = await getDoc(doc(db, 'admins', normalizedEmail));
 
       setFailedAttempts(0);
-      showSuccess("Signed in successfully.");
+      showSuccess('Signed in successfully.');
 
       if (adminDoc.exists()) {
-        showInfo("Admin account detected. Please complete verification.");
+        showInfo('Admin account detected. Please complete verification.');
         setShowAdminKeyModal(true);
       } else {
         setIsCheckingAdmin(false);
-        router.push("/profile");
+        router.push('/profile');
       }
     } catch (err: any) {
       console.error(err);
@@ -133,15 +133,15 @@ export default function LoginPage() {
       setFailedAttempts(nextAttempts);
 
       const message =
-        err?.code === "auth/invalid-credential" ||
-        err?.code === "auth/wrong-password"
-          ? "Invalid email or password."
-          : "Login failed. Please check your credentials.";
+        err?.code === 'auth/invalid-credential' ||
+        err?.code === 'auth/wrong-password'
+          ? 'Invalid email or password.'
+          : 'Login failed. Please check your credentials.';
 
       if (nextAttempts >= 3) {
         setCooldownSeconds(30);
         const cooldownMessage =
-          "Too many failed attempts. Please wait 30 seconds and try again.";
+          'Too many failed attempts. Please wait 30 seconds and try again.';
         setError(cooldownMessage);
         showError(cooldownMessage);
       } else {
@@ -155,7 +155,7 @@ export default function LoginPage() {
     }
   };
 
-  const handleProviderLogin = async (providerName: "google" | "github") => {
+  const handleProviderLogin = async (providerName: 'google' | 'github') => {
     if (
       isMaintenanceMode ||
       isSubmitting ||
@@ -163,53 +163,53 @@ export default function LoginPage() {
       cooldownSeconds > 0
     )
       return;
-    setError("");
+    setError('');
     setActiveProvider(providerName);
     setIsCheckingAdmin(true);
 
     try {
       const provider =
-        providerName === "google"
+        providerName === 'google'
           ? new GoogleAuthProvider()
           : new GithubAuthProvider();
 
-      if (providerName === "github") {
-        provider.addScope("read:user");
-        provider.addScope("user:email");
+      if (providerName === 'github') {
+        provider.addScope('read:user');
+        provider.addScope('user:email');
       }
 
       const result = await signInWithPopup(auth, provider);
       const signedInEmail =
         result.user.email?.toLowerCase() ||
         auth.currentUser?.email?.toLowerCase() ||
-        "";
+        '';
 
       setFailedAttempts(0);
       showSuccess(
-        `Signed in with ${providerName === "google" ? "Google" : "GitHub"}.`,
+        `Signed in with ${providerName === 'google' ? 'Google' : 'GitHub'}.`
       );
 
       if (!signedInEmail) {
         setIsCheckingAdmin(false);
-        router.push("/profile");
+        router.push('/profile');
         return;
       }
 
-      const adminDoc = await getDoc(doc(db, "admins", signedInEmail));
+      const adminDoc = await getDoc(doc(db, 'admins', signedInEmail));
 
       if (adminDoc.exists()) {
-        showInfo("Admin account detected. Please complete verification.");
+        showInfo('Admin account detected. Please complete verification.');
         setShowAdminKeyModal(true);
       } else {
         setIsCheckingAdmin(false);
-        router.push("/profile");
+        router.push('/profile');
       }
     } catch (err: any) {
       console.error(err);
       const message =
-        err?.code === "auth/popup-closed-by-user"
-          ? "Sign-in popup closed before finishing."
-          : `Unable to sign in with ${providerName === "google" ? "Google" : "GitHub"}.`;
+        err?.code === 'auth/popup-closed-by-user'
+          ? 'Sign-in popup closed before finishing.'
+          : `Unable to sign in with ${providerName === 'google' ? 'Google' : 'GitHub'}.`;
       setError(message);
       showError(message);
       setIsCheckingAdmin(false);
@@ -221,7 +221,7 @@ export default function LoginPage() {
   const handleAdminVerified = () => {
     setShowAdminKeyModal(false);
     setIsCheckingAdmin(false);
-    router.push("/profile");
+    router.push('/profile');
   };
 
   const handleAdminCancel = async () => {
@@ -313,7 +313,7 @@ export default function LoginPage() {
             <div className="mb-6 grid gap-3 sm:grid-cols-2">
               <button
                 type="button"
-                onClick={() => handleProviderLogin("google")}
+                onClick={() => handleProviderLogin('google')}
                 disabled={
                   isMaintenanceMode ||
                   isSubmitting ||
@@ -322,7 +322,7 @@ export default function LoginPage() {
                 }
                 className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {activeProvider === "google" ? (
+                {activeProvider === 'google' ? (
                   <Loader2 className="animate-spin" size={18} />
                 ) : (
                   <Chrome size={18} />
@@ -331,7 +331,7 @@ export default function LoginPage() {
               </button>
               <button
                 type="button"
-                onClick={() => handleProviderLogin("github")}
+                onClick={() => handleProviderLogin('github')}
                 disabled={
                   isMaintenanceMode ||
                   isSubmitting ||
@@ -340,7 +340,7 @@ export default function LoginPage() {
                 }
                 className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {activeProvider === "github" ? (
+                {activeProvider === 'github' ? (
                   <Loader2 className="animate-spin" size={18} />
                 ) : (
                   <Github size={18} />
@@ -399,7 +399,7 @@ export default function LoginPage() {
                   <input
                     id="login-password"
                     name="password"
-                    type={showPassword ? "text" : "password"}
+                    type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
@@ -414,7 +414,7 @@ export default function LoginPage() {
                     onClick={() => setShowPassword((current) => !current)}
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                     aria-label={
-                      showPassword ? "Hide password" : "Show password"
+                      showPassword ? 'Hide password' : 'Show password'
                     }
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -462,7 +462,7 @@ export default function LoginPage() {
 
               {cooldownSeconds > 0 && (
                 <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
-                  Rate limiting is active. Try again in {cooldownSeconds}{" "}
+                  Rate limiting is active. Try again in {cooldownSeconds}{' '}
                   seconds.
                 </div>
               )}
@@ -479,13 +479,13 @@ export default function LoginPage() {
                 ) : (
                   <LogIn size={18} />
                 )}
-                {isSubmitting ? "Signing in..." : "Login"}
+                {isSubmitting ? 'Signing in...' : 'Login'}
               </button>
             </form>
 
             <div className="mt-6 flex flex-col gap-4 text-center text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-left">
               <p>
-                Don't have an account?{" "}
+                Don't have an account?{' '}
                 <Link
                   href="/signup"
                   className="font-medium text-cyan-300 transition-colors hover:text-cyan-200"

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import React from "react";
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React from 'react';
+import { useEffect, useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const BackToTop = (): React.ReactElement | null => {
   const [isVisible, setIsVisible] = useState<boolean>(false);
@@ -16,14 +16,14 @@ const BackToTop = (): React.ReactElement | null => {
       }
     };
 
-    window.addEventListener("scroll", toggleVisibility);
-    return () => window.removeEventListener("scroll", toggleVisibility);
+    window.addEventListener('scroll', toggleVisibility);
+    return () => window.removeEventListener('scroll', toggleVisibility);
   }, []);
 
   const scrollToTop = (): void => {
     window.scrollTo({
       top: 0,
-      behavior: "smooth",
+      behavior: 'smooth',
     });
   };
 

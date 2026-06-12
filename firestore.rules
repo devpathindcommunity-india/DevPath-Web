@@ -95,16 +95,12 @@ service cloud.firestore {
         allow update, delete: if request.auth != null && (request.auth.uid == userId || isSuperAdmin());
       }
 
-      // ── 🆕 Gamification subcollection ──────────────────────────────────────
-      // Stores XP, streak data, earned badges, and activity calendar per user.
-      // xp and earnedBadges are protected — only super admin or Cloud Functions
-      // should increment them. Users can write activityDates and streakFreezes.
+
       match /gamification/{docId} {
-        allow read: if true; // Public so leaderboard components can read
+        allow read: if true;
         allow create: if request.auth != null && request.auth.uid == userId;
         allow update: if request.auth != null && (
           isSuperAdmin() ||
-          // Users can only update non-sensitive fields (streak calendar, freeze usage)
           (request.auth.uid == userId &&
             !request.resource.data.diff(resource.data).affectedKeys().hasAny(['xp', 'earnedBadges', 'weeklyXP', 'monthlyXP']))
         );
@@ -119,8 +115,6 @@ service cloud.firestore {
     }
 
     // ─── Leaderboard ──────────────────────────────────────────────────────────
-    // Updated: super admin or a Cloud Function (via admin SDK) should write xp/points.
-    // Direct user writes are blocked for score fields to prevent cheating.
     match /leaderboard/{userId} {
       allow read: if true;
       allow create, delete: if (request.auth != null && request.auth.uid == userId) || isSuperAdmin();
@@ -217,5 +211,20 @@ service cloud.firestore {
       allow read: if true;
       allow write: if isSuperAdmin();
     }
+
+    // ─── Portfolios ──────────────────────────────────────────────────────────
+    match /portfolios/{userId} {
+      allow read: if resource.data.isPublic == true
+                  || (request.auth != null && request.auth.uid == userId);
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.userId == userId;
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.userId == resource.data.userId
+                    && request.resource.data.username == resource.data.username;
+      allow delete: if false;
+    }
+
   }
 }

@@ -11,21 +11,23 @@ This document explains the theme-aware text color system that has been implement
 The following CSS variables have been added to support theme-aware text colors:
 
 #### Light Mode (Default)
+
 ```css
---text-primary: #0f172a;      /* Dark slate for main text */
---text-secondary: #64748b;    /* Medium slate for secondary text */
---text-muted: #94a3b8;        /* Light slate for muted text */
---text-light: #f1f5f9;        /* Light color for text on dark backgrounds */
---text-dark: #0f172a;         /* Dark color for text on light backgrounds */
+--text-primary: #0f172a; /* Dark slate for main text */
+--text-secondary: #64748b; /* Medium slate for secondary text */
+--text-muted: #94a3b8; /* Light slate for muted text */
+--text-light: #f1f5f9; /* Light color for text on dark backgrounds */
+--text-dark: #0f172a; /* Dark color for text on light backgrounds */
 ```
 
 #### Dark Mode (.dark class)
+
 ```css
---text-primary: #ffffff;      /* White for main text */
---text-secondary: #94a3b8;    /* Slate for secondary text */
---text-muted: #64748b;        /* Darker slate for muted text */
---text-light: #e2e8f0;        /* Light color for text */
---text-dark: #ffffff;         /* White for dark theme */
+--text-primary: #ffffff; /* White for main text */
+--text-secondary: #94a3b8; /* Slate for secondary text */
+--text-muted: #64748b; /* Darker slate for muted text */
+--text-light: #e2e8f0; /* Light color for text */
+--text-dark: #ffffff; /* White for dark theme */
 ```
 
 ### 2. Utility Classes in `globals.css`
@@ -67,15 +69,15 @@ Use CSS variables for text colors:
 
 ```css
 .myComponent {
-  color: var(--text-primary);        /* Main text */
+  color: var(--text-primary); /* Main text */
 }
 
 .myComponent p {
-  color: var(--text-secondary);      /* Secondary text */
+  color: var(--text-secondary); /* Secondary text */
 }
 
 .myComponent .helper {
-  color: var(--text-muted);          /* Muted/disabled text */
+  color: var(--text-muted); /* Muted/disabled text */
 }
 ```
 
@@ -103,7 +105,7 @@ import { useThemeColors } from '@/lib/theme';
 
 function MyComponent() {
   const { textPrimary, textSecondary } = useThemeColors();
-  
+
   return (
     <>
       <p style={{ color: textPrimary }}>Main text</p>
@@ -118,17 +120,20 @@ function MyComponent() {
 ### ✅ Do's
 
 1. **Use CSS variables for static colors:**
+
    ```css
    color: var(--text-primary);
    ```
 
 2. **Use Tailwind classes when possible:**
+
    ```jsx
-   className="text-foreground"
-   className="text-muted-foreground"
+   className = 'text-foreground';
+   className = 'text-muted-foreground';
    ```
 
 3. **Add smooth transitions:**
+
    ```css
    color: var(--text-primary);
    transition: color var(--transition-fast);
@@ -142,6 +147,7 @@ function MyComponent() {
 ### ❌ Don'ts
 
 1. **Avoid hardcoded color values:**
+
    ```css
    /* ❌ BAD */
    color: #000000;
@@ -150,19 +156,21 @@ function MyComponent() {
    ```
 
 2. **Don't mix theme approaches:**
+
    ```css
    /* ❌ BAD */
    .myClass {
-     color: white;  /* Will be invisible in light mode */
+     color: white; /* Will be invisible in light mode */
    }
    ```
 
 3. **Don't forget transitions:**
+
    ```css
    /* ❌ Jarring color change */
    color: var(--text-primary);
    /* without transition */
-   
+
    /* ✅ Smooth transition */
    color: var(--text-primary);
    transition: color var(--transition-fast);
@@ -172,13 +180,13 @@ function MyComponent() {
 
 ### Text Colors
 
-| Variable | Light Mode | Dark Mode | Use Case |
-|----------|-----------|----------|----------|
-| `--text-primary` | #0f172a | #ffffff | Main headings and body text |
-| `--text-secondary` | #64748b | #94a3b8 | Secondary information, captions |
-| `--text-muted` | #94a3b8 | #64748b | Disabled, placeholder, helper text |
-| `--text-light` | #f1f5f9 | #e2e8f0 | Text on dark backgrounds |
-| `--text-dark` | #0f172a | #ffffff | Text on light backgrounds |
+| Variable           | Light Mode | Dark Mode | Use Case                           |
+| ------------------ | ---------- | --------- | ---------------------------------- |
+| `--text-primary`   | #0f172a    | #ffffff   | Main headings and body text        |
+| `--text-secondary` | #64748b    | #94a3b8   | Secondary information, captions    |
+| `--text-muted`     | #94a3b8    | #64748b   | Disabled, placeholder, helper text |
+| `--text-light`     | #f1f5f9    | #e2e8f0   | Text on dark backgrounds           |
+| `--text-dark`      | #0f172a    | #ffffff   | Text on light backgrounds          |
 
 ### Accent Colors (Fixed across themes)
 
@@ -193,15 +201,17 @@ function MyComponent() {
 If you're updating existing components:
 
 1. **Find hardcoded text colors:**
+
    ```bash
    grep -r "color: #" src/components --include="*.module.css"
    ```
 
 2. **Replace with variables:**
+
    ```css
    /* Before */
    color: #475569;
-   
+
    /* After */
    color: var(--text-secondary);
    ```

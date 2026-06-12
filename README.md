@@ -28,12 +28,12 @@
 | Section                                                           | Description                                                                |
 | ----------------------------------------------------------------- | -------------------------------------------------------------------------- |
 | [🚀 Features](#-features)                                         | Explore the platform's core functionality and community-focused features.  |
-| [🛠️ Tech Stack](#️-tech-stack)                                   | Discover the technologies, frameworks, and services powering the platform. |
+| [🛠️ Tech Stack](#️-tech-stack)                                     | Discover the technologies, frameworks, and services powering the platform. |
 | [📂 Project Structure](#-project-structure)                       | Understand the organization and architecture of the codebase.              |
 | [📸 Screenshots](#-screenshots)                                   | Preview key pages and user experiences.                                    |
 | [🏁 Getting Started](#-getting-started)                           | Set up and run the project locally.                                        |
 | [📋 Prerequisites](#-prerequisites)                               | Review required tools and dependencies.                                    |
-| [⚡ Installation](#-installation)                                  | Follow the project installation steps.                                     |
+| [⚡ Installation](#-installation)                                 | Follow the project installation steps.                                     |
 | [🔥 Local Firebase Configuration](#-local-firebase-configuration) | Configure Firebase for local development.                                  |
 | [📜 Available Scripts](#-available-scripts)                       | Reference commonly used development commands.                              |
 | [🤝 Contributing](#-contributing)                                 | Learn how to contribute to the project.                                    |
@@ -45,13 +45,13 @@
 
 ## 🚀 Features
 
-* 🤝 **Community Hub** — Connect with developers, mentors, and contributors.
-* 📅 **Event Management** — Discover hackathons, workshops, and community events.
-* 📚 **Resource Library** — Access curated roadmaps, tutorials, and learning resources.
-* 📖 **Wiki & Knowledge Base** — Explore guides, documentation, and community articles.
-* 👤 **User Profiles** — Showcase your skills, achievements, and contributions.
-* 🌟 **Open Source Collaboration** — Contribute to projects and grow through real-world experience.
-* 📱 **Responsive Design** — Seamlessly accessible across desktop, tablet, and mobile devices.
+- 🤝 **Community Hub** — Connect with developers, mentors, and contributors.
+- 📅 **Event Management** — Discover hackathons, workshops, and community events.
+- 📚 **Resource Library** — Access curated roadmaps, tutorials, and learning resources.
+- 📖 **Wiki & Knowledge Base** — Explore guides, documentation, and community articles.
+- 👤 **User Profiles** — Showcase your skills, achievements, and contributions.
+- 🌟 **Open Source Collaboration** — Contribute to projects and grow through real-world experience.
+- 📱 **Responsive Design** — Seamlessly accessible across desktop, tablet, and mobile devices.
 
 ---
 
@@ -63,21 +63,20 @@ DevPath India is built using a modern, scalable, and developer-friendly technolo
 
 <div align="center">
 
-| Category | Technology |
-|----------|------------|
-| **Framework** | Next.js 16 (App Router) |
-| **Frontend Library** | React 19 |
-| **Language** | TypeScript |
-| **Styling** | Tailwind CSS |
-| **Animations** | Framer Motion & GSAP |
-| **Icons** | Lucide React |
-| **Linting & Code Quality** | ESLint |
-| **Package Manager** | npm |
-| **Backend Services** | Firebase |
-| **Deployment** | Vercel |
+| Category                   | Technology              |
+| -------------------------- | ----------------------- |
+| **Framework**              | Next.js 16 (App Router) |
+| **Frontend Library**       | React 19                |
+| **Language**               | TypeScript              |
+| **Styling**                | Tailwind CSS            |
+| **Animations**             | Framer Motion & GSAP    |
+| **Icons**                  | Lucide React            |
+| **Linting & Code Quality** | ESLint                  |
+| **Package Manager**        | npm                     |
+| **Backend Services**       | Firebase                |
+| **Deployment**             | Vercel                  |
 
 </div>
-
 
 ---
 
@@ -86,20 +85,20 @@ DevPath India is built using a modern, scalable, and developer-friendly technolo
 ```mermaid
 flowchart LR
     User["👤 User"]
-    
+
     User --> UI["⚛️ React 19 UI"]
-    
+
     UI --> Next["▲ Next.js 16"]
-    
+
     Next --> TS["📘 TypeScript"]
     Next --> Tailwind["🎨 Tailwind CSS"]
     Next --> Motion["✨ Framer Motion / GSAP"]
-    
+
     Next --> Firebase["🔥 Firebase"]
-    
+
     Firebase --> Auth["🔐 Authentication"]
     Firebase --> DB["📂 Database"]
-    
+
     Next --> Vercel["☁️ Vercel Deployment"]
 ```
 
@@ -136,11 +135,10 @@ DevPath-Web/
 └── eslint.config.mjs      # ESLint rules and configuration
 ```
 
-
 ## 📸 Screenshots
 
-| Home Page | Community |
-| :---: | :---: |
+|                               Home Page                               |                                 Community                                  |
+| :-------------------------------------------------------------------: | :------------------------------------------------------------------------: |
 | <img src="public/screenshot-home.webp" alt="Home Page" height="250"/> | <img src="public/screenshot-community.webp" alt="Community" height="250"/> |
 
 ---
@@ -181,10 +179,10 @@ Get DevPath India running locally in just a few steps.
 
 Make sure you have:
 
-* Node.js (Latest LTS recommended)
-* npm, yarn, or pnpm
-* Git
-* A Firebase project
+- Node.js (Latest LTS recommended)
+- npm, yarn, or pnpm
+- Git
+- A Firebase project
 
 ---
 
@@ -217,9 +215,9 @@ Add your Firebase credentials to `.env.local`.
 
 1. Create a project in the Firebase Console.
 2. Enable:
+   - Authentication
+   - Firestore Database
 
-   * Authentication
-   * Firestore Database
 3. Register a Web App and copy the Firebase configuration.
 4. Paste the values into `.env.local`.
 
@@ -301,9 +299,9 @@ Contributions of all sizes are welcome! Whether you're fixing bugs, improving do
 
 Before contributing, please review our:
 
-* 📖 [Contributing Guidelines](CONTRIBUTING.md)
-* 🐛 [Open Issues](https://github.com/devpathindcommunity-india/DevPath-Web/issues)
-* 🌱 [Good First Issues](https://github.com/devpathindcommunity-india/DevPath-Web/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
+- 📖 [Contributing Guidelines](CONTRIBUTING.md)
+- 🐛 [Open Issues](https://github.com/devpathindcommunity-india/DevPath-Web/issues)
+- 🌱 [Good First Issues](https://github.com/devpathindcommunity-india/DevPath-Web/issues?q=is%3Aopen+is%3Aissue+label%3A%22good+first+issue%22)
 
 We appreciate every contribution, from first-time contributors to experienced maintainers.
 
@@ -315,7 +313,7 @@ DevPath India is committed to fostering a welcoming, inclusive, and respectful c
 
 By participating in this project, you agree to follow our:
 
-* 📜 [Code of Conduct](CODE_OF_CONDUCT.md)
+- 📜 [Code of Conduct](CODE_OF_CONDUCT.md)
 
 Let's build a positive and collaborative environment together.
 
@@ -327,15 +325,15 @@ This project is distributed under the **DevPath India Source-Available License**
 
 ### What You Can Do
 
-* ✅ Clone and run the project locally
-* ✅ Learn from and modify the source code
-* ✅ Submit pull requests and community contributions
+- ✅ Clone and run the project locally
+- ✅ Learn from and modify the source code
+- ✅ Submit pull requests and community contributions
 
 ### Restrictions
 
-* ❌ Commercial use is prohibited
-* ❌ Hosting public clones or competing services is not permitted
-* ❌ Redistribution under the DevPath India brand is not allowed
+- ❌ Commercial use is prohibited
+- ❌ Hosting public clones or competing services is not permitted
+- ❌ Redistribution under the DevPath India brand is not allowed
 
 > [!WARNING]
 > The **DevPath India** name, logo, branding assets, and visual identity are protected and may not be used without explicit permission.
@@ -344,10 +342,10 @@ For complete terms, please refer to the [LICENSE](LICENSE) file.
 
 ---
 
-
 ## 🌟 Major Contributors
 
 - **Aditya948351** - Core Maintainer & Lead Developer
+
 ---
 
 <p align="center">

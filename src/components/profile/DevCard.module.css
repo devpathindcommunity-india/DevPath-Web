@@ -20,9 +20,9 @@
   --devcard-surface-end: #eef2ff;
   --devcard-border: rgba(15, 23, 42, 0.08);
   --devcard-shadow-primary: rgba(15, 23, 42, 0.14);
-  --devcard-shadow-accent: rgba(0, 212, 255, 0.10);
+  --devcard-shadow-accent: rgba(0, 212, 255, 0.1);
   --devcard-text: #0f172a;
-  --devcard-text-muted: rgba(15, 23, 42, 0.70);
+  --devcard-text-muted: rgba(15, 23, 42, 0.7);
   --devcard-text-soft: rgba(15, 23, 42, 0.54);
   --devcard-text-faint: rgba(15, 23, 42, 0.42);
   --devcard-text-subtle: rgba(15, 23, 42, 0.32);
@@ -37,18 +37,23 @@
   --devcard-badge-bg: rgba(15, 23, 42, 0.04);
   --devcard-badge-bg-hover: rgba(15, 23, 42, 0.07);
   --devcard-badge-border: rgba(15, 23, 42, 0.08);
-  --devcard-lang-name: rgba(15, 23, 42, 0.60);
+  --devcard-lang-name: rgba(15, 23, 42, 0.6);
   --devcard-lang-pct: rgba(15, 23, 42, 0.42);
   --devcard-empty: rgba(15, 23, 42, 0.32);
   --devcard-btn-secondary-bg: rgba(15, 23, 42, 0.05);
   --devcard-btn-secondary-text: rgba(15, 23, 42, 0.78);
-  --devcard-btn-secondary-border: rgba(15, 23, 42, 0.10);
+  --devcard-btn-secondary-border: rgba(15, 23, 42, 0.1);
   --devcard-btn-secondary-hover: rgba(15, 23, 42, 0.09);
   --devcard-btn-success-bg: rgba(16, 185, 129, 0.12);
   --devcard-btn-success-text: #059669;
   --devcard-btn-success-border: rgba(16, 185, 129, 0.28);
   --devcard-ring-inner: #ffffff;
-  background: linear-gradient(140deg, var(--devcard-surface-start) 0%, var(--devcard-surface-mid) 50%, var(--devcard-surface-end) 100%);
+  background: linear-gradient(
+    140deg,
+    var(--devcard-surface-start) 0%,
+    var(--devcard-surface-mid) 50%,
+    var(--devcard-surface-end) 100%
+  );
   border: 1px solid var(--devcard-border);
   box-shadow:
     0 0 0 1px var(--devcard-shadow-accent),
@@ -71,8 +76,13 @@
 }
 
 @keyframes skeletonPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.55; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.55;
+  }
 }
 
 .skeletonCircle,
@@ -192,16 +202,16 @@
   --devcard-shadow-primary: rgba(0, 0, 0, 0.75);
   --devcard-shadow-accent: rgba(0, 212, 255, 0.12);
   --devcard-text: #ffffff;
-  --devcard-text-muted: rgba(255, 255, 255, 0.70);
+  --devcard-text-muted: rgba(255, 255, 255, 0.7);
   --devcard-text-soft: rgba(255, 255, 255, 0.45);
-  --devcard-text-faint: rgba(255, 255, 255, 0.40);
-  --devcard-text-subtle: rgba(255, 255, 255, 0.30);
+  --devcard-text-faint: rgba(255, 255, 255, 0.4);
+  --devcard-text-subtle: rgba(255, 255, 255, 0.3);
   --devcard-panel: rgba(255, 255, 255, 0.03);
   --devcard-panel-border: rgba(255, 255, 255, 0.07);
   --devcard-grid-dot: rgba(255, 255, 255, 0.04);
   --devcard-footer-bg: rgba(0, 0, 0, 0.25);
   --devcard-footer-border: rgba(255, 255, 255, 0.05);
-  --devcard-footer-url: rgba(255, 255, 255, 0.20);
+  --devcard-footer-url: rgba(255, 255, 255, 0.2);
   --devcard-line: rgba(255, 255, 255, 0.06);
   --devcard-progress-track: rgba(255, 255, 255, 0.07);
   --devcard-badge-bg: rgba(255, 255, 255, 0.04);
@@ -209,14 +219,14 @@
   --devcard-badge-border: rgba(255, 255, 255, 0.08);
   --devcard-lang-name: rgba(255, 255, 255, 0.55);
   --devcard-lang-pct: rgba(255, 255, 255, 0.35);
-  --devcard-empty: rgba(255, 255, 255, 0.30);
+  --devcard-empty: rgba(255, 255, 255, 0.3);
   --devcard-btn-secondary-bg: rgba(255, 255, 255, 0.06);
-  --devcard-btn-secondary-text: rgba(255, 255, 255, 0.80);
+  --devcard-btn-secondary-text: rgba(255, 255, 255, 0.8);
   --devcard-btn-secondary-border: rgba(255, 255, 255, 0.12);
-  --devcard-btn-secondary-hover: rgba(255, 255, 255, 0.10);
+  --devcard-btn-secondary-hover: rgba(255, 255, 255, 0.1);
   --devcard-btn-success-bg: rgba(16, 185, 129, 0.15);
   --devcard-btn-success-text: #34d399;
-  --devcard-btn-success-border: rgba(16, 185, 129, 0.30);
+  --devcard-btn-success-border: rgba(16, 185, 129, 0.3);
   --devcard-ring-inner: #0d1117;
 }
 
@@ -226,8 +236,16 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(ellipse 55% 45% at 8% 15%,  rgba(0, 212, 255, 0.08) 0%, transparent 65%),
-    radial-gradient(ellipse 45% 55% at 92% 85%, rgba(157, 78, 221, 0.10) 0%, transparent 65%);
+    radial-gradient(
+      ellipse 55% 45% at 8% 15%,
+      rgba(0, 212, 255, 0.08) 0%,
+      transparent 65%
+    ),
+    radial-gradient(
+      ellipse 45% 55% at 92% 85%,
+      rgba(157, 78, 221, 0.1) 0%,
+      transparent 65%
+    );
   pointer-events: none;
   z-index: 0;
 }
@@ -237,7 +255,11 @@
   content: '';
   position: absolute;
   inset: 0;
-  background-image: radial-gradient(circle, var(--devcard-grid-dot) 1px, transparent 1px);
+  background-image: radial-gradient(
+    circle,
+    var(--devcard-grid-dot) 1px,
+    transparent 1px
+  );
   background-size: 28px 28px;
   pointer-events: none;
   z-index: 0;
@@ -260,7 +282,11 @@
   flex-direction: column;
   align-items: center;
   gap: 10px;
-  background: linear-gradient(180deg, rgba(0, 212, 255, 0.03) 0%, transparent 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(0, 212, 255, 0.03) 0%,
+    transparent 100%
+  );
 }
 
 .avatarRing {
@@ -279,7 +305,9 @@
 }
 
 @keyframes spinRing {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .avatarRingInner::after {
@@ -303,7 +331,11 @@
   position: absolute;
   inset: 4px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(0,212,255,0.2), rgba(157,78,221,0.2));
+  background: linear-gradient(
+    135deg,
+    rgba(0, 212, 255, 0.2),
+    rgba(157, 78, 221, 0.2)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -442,13 +474,15 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
-  transition: border-color 0.2s, transform 0.2s;
+  transition:
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .statCard:hover {
   border-color: rgba(0, 212, 255, 0.28);
   transform: translateY(-2px);
-  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.10);
+  box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
 }
 
 .statIconWrap {
@@ -703,7 +737,7 @@
 
 .btnSecondary:hover {
   background: var(--devcard-btn-secondary-hover);
-  border-color: rgba(0, 212, 255, 0.20);
+  border-color: rgba(0, 212, 255, 0.2);
   transform: translateY(-2px);
 }
 

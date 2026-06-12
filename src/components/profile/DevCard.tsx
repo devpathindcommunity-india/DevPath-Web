@@ -1,68 +1,129 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { motion, type Variants } from 'framer-motion';
 import {
-  Download, Link2, Check, MapPin, Calendar,
-  Trophy, Zap, Flame, Star, Award, Github,
-  Layers, Code2, Globe, Users, Brain,
-  ChevronRight, Sparkles, Medal, Linkedin, Instagram,
+  Download,
+  Link2,
+  Check,
+  MapPin,
+  Calendar,
+  Trophy,
+  Zap,
+  Flame,
+  Star,
+  Award,
+  Github,
+  Layers,
+  Code2,
+  Globe,
+  Users,
+  Brain,
+  ChevronRight,
+  Sparkles,
+  Medal,
+  Linkedin,
+  Instagram,
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
-import { collection, query, where, getCountFromServer, doc, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  query,
+  where,
+  getCountFromServer,
+  doc,
+  onSnapshot,
+} from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useNotificationActions } from '@/stores/ui-store';
 import styles from './DevCard.module.css';
 
 // ── Badge registry ────────────────────────────────────────────────────────────
-const BADGE_REGISTRY: Record<string, { name: string; Icon: any; color: string }> = {
-  'early-adopter':     { name: 'Early Adopter',     Icon: Sparkles,    color: '#60a5fa' },
-  'profile-perfect':   { name: 'Profile Perfect',   Icon: Check,       color: '#34d399' },
-  'builder-1':         { name: 'Builder',            Icon: Layers,      color: '#fb923c' },
-  'builder-3':         { name: 'Prolific Builder',   Icon: Layers,      color: '#fb923c' },
-  'builder-5':         { name: 'Architect',          Icon: Layers,      color: '#f59e0b' },
-  'builder-10':        { name: 'Master Builder',     Icon: Layers,      color: '#f59e0b' },
-  'connector-social':  { name: 'Super Connector',    Icon: Globe,       color: '#a78bfa' },
-  'social-github':     { name: 'Coder',              Icon: Github,      color: '#94a3b8' },
-  'social-linkedin':   { name: 'Professional',       Icon: Globe,       color: '#0ea5e9' },
-  'social-instagram':  { name: 'Socialite',          Icon: Globe,       color: '#f472b6' },
-  'storyteller':       { name: 'Storyteller',        Icon: Code2,       color: '#c084fc' },
-  'face-of-community': { name: 'Face of Community',  Icon: Users,       color: '#34d399' },
-  'local-hero':        { name: 'Local Hero',         Icon: MapPin,      color: '#fb923c' },
-  'streak-7':          { name: 'Dedicated',          Icon: Flame,       color: '#f87171' },
-  'rising-star':       { name: 'Rising Star',        Icon: Star,        color: '#fbbf24' },
-  'top-collaborator':  { name: 'Top Collaborator',   Icon: Users,       color: '#2dd4bf' },
+const BADGE_REGISTRY: Record<
+  string,
+  { name: string; Icon: any; color: string }
+> = {
+  'early-adopter': { name: 'Early Adopter', Icon: Sparkles, color: '#60a5fa' },
+  'profile-perfect': { name: 'Profile Perfect', Icon: Check, color: '#34d399' },
+  'builder-1': { name: 'Builder', Icon: Layers, color: '#fb923c' },
+  'builder-3': { name: 'Prolific Builder', Icon: Layers, color: '#fb923c' },
+  'builder-5': { name: 'Architect', Icon: Layers, color: '#f59e0b' },
+  'builder-10': { name: 'Master Builder', Icon: Layers, color: '#f59e0b' },
+  'connector-social': {
+    name: 'Super Connector',
+    Icon: Globe,
+    color: '#a78bfa',
+  },
+  'social-github': { name: 'Coder', Icon: Github, color: '#94a3b8' },
+  'social-linkedin': { name: 'Professional', Icon: Globe, color: '#0ea5e9' },
+  'social-instagram': { name: 'Socialite', Icon: Globe, color: '#f472b6' },
+  storyteller: { name: 'Storyteller', Icon: Code2, color: '#c084fc' },
+  'face-of-community': {
+    name: 'Face of Community',
+    Icon: Users,
+    color: '#34d399',
+  },
+  'local-hero': { name: 'Local Hero', Icon: MapPin, color: '#fb923c' },
+  'streak-7': { name: 'Dedicated', Icon: Flame, color: '#f87171' },
+  'rising-star': { name: 'Rising Star', Icon: Star, color: '#fbbf24' },
+  'top-collaborator': {
+    name: 'Top Collaborator',
+    Icon: Users,
+    color: '#2dd4bf',
+  },
 };
 
 const LANG_COLORS: Record<string, string> = {
-  TypeScript: '#3178c6', JavaScript: '#f7df1e', Python: '#3572A5',
-  Java: '#b07219', Go: '#00ADD8', Rust: '#dea584', 'C++': '#f34b7d',
-  'C#': '#178600', CSS: '#563d7c', HTML: '#e34c26', Ruby: '#701516',
-  PHP: '#4F5D95', Swift: '#F05138', Kotlin: '#A97BFF', Dart: '#00B4AB',
-  Shell: '#89e051', Vue: '#41b883',
+  TypeScript: '#3178c6',
+  JavaScript: '#f7df1e',
+  Python: '#3572A5',
+  Java: '#b07219',
+  Go: '#00ADD8',
+  Rust: '#dea584',
+  'C++': '#f34b7d',
+  'C#': '#178600',
+  CSS: '#563d7c',
+  HTML: '#e34c26',
+  Ruby: '#701516',
+  PHP: '#4F5D95',
+  Swift: '#F05138',
+  Kotlin: '#A97BFF',
+  Dart: '#00B4AB',
+  Shell: '#89e051',
+  Vue: '#41b883',
 };
 const getLangColor = (lang: string) => LANG_COLORS[lang] ?? '#94a3b8';
 
 function resolveLevelColor(colorClass: string): string {
   const map: Record<string, string> = {
-    'text-gray-500': '#6b7280',   'text-slate-500': '#64748b',
-    'text-blue-500': '#3b82f6',   'text-green-500': '#22c55e',
-    'text-teal-500': '#14b8a6',   'text-cyan-500': '#06b6d4',
-    'text-indigo-500': '#6366f1', 'text-purple-500': '#a855f7',
-    'text-rose-500': '#f43f5e',   'text-orange-500': '#f97316',
+    'text-gray-500': '#6b7280',
+    'text-slate-500': '#64748b',
+    'text-blue-500': '#3b82f6',
+    'text-green-500': '#22c55e',
+    'text-teal-500': '#14b8a6',
+    'text-cyan-500': '#06b6d4',
+    'text-indigo-500': '#6366f1',
+    'text-purple-500': '#a855f7',
+    'text-rose-500': '#f43f5e',
+    'text-orange-500': '#f97316',
     'text-emerald-500': '#10b981',
   };
   return map[colorClass] ?? '#94a3b8';
 }
 function resolveLevelBg(bgClass: string): string {
   const map: Record<string, string> = {
-    'bg-gray-500/10': 'rgba(107,114,128,0.12)',   'bg-slate-500/10': 'rgba(100,116,139,0.12)',
-    'bg-blue-500/10': 'rgba(59,130,246,0.12)',    'bg-green-500/10': 'rgba(34,197,94,0.12)',
-    'bg-teal-500/10': 'rgba(20,184,166,0.12)',    'bg-cyan-500/10': 'rgba(6,182,212,0.12)',
-    'bg-indigo-500/10': 'rgba(99,102,241,0.12)',  'bg-purple-500/10': 'rgba(168,85,247,0.12)',
-    'bg-rose-500/10': 'rgba(244,63,94,0.12)',     'bg-orange-500/10': 'rgba(249,115,22,0.12)',
+    'bg-gray-500/10': 'rgba(107,114,128,0.12)',
+    'bg-slate-500/10': 'rgba(100,116,139,0.12)',
+    'bg-blue-500/10': 'rgba(59,130,246,0.12)',
+    'bg-green-500/10': 'rgba(34,197,94,0.12)',
+    'bg-teal-500/10': 'rgba(20,184,166,0.12)',
+    'bg-cyan-500/10': 'rgba(6,182,212,0.12)',
+    'bg-indigo-500/10': 'rgba(99,102,241,0.12)',
+    'bg-purple-500/10': 'rgba(168,85,247,0.12)',
+    'bg-rose-500/10': 'rgba(244,63,94,0.12)',
+    'bg-orange-500/10': 'rgba(249,115,22,0.12)',
     'bg-emerald-500/10': 'rgba(16,185,129,0.12)',
   };
   return map[bgClass] ?? 'rgba(148,163,184,0.12)';
@@ -71,13 +132,18 @@ function resolveLevelBg(bgClass: string): string {
 function useAnimatedCount(target: number, duration = 1400) {
   const [count, setCount] = useState(0);
   useEffect(() => {
-    if (target === 0) { setCount(0); return; }
+    if (target === 0) {
+      setCount(0);
+      return;
+    }
     let current = 0;
     const step = target / (duration / 16);
     const timer = setInterval(() => {
       current += step;
-      if (current >= target) { setCount(target); clearInterval(timer); }
-      else setCount(Math.floor(current));
+      if (current >= target) {
+        setCount(target);
+        clearInterval(timer);
+      } else setCount(Math.floor(current));
     }, 16);
     return () => clearInterval(timer);
   }, [target, duration]);
@@ -86,7 +152,7 @@ function useAnimatedCount(target: number, duration = 1400) {
 
 function fmtPoints(n: number) {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
-  if (n >= 1_000)     return `${(n / 1_000).toFixed(1)}K`;
+  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
   return String(n);
 }
 function fmtDate(raw: any): string {
@@ -102,16 +168,18 @@ function fmtDate(raw: any): string {
     }
     if (isNaN(d.getTime())) return 'Recent Member';
     return d.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
-  } catch { return 'Recent Member'; }
+  } catch {
+    return 'Recent Member';
+  }
 }
 
 export default function DevCard({ user }: { user: any }) {
   const IMAGE_WAIT_TIMEOUT_MS = 5000;
   const cardRef = useRef<HTMLDivElement>(null);
   const [showSkeleton, setShowSkeleton] = useState(true);
-  const [rank, setRank]             = useState<number | null>(null);
+  const [rank, setRank] = useState<number | null>(null);
   const [rankLoading, setRankLoading] = useState(true);
-  const [copied, setCopied]         = useState(false);
+  const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [langMounted, setLangMounted] = useState(false);
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
@@ -151,13 +219,23 @@ export default function DevCard({ user }: { user: any }) {
 
   useEffect(() => {
     const fetch = async () => {
-      if (!realTimeUser?.points) { setRankLoading(false); return; }
+      if (!realTimeUser?.points) {
+        setRankLoading(false);
+        return;
+      }
       try {
         const snap = await getCountFromServer(
-          query(collection(db, 'leaderboard'), where('points', '>', realTimeUser.points))
+          query(
+            collection(db, 'leaderboard'),
+            where('points', '>', realTimeUser.points)
+          )
         );
         setRank(snap.data().count + 1);
-      } catch { /* silent */ } finally { setRankLoading(false); }
+      } catch {
+        /* silent */
+      } finally {
+        setRankLoading(false);
+      }
     };
     fetch();
   }, [realTimeUser?.points]);
@@ -177,26 +255,32 @@ export default function DevCard({ user }: { user: any }) {
     setAvatarLoadFailed(false);
   }, [realTimeUser?.photoURL]);
 
-  const levelInfo   = calculateLevel(realTimeUser?.points ?? 0);
-  const level       = levelInfo.currentLevel;
-  const levelColor  = resolveLevelColor(level.color);
-  const levelBg     = resolveLevelBg(level.bg);
+  const levelInfo = calculateLevel(realTimeUser?.points ?? 0);
+  const level = levelInfo.currentLevel;
+  const levelColor = resolveLevelColor(level.color);
+  const levelBg = resolveLevelBg(level.bg);
 
   const earnedBadges = (realTimeUser?.achievements ?? [])
     .filter((id: string) => BADGE_REGISTRY[id])
     .map((id: string) => ({ id, ...BADGE_REGISTRY[id] }));
 
-  const topBadges  = earnedBadges.slice(0, 4);
+  const topBadges = earnedBadges.slice(0, 4);
   const extraCount = Math.max(0, earnedBadges.length - 4);
-  const topLangs = ((realTimeUser?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
+  const topLangs = (
+    (realTimeUser?.githubStats?.topLanguages ?? []) as {
+      language: string;
+      count: number;
+    }[]
+  ).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
 
-  const animXP     = useAnimatedCount(realTimeUser?.points ?? 0);
+  const animXP = useAnimatedCount(realTimeUser?.points ?? 0);
   const animStreak = useAnimatedCount(realTimeUser?.streak ?? 0, 900);
 
-  const profileUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/u/${realTimeUser?.uid}`
-    : `devpath.in/u/${realTimeUser?.uid}`;
+  const profileUrl =
+    typeof window !== 'undefined'
+      ? `${window.location.origin}/u/${realTimeUser?.uid}`
+      : `devpath.in/u/${realTimeUser?.uid}`;
 
   const waitForCardImages = async (root: HTMLElement) => {
     const imgs = Array.from(root.querySelectorAll('img'));
@@ -279,37 +363,66 @@ export default function DevCard({ user }: { user: any }) {
   };
 
   // ── Motion variants ───────────────────────────────────────────────────────
-  const container: Variants = { hidden: {}, show: { transition: { staggerChildren: 0.07 } } };
+  const container: Variants = {
+    hidden: {},
+    show: { transition: { staggerChildren: 0.07 } },
+  };
   const item: Variants = {
     hidden: { opacity: 0, y: 14 },
-    show:   { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.19, 1, 0.22, 1] as [number, number, number, number] } },
+    show: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        duration: 0.5,
+        ease: [0.19, 1, 0.22, 1] as [number, number, number, number],
+      },
+    },
   };
 
   if (showSkeleton) {
     return (
-      <div className={styles.wrapper} aria-busy="true" aria-label="Loading dev card">
+      <div
+        className={styles.wrapper}
+        aria-busy="true"
+        aria-label="Loading dev card"
+      >
         <div className={`${styles.card} ${styles.skeletonCard}`}>
           <div className={styles.cardInner}>
             <div className={styles.leftPanel}>
               <div className={`${styles.skeletonCircle} ${styles.pulse}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonName} ${styles.pulse}`} />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonName} ${styles.pulse}`}
+              />
               <div className={`${styles.skeletonPill} ${styles.pulse}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonMeta} ${styles.pulse}`} />
-              <div className={`${styles.skeletonLine} ${styles.skeletonMeta} ${styles.pulse}`} />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonMeta} ${styles.pulse}`}
+              />
+              <div
+                className={`${styles.skeletonLine} ${styles.skeletonMeta} ${styles.pulse}`}
+              />
               <div className={styles.skeletonProgressWrap}>
-                <div className={`${styles.skeletonLine} ${styles.skeletonProgressLabel} ${styles.pulse}`} />
-                <div className={`${styles.skeletonProgressBar} ${styles.pulse}`} />
+                <div
+                  className={`${styles.skeletonLine} ${styles.skeletonProgressLabel} ${styles.pulse}`}
+                />
+                <div
+                  className={`${styles.skeletonProgressBar} ${styles.pulse}`}
+                />
               </div>
             </div>
 
             <div className={styles.rightPanel}>
               <div className={styles.statsGrid}>
                 {Array.from({ length: 6 }).map((_, index) => (
-                  <div key={index} className={`${styles.skeletonStat} ${styles.pulse}`} />
+                  <div
+                    key={index}
+                    className={`${styles.skeletonStat} ${styles.pulse}`}
+                  />
                 ))}
               </div>
               <div className={styles.skeletonSection}>
-                <div className={`${styles.skeletonLine} ${styles.skeletonSectionTitle} ${styles.pulse}`} />
+                <div
+                  className={`${styles.skeletonLine} ${styles.skeletonSectionTitle} ${styles.pulse}`}
+                />
                 <div className={styles.skeletonBadgeRow}>
                   <span className={`${styles.skeletonBadge} ${styles.pulse}`} />
                   <span className={`${styles.skeletonBadge} ${styles.pulse}`} />
@@ -319,8 +432,12 @@ export default function DevCard({ user }: { user: any }) {
             </div>
 
             <div className={styles.footer}>
-              <span className={`${styles.skeletonLine} ${styles.skeletonFooterLeft} ${styles.pulse}`} />
-              <span className={`${styles.skeletonLine} ${styles.skeletonFooterRight} ${styles.pulse}`} />
+              <span
+                className={`${styles.skeletonLine} ${styles.skeletonFooterLeft} ${styles.pulse}`}
+              />
+              <span
+                className={`${styles.skeletonLine} ${styles.skeletonFooterRight} ${styles.pulse}`}
+              />
             </div>
           </div>
         </div>
@@ -344,7 +461,12 @@ export default function DevCard({ user }: { user: any }) {
         id="devcard-render"
       >
         <div className={styles.cardInner}>
-          <motion.div className={styles.leftPanel} variants={container} initial="hidden" animate="show">
+          <motion.div
+            className={styles.leftPanel}
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
             <motion.div className={styles.avatarRing} variants={item}>
               <div className={styles.avatarRingInner} />
               {realTimeUser?.photoURL && !avatarLoadFailed ? (
@@ -360,47 +482,198 @@ export default function DevCard({ user }: { user: any }) {
                   onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
-                <div className={styles.avatarFallback}>{realTimeUser?.name?.charAt(0)?.toUpperCase() ?? '?'}</div>
+                <div className={styles.avatarFallback}>
+                  {realTimeUser?.name?.charAt(0)?.toUpperCase() ?? '?'}
+                </div>
               )}
             </motion.div>
-            <motion.h2 className={styles.name} variants={item}>{realTimeUser?.name ?? 'Developer'}</motion.h2>
-            <motion.div className={styles.levelBadge} variants={item} style={{ background: levelBg, color: levelColor, borderColor: `${levelColor}44` }}>
+            <motion.h2 className={styles.name} variants={item}>
+              {realTimeUser?.name ?? 'Developer'}
+            </motion.h2>
+            <motion.div
+              className={styles.levelBadge}
+              variants={item}
+              style={{
+                background: levelBg,
+                color: levelColor,
+                borderColor: `${levelColor}44`,
+              }}
+            >
               <Medal size={11} />
               <span>{level.name}</span>
             </motion.div>
             <motion.div className={styles.meta} variants={item}>
               {(realTimeUser?.city || realTimeUser?.state) && (
-                <span className={styles.metaRow}><MapPin size={10} />{[realTimeUser.city, realTimeUser.state].filter(Boolean).join(', ')}</span>
+                <span className={styles.metaRow}>
+                  <MapPin size={10} />
+                  {[realTimeUser.city, realTimeUser.state].filter(Boolean).join(', ')}
+                </span>
               )}
-              <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(realTimeUser?.createdAt)}</span>
-              {realTimeUser?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{realTimeUser.githubStats.username}</span>}
+              <span className={styles.metaRow}>
+                <Calendar size={10} />
+                Joined {fmtDate(realTimeUser?.createdAt)}
+              </span>
+              {realTimeUser?.githubStats?.username && (
+                <span className={styles.metaRow}>
+                  <Github size={10} />
+                  {realTimeUser.githubStats.username}
+                </span>
+              )}
               {realTimeUser?.linkedin && (
-                <a href={realTimeUser.linkedin} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
-                  <Linkedin size={10} />LinkedIn
+                <a
+                  href={realTimeUser.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.metaRowLink}
+                >
+                  <Linkedin size={10} />
+                  LinkedIn
                 </a>
               )}
               {realTimeUser?.instagram && (
-                <a href={realTimeUser.instagram} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
-                  <Instagram size={10} />Instagram
+                <a
+                  href={realTimeUser.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.metaRowLink}
+                >
+                  <Instagram size={10} />
+                  Instagram
                 </a>
               )}
             </motion.div>
             <motion.div className={styles.progressSection} variants={item}>
-              <div className={styles.progressMeta}><span className={styles.progressLabel}>Level Progress</span><span className={styles.progressPct}>{Math.round(levelInfo.progress)}%</span></div>
+              <div className={styles.progressMeta}>
+                <span className={styles.progressLabel}>Level Progress</span>
+                <span className={styles.progressPct}>
+                  {Math.round(levelInfo.progress)}%
+                </span>
+              </div>
               <div className={styles.progressTrack}>
-                <motion.div className={styles.progressFill} initial={{ width: 0 }} animate={{ width: `${levelInfo.progress}%` }} transition={{ delay: 0.6, duration: 1.2, ease: [0.19, 1, 0.22, 1] as any }} style={{ background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)` }} />
+                <motion.div
+                  className={styles.progressFill}
+                  initial={{ width: 0 }}
+                  animate={{ width: `${levelInfo.progress}%` }}
+                  transition={{
+                    delay: 0.6,
+                    duration: 1.2,
+                    ease: [0.19, 1, 0.22, 1] as any,
+                  }}
+                  style={{
+                    background: `linear-gradient(90deg, ${levelColor}, ${levelColor}99)`,
+                  }}
+                />
               </div>
             </motion.div>
           </motion.div>
 
-          <motion.div className={styles.rightPanel} variants={container} initial="hidden" animate="show">
+          <motion.div
+            className={styles.rightPanel}
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
             <motion.div className={styles.statsGrid} variants={item}>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(0,212,255,0.1)', color: '#00d4ff' }}><Zap size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.cyan}`}>{fmtPoints(animXP)}</span><span className={styles.statLabel}>Dev XP</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}><Trophy size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.purple}`}>{rankLoading ? '—' : rank ? `#${rank}` : '—'}</span><span className={styles.statLabel}>Global Rank</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(249,115,22,0.1)', color: '#fb923c' }}><Flame size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.flame}`}>{animStreak}d</span><span className={styles.statLabel}>Streak</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}><Award size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{earnedBadges.length}</span><span className={styles.statLabel}>Badges</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}><Brain size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{realTimeUser?.completedQuizzes?.length ?? 0}</span><span className={styles.statLabel}>Quizzes</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>{realTimeUser?.githubStats?.connected ? <Github size={14} strokeWidth={2.5} /> : <Users size={14} strokeWidth={2.5} />}</div><span className={styles.statValue}>{realTimeUser?.githubStats?.connected ? fmtPoints(realTimeUser.githubStats.totalStars ?? realTimeUser.githubStats.stars ?? 0) : (realTimeUser?.followers?.length ?? 0)}</span><span className={styles.statLabel}>{realTimeUser?.githubStats?.connected ? 'GH Stars' : 'Followers'}</span></div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(0,212,255,0.1)',
+                    color: '#00d4ff',
+                  }}
+                >
+                  <Zap size={14} strokeWidth={2.5} />
+                </div>
+                <span className={`${styles.statValue} ${styles.cyan}`}>
+                  {fmtPoints(animXP)}
+                </span>
+                <span className={styles.statLabel}>Dev XP</span>
+              </div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(168,85,247,0.1)',
+                    color: '#c084fc',
+                  }}
+                >
+                  <Trophy size={14} strokeWidth={2.5} />
+                </div>
+                <span className={`${styles.statValue} ${styles.purple}`}>
+                  {rankLoading ? '—' : rank ? `#${rank}` : '—'}
+                </span>
+                <span className={styles.statLabel}>Global Rank</span>
+              </div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(249,115,22,0.1)',
+                    color: '#fb923c',
+                  }}
+                >
+                  <Flame size={14} strokeWidth={2.5} />
+                </div>
+                <span className={`${styles.statValue} ${styles.flame}`}>
+                  {animStreak}d
+                </span>
+                <span className={styles.statLabel}>Streak</span>
+              </div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(251,191,36,0.1)',
+                    color: '#fbbf24',
+                  }}
+                >
+                  <Award size={14} strokeWidth={2.5} />
+                </div>
+                <span className={styles.statValue}>{earnedBadges.length}</span>
+                <span className={styles.statLabel}>Badges</span>
+              </div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(52,211,153,0.1)',
+                    color: '#34d399',
+                  }}
+                >
+                  <Brain size={14} strokeWidth={2.5} />
+                </div>
+                <span className={styles.statValue}>
+                  {realTimeUser?.completedQuizzes?.length ?? 0}
+                </span>
+                <span className={styles.statLabel}>Quizzes</span>
+              </div>
+              <div className={styles.statCard}>
+                <div
+                  className={styles.statIconWrap}
+                  style={{
+                    background: 'rgba(99,102,241,0.1)',
+                    color: '#818cf8',
+                  }}
+                >
+                  {realTimeUser?.githubStats?.connected ? (
+                    <Github size={14} strokeWidth={2.5} />
+                  ) : (
+                    <Users size={14} strokeWidth={2.5} />
+                  )}
+                </div>
+                <span className={styles.statValue}>
+                  {realTimeUser?.githubStats?.connected
+                    ? fmtPoints(
+                        realTimeUser.githubStats.totalStars ??
+                          realTimeUser.githubStats.stars ??
+                          0
+                      )
+                    : (realTimeUser?.followers?.length ?? 0)}
+                </span>
+                <span className={styles.statLabel}>
+                  {realTimeUser?.githubStats?.connected ? 'GH Stars' : 'Followers'}
+                </span>
+              </div>
             </motion.div>
             {topBadges.length > 0 && (
               <motion.div variants={item} className={styles.badgesSection}>
@@ -408,27 +681,64 @@ export default function DevCard({ user }: { user: any }) {
                   <Award size={11} /> Top Achievements
                 </span>
                 <div className={styles.badgesRow}>
-                  {topBadges.map((b: { id: string; name: string; Icon: any; color: string }) => {
-                    const BadgeIcon = b.Icon;
-                    return (
-                      <span key={b.id} className={styles.badge} style={{ borderColor: `${b.color}33` }}>
-                        <BadgeIcon size={12} color={b.color} strokeWidth={2.5} />
-                        <span>{b.name}</span>
-                      </span>
-                    );
-                  })}
+                  {topBadges.map(
+                    (b: {
+                      id: string;
+                      name: string;
+                      Icon: any;
+                      color: string;
+                    }) => {
+                      const BadgeIcon = b.Icon;
+                      return (
+                        <span
+                          key={b.id}
+                          className={styles.badge}
+                          style={{ borderColor: `${b.color}33` }}
+                        >
+                          <BadgeIcon
+                            size={12}
+                            color={b.color}
+                            strokeWidth={2.5}
+                          />
+                          <span>{b.name}</span>
+                        </span>
+                      );
+                    }
+                  )}
                   {extraCount > 0 && (
-                    <span className={styles.badgeMore}>
-                      +{extraCount} more
-                    </span>
+                    <span className={styles.badgeMore}>+{extraCount} more</span>
                   )}
                 </div>
               </motion.div>
             )}
             {topLangs.length > 0 && (
               <motion.div variants={item} className={styles.languagesSection}>
-                <span className={styles.sectionLabel}><Code2 size={11} /> Top Languages</span>
-                {topLangs.map(({ language, count }) => { const pct = totalLang > 0 ? Math.round((count / totalLang) * 100) : 0; return (<div key={language} className={styles.langRow}><span className={styles.langDot} style={{ background: getLangColor(language) }} /><span className={styles.langName}>{language}</span><div className={styles.langBar}><div className={styles.langBarFill} style={{ width: langMounted ? `${pct}%` : '0%', background: getLangColor(language) }} /></div><span className={styles.langPct}>{pct}%</span></div>); })}
+                <span className={styles.sectionLabel}>
+                  <Code2 size={11} /> Top Languages
+                </span>
+                {topLangs.map(({ language, count }) => {
+                  const pct =
+                    totalLang > 0 ? Math.round((count / totalLang) * 100) : 0;
+                  return (
+                    <div key={language} className={styles.langRow}>
+                      <span
+                        className={styles.langDot}
+                        style={{ background: getLangColor(language) }}
+                      />
+                      <span className={styles.langName}>{language}</span>
+                      <div className={styles.langBar}>
+                        <div
+                          className={styles.langBarFill}
+                          style={{
+                            width: langMounted ? `${pct}%` : '0%',
+                            background: getLangColor(language),
+                          }}
+                        />
+                      </div>
+                      <span className={styles.langPct}>{pct}%</span>
+                    </div>
+                  );
+                })}
               </motion.div>
             )}
           </motion.div>
@@ -445,14 +755,43 @@ export default function DevCard({ user }: { user: any }) {
               />
               DevPath · Developer Network
             </span>
-            <span className={styles.footerUrl}><ChevronRight size={11} style={{ opacity: 0.5 }} />devpath.in</span>
+            <span className={styles.footerUrl}>
+              <ChevronRight size={11} style={{ opacity: 0.5 }} />
+              devpath.in
+            </span>
           </div>
         </div>
       </motion.div>
 
-      <motion.div className={styles.actions} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.45, duration: 0.5, ease: [0.19, 1, 0.22, 1] as any }}>
-        <button id="devcard-download-btn" className={`${styles.btn} ${styles.btnPrimary}`} onClick={handleDownload} disabled={downloading} aria-label="Download Dev Card as PNG"><Download size={15} />{downloading ? 'Generating...' : 'Download Card'}</button>
-        <button id="devcard-copy-btn" className={`${styles.btn} ${copied ? styles.btnSuccess : styles.btnSecondary}`} onClick={handleCopy} aria-label="Copy profile link">{copied ? <Check size={15} /> : <Link2 size={15} />}{copied ? 'Copied!' : 'Copy Profile Link'}</button>
+      <motion.div
+        className={styles.actions}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{
+          delay: 0.45,
+          duration: 0.5,
+          ease: [0.19, 1, 0.22, 1] as any,
+        }}
+      >
+        <button
+          id="devcard-download-btn"
+          className={`${styles.btn} ${styles.btnPrimary}`}
+          onClick={handleDownload}
+          disabled={downloading}
+          aria-label="Download Dev Card as PNG"
+        >
+          <Download size={15} />
+          {downloading ? 'Generating...' : 'Download Card'}
+        </button>
+        <button
+          id="devcard-copy-btn"
+          className={`${styles.btn} ${copied ? styles.btnSuccess : styles.btnSecondary}`}
+          onClick={handleCopy}
+          aria-label="Copy profile link"
+        >
+          {copied ? <Check size={15} /> : <Link2 size={15} />}
+          {copied ? 'Copied!' : 'Copy Profile Link'}
+        </button>
       </motion.div>
     </div>
   );

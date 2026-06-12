@@ -25,8 +25,15 @@ jest.mock('firebase/firestore', () => ({
   doc: jest.fn(() => ({})),
   getDoc: jest.fn(() => Promise.resolve({ exists: () => false })),
   setDoc: jest.fn(() => Promise.resolve()),
-  onSnapshot: jest.fn((_: any, cb: any) => { cb({ exists: () => false }); return jest.fn(); }),
-  writeBatch: jest.fn(() => ({ commit: jest.fn(), set: jest.fn(), update: jest.fn() })),
+  onSnapshot: jest.fn((_: any, cb: any) => {
+    cb({ exists: () => false });
+    return jest.fn();
+  }),
+  writeBatch: jest.fn(() => ({
+    commit: jest.fn(),
+    set: jest.fn(),
+    update: jest.fn(),
+  })),
   increment: jest.fn((n: number) => n),
   arrayUnion: jest.fn((...args: any[]) => args),
   arrayRemove: jest.fn((...args: any[]) => args),
@@ -50,20 +57,32 @@ function TestHarness() {
   const { user, login, logout } = useAuth();
   const [error, setError] = React.useState<string | null>(null);
   const handleLogin = async () => {
-    try { await login('test@test.com', 'pass123'); } catch (e: any) { setError(e.message); }
+    try {
+      await login('test@test.com', 'pass123');
+    } catch (e: any) {
+      setError(e.message);
+    }
   };
   return (
     <div>
       <span data-testid="user-email">{user?.email || 'null'}</span>
       <span data-testid="error">{error || ''}</span>
-      <button data-testid="login-btn" onClick={handleLogin}>login</button>
-      <button data-testid="logout-btn" onClick={logout}>logout</button>
+      <button data-testid="login-btn" onClick={handleLogin}>
+        login
+      </button>
+      <button data-testid="logout-btn" onClick={logout}>
+        logout
+      </button>
     </div>
   );
 }
 
 function renderWithAuth() {
-  return render(<AuthProvider><TestHarness /></AuthProvider>);
+  return render(
+    <AuthProvider>
+      <TestHarness />
+    </AuthProvider>
+  );
 }
 
 beforeEach(() => {
@@ -72,19 +91,26 @@ beforeEach(() => {
 });
 
 describe('AuthContext', () => {
-
   describe('login', () => {
     it('calls signInWithEmailAndPassword with correct credentials', async () => {
-      mockSignIn.mockResolvedValue({ user: { uid: '123', email: 'test@test.com' } });
+      mockSignIn.mockResolvedValue({
+        user: { uid: '123', email: 'test@test.com' },
+      });
       renderWithAuth();
-      await act(async () => { screen.getByTestId('login-btn').click(); });
+      await act(async () => {
+        screen.getByTestId('login-btn').click();
+      });
       expect(mockSignIn).toHaveBeenCalledWith({}, 'test@test.com', 'pass123');
     });
 
     it('sets localStorage sessionId on success', async () => {
-      mockSignIn.mockResolvedValue({ user: { uid: '123', email: 'test@test.com' } });
+      mockSignIn.mockResolvedValue({
+        user: { uid: '123', email: 'test@test.com' },
+      });
       renderWithAuth();
-      await act(async () => { screen.getByTestId('login-btn').click(); });
+      await act(async () => {
+        screen.getByTestId('login-btn').click();
+      });
       expect(localStorage.getItem('devpath_session_id')).toBeTruthy();
     });
   });
@@ -93,24 +119,34 @@ describe('AuthContext', () => {
     it('clears localStorage sessionId', async () => {
       localStorage.setItem('devpath_session_id', 'test-session');
       renderWithAuth();
-      await act(async () => { screen.getByTestId('logout-btn').click(); });
+      await act(async () => {
+        screen.getByTestId('logout-btn').click();
+      });
       expect(localStorage.getItem('devpath_session_id')).toBeNull();
     });
 
     it('calls signOut', async () => {
       renderWithAuth();
-      await act(async () => { screen.getByTestId('logout-btn').click(); });
+      await act(async () => {
+        screen.getByTestId('logout-btn').click();
+      });
       expect(mockSignOut).toHaveBeenCalled();
     });
   });
 
   describe('error conditions', () => {
     it('propagates signInWithEmailAndPassword errors', async () => {
-      mockSignIn.mockRejectedValue(new Error('Firebase: Error (auth/invalid-credential).'));
+      mockSignIn.mockRejectedValue(
+        new Error('Firebase: Error (auth/invalid-credential).')
+      );
       renderWithAuth();
-      await act(async () => { screen.getByTestId('login-btn').click(); });
+      await act(async () => {
+        screen.getByTestId('login-btn').click();
+      });
       await screen.findByTestId('error');
-      expect(screen.getByTestId('error')).toHaveTextContent('auth/invalid-credential');
+      expect(screen.getByTestId('error')).toHaveTextContent(
+        'auth/invalid-credential'
+      );
     });
 
     it('throws readable error when Firebase is unavailable', async () => {
@@ -120,17 +156,34 @@ describe('AuthContext', () => {
       let error: string | null = null;
       function TestPage() {
         const { login } = useAuth();
-        return <button onClick={async () => {
-          try { await login('a@b.com', 'p'); } catch (e: any) { error = e.message; }
-        }}>login</button>;
+        return (
+          <button
+            onClick={async () => {
+              try {
+                await login('a@b.com', 'p');
+              } catch (e: any) {
+                error = e.message;
+              }
+            }}
+          >
+            login
+          </button>
+        );
       }
 
-      render(<AuthProvider><TestPage /></AuthProvider>);
-      await act(async () => { screen.getByText('login').click(); });
-      expect(error).toBe('Firebase is not configured. Login is unavailable in local UI-only mode.');
+      render(
+        <AuthProvider>
+          <TestPage />
+        </AuthProvider>
+      );
+      await act(async () => {
+        screen.getByText('login').click();
+      });
+      expect(error).toBe(
+        'Firebase is not configured. Login is unavailable in local UI-only mode.'
+      );
 
       firebaseLib.firebaseAvailable = true;
     });
   });
-
 });
