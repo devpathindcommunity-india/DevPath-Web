@@ -3,7 +3,9 @@
 
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
+import { collection, getDocs, query, where } from 'firebase/firestore';
 import { getPublicProfileByUsername } from '@/lib/portfolio-service';
+import { db, isFirebaseConfigured } from '@/lib/firebase';
 import { ProfileHeader } from '@/components/profile/ProfileHeader';
 import { PathProgressSection } from '@/components/profile/PathProgressSection';
 import { SkillBadgesSection } from '@/components/profile/SkillBadgesSection';
@@ -14,9 +16,35 @@ interface Props {
   params: { username: string };
 }
 
+export const dynamicParams = false;
+
+export async function generateStaticParams() {
+  if (!isFirebaseConfigured) return [];
+
+  try {
+    const profilesQuery = query(
+      collection(db, 'portfolios'),
+      where('isPublic', '==', true)
+    );
+    const snapshot = await getDocs(profilesQuery);
+
+    return snapshot.docs
+      .map((profileDoc) => profileDoc.data().username)
+      .filter((username): username is string => Boolean(username))
+      .map((username) => ({ username }));
+  } catch {
+    return [];
+  }
+}
+
 // Generate OpenGraph metadata dynamically
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const profile = await getPublicProfileByUsername(params.username);
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+  const { username } = await params;
+  const profile = await getPublicProfileByUsername(username);
   if (!profile) return { title: 'Profile not found' };
 
   return {
@@ -30,8 +58,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function PublicProfilePage({ params }: Props) {
-  const profile = await getPublicProfileByUsername(params.username);
+export default async function PublicProfilePage({
+  params,
+}: {
+  params: Promise<{ username: string }>;
+}) {
+  const { username } = await params;
+  const profile = await getPublicProfileByUsername(username);
 
   if (!profile) notFound();
 

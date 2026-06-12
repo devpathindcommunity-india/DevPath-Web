@@ -28,7 +28,7 @@ import AdminKeyModal from '@/components/auth/AdminKeyModal';
 import { useAuth } from '@/context/AuthContext';
 import { useNotificationActions } from '@/stores/ui-store';
 import { useMaintenance } from '@/hooks/useMaintenance';
-import { auth, db } from '@/lib/firebase';
+import { auth, db, isFirebaseConfigured } from '@/lib/firebase';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -113,6 +113,15 @@ export default function LoginPage() {
     setIsCheckingAdmin(true);
 
     try {
+      if (!isFirebaseConfigured) {
+        const message =
+          'Login is temporarily unavailable because Firebase is not configured.';
+        setError(message);
+        showError(message);
+        setIsCheckingAdmin(false);
+        return;
+      }
+
       await login(normalizedEmail, password);
       const adminDoc = await getDoc(doc(db, 'admins', normalizedEmail));
 
@@ -168,6 +177,15 @@ export default function LoginPage() {
     setIsCheckingAdmin(true);
 
     try {
+      if (!isFirebaseConfigured) {
+        const message =
+          'Sign-in is temporarily unavailable because Firebase is not configured.';
+        setError(message);
+        showError(message);
+        setIsCheckingAdmin(false);
+        return;
+      }
+
       const provider =
         providerName === 'google'
           ? new GoogleAuthProvider()
