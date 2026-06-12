@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 import { calculateLevel } from '@/lib/points';
 import { copyToClipboard } from '@/lib/clipboard';
-import { collection, query, where, getCountFromServer } from 'firebase/firestore';
+import { collection, query, where, getCountFromServer, doc, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { useNotificationActions } from '@/stores/ui-store';
 import styles from './DevCard.module.css';
@@ -117,24 +117,56 @@ export default function DevCard({ user }: { user: any }) {
   const [avatarLoadFailed, setAvatarLoadFailed] = useState(false);
   const { showSuccess, showError } = useNotificationActions();
 
+  const [realTimeUser, setRealTimeUser] = useState(user);
+
+  useEffect(() => {
+    setRealTimeUser(user);
+  }, [user]);
+
+  useEffect(() => {
+    if (!user?.uid) return;
+
+    const collectionName = user.role === 'admin' ? 'admins' : 'members';
+    const docId = user.role === 'admin' ? user.email?.toLowerCase() : user.uid;
+
+    if (!docId) return;
+
+    const docRef = doc(db, collectionName, docId);
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        setRealTimeUser((prev: any) => ({
+          ...prev,
+          ...data,
+          uid: user.uid,
+          role: user.role,
+        }));
+      }
+    }, (error) => {
+      console.error("Error listening to profile changes in DevCard:", error);
+    });
+
+    return () => unsubscribe();
+  }, [user?.uid, user?.role, user?.email]);
+
   useEffect(() => {
     const fetch = async () => {
-      if (!user?.points) { setRankLoading(false); return; }
+      if (!realTimeUser?.points) { setRankLoading(false); return; }
       try {
         const snap = await getCountFromServer(
-          query(collection(db, 'leaderboard'), where('points', '>', user.points))
+          query(collection(db, 'leaderboard'), where('points', '>', realTimeUser.points))
         );
         setRank(snap.data().count + 1);
       } catch { /* silent */ } finally { setRankLoading(false); }
     };
     fetch();
-  }, [user?.points]);
+  }, [realTimeUser?.points]);
 
   useEffect(() => {
     setShowSkeleton(true);
     const timer = setTimeout(() => setShowSkeleton(false), 650);
     return () => clearTimeout(timer);
-  }, [user?.uid]);
+  }, [realTimeUser?.uid]);
 
   useEffect(() => {
     const t = setTimeout(() => setLangMounted(true), 500);
@@ -143,28 +175,28 @@ export default function DevCard({ user }: { user: any }) {
 
   useEffect(() => {
     setAvatarLoadFailed(false);
-  }, [user?.photoURL]);
+  }, [realTimeUser?.photoURL]);
 
-  const levelInfo   = calculateLevel(user?.points ?? 0);
+  const levelInfo   = calculateLevel(realTimeUser?.points ?? 0);
   const level       = levelInfo.currentLevel;
   const levelColor  = resolveLevelColor(level.color);
   const levelBg     = resolveLevelBg(level.bg);
 
-  const earnedBadges = (user?.achievements ?? [])
+  const earnedBadges = (realTimeUser?.achievements ?? [])
     .filter((id: string) => BADGE_REGISTRY[id])
     .map((id: string) => ({ id, ...BADGE_REGISTRY[id] }));
 
   const topBadges  = earnedBadges.slice(0, 4);
   const extraCount = Math.max(0, earnedBadges.length - 4);
-  const topLangs = ((user?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
+  const topLangs = ((realTimeUser?.githubStats?.topLanguages ?? []) as { language: string; count: number }[]).slice(0, 4);
   const totalLang = topLangs.reduce((s, l) => s + l.count, 0);
 
-  const animXP     = useAnimatedCount(user?.points ?? 0);
-  const animStreak = useAnimatedCount(user?.streak ?? 0, 900);
+  const animXP     = useAnimatedCount(realTimeUser?.points ?? 0);
+  const animStreak = useAnimatedCount(realTimeUser?.streak ?? 0, 900);
 
   const profileUrl = typeof window !== 'undefined'
-    ? `${window.location.origin}/u/${user?.uid}`
-    : `devpath.in/u/${user?.uid}`;
+    ? `${window.location.origin}/u/${realTimeUser?.uid}`
+    : `devpath.in/u/${realTimeUser?.uid}`;
 
   const waitForCardImages = async (root: HTMLElement) => {
     const imgs = Array.from(root.querySelectorAll('img'));
@@ -224,7 +256,7 @@ export default function DevCard({ user }: { user: any }) {
       const url = canvas.toDataURL('image/png');
       const a = document.createElement('a');
       a.href = url;
-      a.download = `devcard-${user?.name?.replace(/\s+/g, '-').toLowerCase() ?? 'devcard'}.png`;
+      a.download = `devcard-${realTimeUser?.name?.replace(/\s+/g, '-').toLowerCase() ?? 'devcard'}.png`;
       a.click();
       showSuccess('DevCard downloaded successfully.');
     } catch {
@@ -315,10 +347,10 @@ export default function DevCard({ user }: { user: any }) {
           <motion.div className={styles.leftPanel} variants={container} initial="hidden" animate="show">
             <motion.div className={styles.avatarRing} variants={item}>
               <div className={styles.avatarRingInner} />
-              {user?.photoURL && !avatarLoadFailed ? (
+              {realTimeUser?.photoURL && !avatarLoadFailed ? (
                 <Image
-                  src={user.photoURL}
-                  alt={user?.name ?? 'Developer'}
+                  src={realTimeUser.photoURL}
+                  alt={realTimeUser?.name ?? 'Developer'}
                   fill
                   className={styles.avatar}
                   unoptimized
@@ -328,27 +360,27 @@ export default function DevCard({ user }: { user: any }) {
                   onError={() => setAvatarLoadFailed(true)}
                 />
               ) : (
-                <div className={styles.avatarFallback}>{user?.name?.charAt(0)?.toUpperCase() ?? '?'}</div>
+                <div className={styles.avatarFallback}>{realTimeUser?.name?.charAt(0)?.toUpperCase() ?? '?'}</div>
               )}
             </motion.div>
-            <motion.h2 className={styles.name} variants={item}>{user?.name ?? 'Developer'}</motion.h2>
+            <motion.h2 className={styles.name} variants={item}>{realTimeUser?.name ?? 'Developer'}</motion.h2>
             <motion.div className={styles.levelBadge} variants={item} style={{ background: levelBg, color: levelColor, borderColor: `${levelColor}44` }}>
               <Medal size={11} />
               <span>{level.name}</span>
             </motion.div>
             <motion.div className={styles.meta} variants={item}>
-              {(user?.city || user?.state) && (
-                <span className={styles.metaRow}><MapPin size={10} />{[user.city, user.state].filter(Boolean).join(', ')}</span>
+              {(realTimeUser?.city || realTimeUser?.state) && (
+                <span className={styles.metaRow}><MapPin size={10} />{[realTimeUser.city, realTimeUser.state].filter(Boolean).join(', ')}</span>
               )}
-              <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(user?.createdAt)}</span>
-              {user?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{user.githubStats.username}</span>}
-              {user?.linkedin && (
-                <a href={user.linkedin} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
+              <span className={styles.metaRow}><Calendar size={10} />Joined {fmtDate(realTimeUser?.createdAt)}</span>
+              {realTimeUser?.githubStats?.username && <span className={styles.metaRow}><Github size={10} />{realTimeUser.githubStats.username}</span>}
+              {realTimeUser?.linkedin && (
+                <a href={realTimeUser.linkedin} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
                   <Linkedin size={10} />LinkedIn
                 </a>
               )}
-              {user?.instagram && (
-                <a href={user.instagram} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
+              {realTimeUser?.instagram && (
+                <a href={realTimeUser.instagram} target="_blank" rel="noopener noreferrer" className={styles.metaRowLink}>
                   <Instagram size={10} />Instagram
                 </a>
               )}
@@ -367,8 +399,8 @@ export default function DevCard({ user }: { user: any }) {
               <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(168,85,247,0.1)', color: '#c084fc' }}><Trophy size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.purple}`}>{rankLoading ? '—' : rank ? `#${rank}` : '—'}</span><span className={styles.statLabel}>Global Rank</span></div>
               <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(249,115,22,0.1)', color: '#fb923c' }}><Flame size={14} strokeWidth={2.5} /></div><span className={`${styles.statValue} ${styles.flame}`}>{animStreak}d</span><span className={styles.statLabel}>Streak</span></div>
               <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(251,191,36,0.1)', color: '#fbbf24' }}><Award size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{earnedBadges.length}</span><span className={styles.statLabel}>Badges</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}><Brain size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{user?.completedQuizzes?.length ?? 0}</span><span className={styles.statLabel}>Quizzes</span></div>
-              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>{user?.githubStats?.connected ? <Github size={14} strokeWidth={2.5} /> : <Users size={14} strokeWidth={2.5} />}</div><span className={styles.statValue}>{user?.githubStats?.connected ? fmtPoints(user.githubStats.totalStars ?? user.githubStats.stars ?? 0) : (user?.followers?.length ?? 0)}</span><span className={styles.statLabel}>{user?.githubStats?.connected ? 'GH Stars' : 'Followers'}</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(52,211,153,0.1)', color: '#34d399' }}><Brain size={14} strokeWidth={2.5} /></div><span className={styles.statValue}>{realTimeUser?.completedQuizzes?.length ?? 0}</span><span className={styles.statLabel}>Quizzes</span></div>
+              <div className={styles.statCard}><div className={styles.statIconWrap} style={{ background: 'rgba(99,102,241,0.1)', color: '#818cf8' }}>{realTimeUser?.githubStats?.connected ? <Github size={14} strokeWidth={2.5} /> : <Users size={14} strokeWidth={2.5} />}</div><span className={styles.statValue}>{realTimeUser?.githubStats?.connected ? fmtPoints(realTimeUser.githubStats.totalStars ?? realTimeUser.githubStats.stars ?? 0) : (realTimeUser?.followers?.length ?? 0)}</span><span className={styles.statLabel}>{realTimeUser?.githubStats?.connected ? 'GH Stars' : 'Followers'}</span></div>
             </motion.div>
             {topBadges.length > 0 && (
               <motion.div variants={item} className={styles.badgesSection}>
