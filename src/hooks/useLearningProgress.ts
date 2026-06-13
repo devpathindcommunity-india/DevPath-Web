@@ -19,12 +19,9 @@ export function useLearningProgress(): UseLearningProgressResult {
 
   useEffect(() => {
     if (!user) {
-      setCompletedNodes([]);
-      setLoading(false);
       return;
     }
 
-    setLoading(true);
     const docRef = doc(db, 'user_progress', user.uid);
     const unsubscribe = onSnapshot(
       docRef,
@@ -46,20 +43,23 @@ export function useLearningProgress(): UseLearningProgressResult {
     return () => unsubscribe();
   }, [user]);
 
+  // Derive state based on user authentication status to avoid cascading renders
+  const actualCompletedNodes = user ? completedNodes : [];
+  const actualLoading = user ? loading : false;
+
   const toggleNode = async (pathId: string, nodeId: string) => {
     if (!user) return;
 
     const nodeKey = `${pathId}-${nodeId}`;
-    const isCompleted = completedNodes.includes(nodeKey);
+    const isCompleted = actualCompletedNodes.includes(nodeKey);
 
-    // Optimistic UI Update: Reflect state immediately in local array
-    const previousCompletedNodes = [...completedNodes];
     const nextCompletedNodes = isCompleted
-      ? completedNodes.filter((id) => id !== nodeKey)
-      : [...completedNodes, nodeKey];
+      ? actualCompletedNodes.filter((id) => id !== nodeKey)
+      : [...actualCompletedNodes, nodeKey];
 
-    setCompletedNodes(nextCompletedNodes);
-
+    // Rely exclusively on Firestore's native latency compensation (which instantly triggers
+    // the onSnapshot listener locally) instead of manually maintaining optimistic state
+    // which leads to race conditions.
     try {
       const docRef = doc(db, 'user_progress', user.uid);
       await setDoc(
@@ -73,18 +73,16 @@ export function useLearningProgress(): UseLearningProgressResult {
       );
     } catch (error) {
       console.error("Failed to save learning progress:", error);
-      // Revert state on error if background write fails
-      setCompletedNodes(previousCompletedNodes);
     }
   };
 
   const isNodeCompleted = (pathId: string, nodeId: string) => {
-    return completedNodes.includes(`${pathId}-${nodeId}`);
+    return actualCompletedNodes.includes(`${pathId}-${nodeId}`);
   };
 
   return {
-    completedNodes,
-    loading,
+    completedNodes: actualCompletedNodes,
+    loading: actualLoading,
     toggleNode,
     isNodeCompleted,
   };
