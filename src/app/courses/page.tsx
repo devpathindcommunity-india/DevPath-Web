@@ -14,7 +14,7 @@ import {
 
 export default function CoursesPage() {
   return (
-    <main className="pb-20 relative bg-surface-deep overflow-hidden">
+    <main className="pb-20 relative bg-background overflow-hidden">
       <div className="container mx-auto px-4 relative z-10">
         {/* Hero Section */}
         <div className="text-center mb-20 max-w-4xl mx-auto">
@@ -27,7 +27,7 @@ export default function CoursesPage() {
               <Sparkles size={16} />
               <span>Coming March 2025</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-[hsl(var(--foreground))] via-[hsl(var(--foreground))] to-muted-foreground tracking-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-b from-[hsl(var(--foreground))] via-[hsl(var(--foreground))] to-[#677383] tracking-tight">
               Master Full Stack
               <br />
               Development
@@ -47,7 +47,7 @@ export default function CoursesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-primary/30 transition-all duration-300"
+            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-primary/30 transition-all duration-300 shadow-lg shadow-primary/5 dark:shadow-2xl dark:shadow-black/50"
           >
             <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
             <div className="relative z-10">
@@ -85,7 +85,7 @@ export default function CoursesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-purple-500/30 transition-all duration-300"
+            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-purple-500/30 transition-all duration-300 shadow-lg shadow-purple-500/5 dark:shadow-2xl dark:shadow-black/50"
           >
             <div className="absolute inset-0 bg-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
             <div className="relative z-10">
@@ -123,7 +123,7 @@ export default function CoursesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.3 }}
-            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-green-500/30 transition-all duration-300"
+            className="group relative bg-gradient-to-b from-card to-transparent border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 hover:border-green-500/30 transition-all duration-300 shadow-lg shadow-green-500/5 dark:shadow-2xl dark:shadow-black/50"
           >
             <div className="absolute inset-0 bg-green-500/5 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl" />
             <div className="relative z-10">
@@ -168,7 +168,7 @@ export default function CoursesPage() {
             <h2 className="text-3xl md:text-4xl font-bold">Launch Timeline</h2>
             <div className="relative border-l border-[hsl(var(--muted-foreground)/0.3)] pl-8 space-y-10">
               <div className="relative">
-                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-primary border-4 border-surface-deep" />
+                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-primary border-4 border-background" />
                 <span className="text-sm font-bold text-primary mb-1 block">
                   MARCH 2025
                 </span>
@@ -179,7 +179,7 @@ export default function CoursesPage() {
                 </p>
               </div>
               <div className="relative">
-                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-slate-700 border-4 border-surface-deep" />
+                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-slate-700 border-4 border-background" />
                 <span className="text-sm font-bold text-slate-500 mb-1 block">
                   APRIL 2025
                 </span>
@@ -190,7 +190,7 @@ export default function CoursesPage() {
                 </p>
               </div>
               <div className="relative">
-                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-slate-700 border-4 border-surface-deep" />
+                <span className="absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-slate-700 border-4 border-background" />
                 <span className="text-sm font-bold text-slate-500 mb-1 block">
                   MAY 2025
                 </span>
@@ -206,7 +206,7 @@ export default function CoursesPage() {
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-surface-deep border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 md:p-10"
+            className="bg-background border border-border dark:border-[hsl(var(--border)/0.3)] rounded-3xl p-8 md:p-10 shadow-xl shadow-black/5 dark:shadow-2xl dark:shadow-black/50"
           >
             <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
               <GraduationCap className="text-yellow-400" />

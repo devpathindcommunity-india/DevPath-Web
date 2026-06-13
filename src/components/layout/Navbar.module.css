@@ -13,60 +13,47 @@
 .navbar {
   pointer-events: auto;
   width: 100%;
-  max-width: 95vw;
-  /* Increased width to fill page */
+  max-width: 1800px;
+
   height: 64px;
+
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   background: rgba(10, 10, 10, 0.6);
+
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 9999px;
+
   padding: 0 24px;
+
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.2);
 }
 
-/* New Island Pill for Navigation */
-.navPill {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  align-items: center;
-  padding: 6px 8px;
-  height: 48px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  overflow: hidden;
-  width: auto;
-  min-width: 0;
-  justify-content: center;
-}
-
-.progressBar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  transform-origin: 0%;
-  z-index: 10;
-}
+/* ==========================
+   Logo
+========================== */
 
 .logo {
   display: flex;
   align-items: center;
   gap: 10px;
+
   font-weight: 700;
   font-size: 20px;
+
   color: var(--text-primary);
-  letter-spacing: -0.5px;
+
   text-decoration: none;
+  letter-spacing: -0.5px;
+
   border-radius: 8px;
+
+  flex-shrink: 0;
 }
 
 .logo:focus-visible {
@@ -77,69 +64,142 @@
 .logoIcon {
   width: 28px;
   height: 28px;
+
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+.logoText {
+  white-space: nowrap;
+}
+
+/* ==========================
+   Center Navigation
+========================== */
+
+.navPill {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 48px;
+  padding: 4px 8px;
+
+  border-radius: 9999px;
+
+  background: rgba(255, 255, 255, 0.03);
+
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  backdrop-filter: blur(8px);
+}
+
 .navLinks {
   display: flex;
-  gap: 4px;
   align-items: center;
-  padding: 0 16px;
+  gap: 6px;
 }
 
 .navLink {
-  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  height: 40px;
+  padding: 0 14px;
+
+  border-radius: 9999px;
+
+  color: rgba(255, 255, 255, 0.72);
+
   font-size: 14px;
   font-weight: 500;
-  transition: all 0.2s ease;
-  padding: 8px 12px;
-  border-radius: 9999px;
+
   white-space: nowrap;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .navLink:hover {
   color: #fff;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .navLink:focus-visible {
   outline: 2px solid #38bdf8;
   outline-offset: 2px;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.1);
 }
 
-.navLink::after {
-  display: none;
+.navLink[aria-current='page'] {
+  color: #fff;
+  font-weight: 600;
+
+  background: linear-gradient(
+    135deg,
+    rgba(59, 130, 246, 0.95),
+    rgba(37, 99, 235, 0.95)
+  );
+
+  box-shadow:
+    0 4px 12px rgba(59, 130, 246, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
+
+/* ==========================
+   Actions
+========================== */
 
 .actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+
+  flex-shrink: 0;
 }
 
 .iconButton {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+  min-width: 40px;
+
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-secondary);
-  background: rgba(10, 10, 10, 0.5);
-  backdrop-filter: blur(12px);
+
+  border-radius: 9999px;
+
+  color: rgba(255, 255, 255, 0.8);
+
+  background: rgba(255, 255, 255, 0.03);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   cursor: pointer;
-  transition: all 0.2s ease;
+
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.iconButton svg {
+  width: 18px;
+  height: 18px;
 }
 
 .iconButton:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-  transform: scale(1.05);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .iconButton:focus-visible {
@@ -147,25 +207,38 @@
   outline-offset: 2px;
 }
 
+/* ==========================
+   Login Button
+========================== */
+
 .profileButton {
   display: flex;
   align-items: center;
+  justify-content: center;
+
   gap: 8px;
-  padding: 6px 16px;
+
+  height: 40px;
+  padding: 0 18px;
+
   border-radius: 9999px;
-  background: #3b82f6;
-  border: none;
+
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+
   color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
+
   font-size: 14px;
   font-weight: 600;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+
+  transition: all 0.2s ease;
+
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
 }
 
 .profileButton:hover {
-  background: #2563eb;
   transform: translateY(-1px);
+
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
 }
 
 .profileButton:focus-visible {
@@ -173,24 +246,66 @@
   outline-offset: 2px;
 }
 
-/* Hamburger Menu Button - Hidden on Desktop */
-.hamburger {
-  display: none;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
+/* ==========================
+   Avatar
+========================== */
+
+.profileAvatar {
+  display: flex;
   align-items: center;
   justify-content: center;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 9999px;
+
+  overflow: hidden;
+
+  background: #3b82f6;
+
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+
+  transition: all 0.2s ease;
+}
+
+.profileAvatar:hover {
+  transform: translateY(-1px);
+}
+
+.profileAvatar:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+/* ==========================
+   Hamburger
+========================== */
+
+.hamburger {
+  display: none;
+
+  width: 40px;
+  height: 40px;
+
+  border-radius: 9999px;
+
+  align-items: center;
+  justify-content: center;
+
   color: var(--text-primary);
-  background: rgba(10, 10, 10, 0.5);
-  backdrop-filter: blur(12px);
+
+  background: rgba(255, 255, 255, 0.03);
+
   border: 1px solid rgba(255, 255, 255, 0.08);
+
   cursor: pointer;
+
   transition: all 0.2s ease;
 }
 
 .hamburger:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .hamburger:focus-visible {
@@ -198,38 +313,54 @@
   outline-offset: 2px;
 }
 
-
-.navLink[aria-current="page"] {
-    color: var(--primary);
-    font-weight: 600;
-    background: rgb(128, 171, 240);
+.navLink[aria-current='page'] {
+  color: var(--primary);
+  font-weight: 600;
+  background: rgb(128, 171, 240);
 }
 
 /* Mobile Menu Backdrop */
 .mobileBackdrop {
   display: none;
+
   position: fixed;
   inset: 0;
+
   background: rgba(0, 0, 0, 0.6);
+
   backdrop-filter: blur(4px);
+
   z-index: 1001;
 }
 
-/* Mobile Menu Drawer */
+/* ==========================
+   Mobile Drawer
+========================== */
+
 .mobileMenu {
   display: none;
+
   position: fixed;
+
   top: 20px;
   right: 20px;
+
   width: 300px;
   max-width: calc(100vw - 40px);
+
   background: rgba(15, 23, 42, 0.95);
+
   border: 1px solid rgba(255, 255, 255, 0.1);
+
   border-radius: 24px;
+
   z-index: 1002;
+
   padding: 20px;
+
   flex-direction: column;
   gap: 20px;
+
   box-shadow:
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
@@ -239,7 +370,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+
   padding-bottom: 16px;
+
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -252,62 +385,57 @@
 .mobileClose {
   width: 36px;
   height: 36px;
-  border-radius: 50%;
+
+  border-radius: 9999px;
+
   display: flex;
   align-items: center;
   justify-content: center;
+
   color: var(--text-secondary);
+
   background: transparent;
+
   border: 1px solid rgba(255, 255, 255, 0.1);
+
   cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.mobileClose:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-}
-
-.mobileClose:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
 }
 
 .mobileNav {
   display: flex;
   flex-direction: column;
   gap: 4px;
-  flex: 1;
 }
 
 .mobileLink {
   display: block;
+
   padding: 12px 16px;
+
   border-radius: 12px;
+
   color: var(--text-secondary);
-  font-size: 16px;
-  font-weight: 500;
+
   transition: all 0.2s ease;
 }
 
-.mobileLink:hover,
-.mobileLink:active {
+.mobileLink:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
 }
 
-.mobileLink:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-primary);
+.mobileLink[aria-current='page'] {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
 }
 
 .mobileActions {
   display: flex;
   flex-direction: column;
   gap: 12px;
+
   padding-top: 16px;
+
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -315,63 +443,38 @@
   display: flex;
   align-items: center;
   gap: 12px;
+
   color: var(--text-secondary);
-  font-size: 14px;
 }
 
 .mobileProfileButton {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 16px;
-  font-weight: 500;
+
   width: 100%;
+
+  padding: 12px 16px;
+
+  border-radius: 12px;
+
+  background: rgba(255, 255, 255, 0.05);
+
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  color: var(--text-primary);
+
+  transition: all 0.2s ease;
 }
 
 .mobileProfileButton:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.mobileProfileButton:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
-}
+/* ==========================
+   Responsive
+========================== */
 
-.profileAvatar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  padding: 0;
-  border-radius: 50%;
-  background: #3b82f6;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-  overflow: hidden;
-}
-
-.profileAvatar:hover {
-  background: #2563eb;
-  transform: translateY(-1px);
-}
-
-.profileAvatar:focus-visible {
-  outline: 2px solid #38bdf8;
-  outline-offset: 2px;
-}
-
-/* Mobile Responsive Styles */
 @media (max-width: 1024px) {
   .navPill {
     display: none;
@@ -380,7 +483,7 @@
   .navbar {
     padding: 0 16px;
     height: 60px;
-    background: rgba(15, 23, 42, 0.88);
+    background: rgba(10, 10, 10, 0.6);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 20px;
@@ -409,7 +512,15 @@
     display: flex;
   }
 
-  /* Hide some desktop actions on mobile */
+  .navbar {
+    height: 60px;
+    padding: 0 16px;
+
+    border-radius: 20px;
+
+    background: rgba(15, 23, 42, 0.88);
+  }
+
   .actions > .iconButton,
   .actions > .profileButton {
     display: none;

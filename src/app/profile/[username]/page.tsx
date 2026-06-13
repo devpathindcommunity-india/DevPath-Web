@@ -11,12 +11,22 @@ import { ProjectShowcaseSection } from '@/components/profile/ProjectShowcaseSect
 import { ExportBar } from '@/components/profile/ExportBar';
 
 interface Props {
-  params: { username: string };
+  params: Promise<{ username: string }>;
 }
+
+export async function generateStaticParams() {
+  return [
+    { username: 'dummy' },
+    { username: 'kew7p1pbj7WoX66uGH2ZMcg79RB3' }
+  ];
+}
+
+export const dynamicParams = false;
 
 // Generate OpenGraph metadata dynamically
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const profile = await getPublicProfileByUsername(params.username);
+  const { username } = await params;
+  const profile = await getPublicProfileByUsername(username);
   if (!profile) return { title: 'Profile not found' };
 
   return {
@@ -31,7 +41,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 export default async function PublicProfilePage({ params }: Props) {
-  const profile = await getPublicProfileByUsername(params.username);
+  const { username } = await params;
+  const profile = await getPublicProfileByUsername(username);
 
   if (!profile) notFound();
 
