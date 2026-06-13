@@ -6,27 +6,22 @@ const COOKIE_KEY = 'cookie_consent';
 
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
-  const [consent, setConsent] = useState(null);
 
   useEffect(() => {
     const saved = localStorage.getItem(COOKIE_KEY);
 
     if (!saved) {
       setVisible(true);
-    } else {
-      setConsent(saved);
     }
   }, []);
 
   const handleAccept = () => {
     localStorage.setItem(COOKIE_KEY, 'accepted');
-    setConsent('accepted');
     setVisible(false);
   };
 
   const handleReject = () => {
     localStorage.setItem(COOKIE_KEY, 'rejected');
-    setConsent('rejected');
     setVisible(false);
   };
 
