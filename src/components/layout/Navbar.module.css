@@ -313,10 +313,13 @@
   outline-offset: 2px;
 }
 
-/* ==========================
-   Mobile Backdrop
-========================== */
+.navLink[aria-current='page'] {
+  color: var(--primary);
+  font-weight: 600;
+  background: rgb(128, 171, 240);
+}
 
+/* Mobile Menu Backdrop */
 .mobileBackdrop {
   display: none;
 
@@ -475,6 +478,26 @@
 @media (max-width: 1024px) {
   .navPill {
     display: none;
+  }
+
+  .navbar {
+    padding: 0 16px;
+    height: 60px;
+    background: rgba(10, 10, 10, 0.6);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 20px;
+  }
+
+  .logo,
+  .actions {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .logoText {
+    display: block;
   }
 
   .hamburger {
