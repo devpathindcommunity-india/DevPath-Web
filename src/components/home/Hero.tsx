@@ -90,9 +90,10 @@ export default function Hero() {
     <section className={styles.hero}>
       <InteractiveBackground />
       {/* Background 3D Model */}
-      <div className="absolute inset-0 z-0 opacity-80 pointer-events-none">
+      <div className="absolute md:inset-0 bottom-0 left-0 right-0 top-[35%] md:top-0 h-[45vh] md:h-full z-0 opacity-30 md:opacity-80 pointer-events-none overflow-hidden">
         <HeaderScene />
       </div>
+
 
       <div className={`${styles.content} relative z-10`}>
         <div className="flex flex-col items-center gap-6 mb-8">
