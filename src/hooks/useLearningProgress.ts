@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
@@ -35,7 +35,7 @@ export function useLearningProgress(): UseLearningProgressResult {
         setLoading(false);
       },
       (error) => {
-        console.error("Error listening to learning progress:", error);
+        console.error('Error listening to learning progress:', error);
         setLoading(false);
       }
     );
@@ -72,7 +72,7 @@ export function useLearningProgress(): UseLearningProgressResult {
         { merge: true }
       );
     } catch (error) {
-      console.error("Failed to save learning progress:", error);
+      console.error('Failed to save learning progress:', error);
     }
   };
 
