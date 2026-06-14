@@ -52,7 +52,7 @@ export default function Footer() {
             </div>
             <div className={styles.links}>
               <Link href="/wiki" className={styles.link}>
-                <Book size={16} /> Wiki &amp; Docs
+                <Book size={16} /> Wiki & Docs
               </Link>
               <Link href="/flags" className={styles.link}>
                 <Flag size={16} /> Feature Flags
@@ -101,6 +101,11 @@ export default function Footer() {
 
               <Link href="/privacy" className={styles.link}>
                 <Shield size={16} /> Privacy Policy
+              </Link>
+
+              {/* Cookies Policy */}
+              <Link href="/cookies" className={styles.link}>
+                <Shield size={16} /> Cookies Policy
               </Link>
             </div>
           </div>
