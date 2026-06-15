@@ -9,6 +9,7 @@ import {
   Code,
   MessageSquare,
   Shield,
+  HelpCircle, // ← Added
 } from 'lucide-react';
 import logo from '@/assets/logo.webp';
 import styles from './Footer.module.css';
@@ -53,6 +54,11 @@ export default function Footer() {
             <div className={styles.links}>
               <Link href="/wiki" className={styles.link}>
                 <Book size={16} /> Wiki & Docs
+              </Link>
+              <Link href="/faq" className={styles.link}>
+                {' '}
+                {/* ← Added */}
+                <HelpCircle size={16} /> FAQ
               </Link>
               <Link href="/flags" className={styles.link}>
                 <Flag size={16} /> Feature Flags
@@ -115,7 +121,9 @@ export default function Footer() {
 
           {/* Contact us */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">CONTACT US</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">
+              CONTACT US
+            </p>
             <a
               aria-label="Link"
               href={`mailto:${siteConfig.contact.email}`}
@@ -127,7 +135,9 @@ export default function Footer() {
 
           {/* Get the app */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">GET THE APP</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">
+              GET THE APP
+            </p>
             <AppStoreButtons
               variant="footer"
               className="flex-col !items-start"
