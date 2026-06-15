@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import Image from 'next/image';
@@ -45,6 +45,15 @@ export default function Navbar() {
   const { isMaintenanceMode } = useMaintenance();
   const setSearchOpen = useSetSearchOpen();
   console.log('Navbar Render: isMaintenanceMode =', isMaintenanceMode);
+
+  useEffect(() => {
+    const handleCloseAll = () => {
+      setMobileMenuOpen(false);
+      setBookmarkDrawerOpen(false);
+    };
+    window.addEventListener('close-all-overlays', handleCloseAll);
+    return () => window.removeEventListener('close-all-overlays', handleCloseAll);
+  }, []);
 
   const toggleMobileMenu = () => {
     if (!isMaintenanceMode) {

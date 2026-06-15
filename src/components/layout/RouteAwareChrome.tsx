@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import MaintenanceBlocker from '@/components/layout/MaintenanceBlocker';
@@ -11,6 +12,8 @@ import PageWrapper from '@/components/layout/PageWrapper';
 import { FloatingAssistant } from '@/components/assistant/floating-assistant';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import SearchModal from '@/components/layout/SearchModal';
+import ShortcutLegend from '@/components/layout/ShortcutLegend';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
 
 export default function RouteAwareChrome({
   children,
@@ -19,6 +22,13 @@ export default function RouteAwareChrome({
 }) {
   const pathname = usePathname();
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const [isLegendOpen, setLegendOpen] = useState(false);
+
+  // Bind global navigation shortcuts
+  useKeyboardShortcuts({
+    '?': () => setLegendOpen((prev) => !prev),
+    'escape': () => setLegendOpen(false),
+  });
 
   return (
     <>
@@ -34,6 +44,7 @@ export default function RouteAwareChrome({
       {!isAuthRoute && <FloatingAssistant />}
       <ToastContainer />
       <SearchModal />
+      <ShortcutLegend isOpen={isLegendOpen} onClose={() => setLegendOpen(false)} />
     </>
   );
 }
