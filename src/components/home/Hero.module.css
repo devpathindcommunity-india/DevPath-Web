@@ -133,7 +133,7 @@
   font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.02em;
-  color: #0f172a;
+  color: var(--text-primary);
   text-shadow:
     0 0 40px rgba(255, 255, 255, 0.9),
     0 0 80px rgba(255, 255, 255, 0.7),
@@ -142,7 +142,7 @@
 }
 
 :global(.dark) .title {
-  color: #ffffff;
+  color: var(--text-primary);
   text-shadow:
     0 0 40px rgba(0, 0, 0, 0.95),
     0 0 80px rgba(0, 0, 0, 0.8),
@@ -154,14 +154,14 @@
   max-width: 600px;
   margin: 0 auto 40px;
   animation: fadeUp 0.8s ease-out 0.2s backwards;
-  color: #1e293b;
+  color: var(--text-secondary);
   text-shadow:
     0 0 30px rgba(255, 255, 255, 0.95),
     0 0 60px rgba(255, 255, 255, 0.8);
 }
 
 :global(.dark) .subtitle {
-  color: #e2e8f0;
+  color: var(--text-light);
   text-shadow:
     0 0 30px rgba(0, 0, 0, 0.99),
     0 0 60px rgba(0, 0, 0, 0.9);
