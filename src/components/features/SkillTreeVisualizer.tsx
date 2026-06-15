@@ -88,13 +88,20 @@ const pathsData: Record<string, SkillNode[]> = {
   ],
 };
 
-export default function SkillTreeVisualizer() {
+export default function SkillTreeVisualizer({ initialPath }: { initialPath?: "Frontend" | "Backend" } = {}) {
   const { user } = useAuth();
   const { completedNodes, loading, toggleNode, isNodeCompleted } = useLearningProgress();
-  const [activePath, setActivePath] = useState<"Frontend" | "Backend">("Frontend");
+  const [activePath, setActivePath] = useState<"Frontend" | "Backend">(initialPath || "Frontend");
   const [selectedNode, setSelectedNode] = useState<SkillNode | null>(null);
 
   const nodes = pathsData[activePath];
+
+  // Sync active path with prop updates
+  useEffect(() => {
+    if (initialPath) {
+      setActivePath(initialPath);
+    }
+  }, [initialPath]);
 
   // Dynamic progress calculation
   const completedCount = nodes.filter(node => isNodeCompleted(activePath, node.id)).length;
