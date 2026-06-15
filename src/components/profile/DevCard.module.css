@@ -273,6 +273,9 @@
   grid-template-rows: 1fr auto;
   min-height: 360px;
 }
+.exporting .cardInner {
+  grid-template-columns: 210px calc(100% - 210px) !important;
+}
 
 /* ── Left Panel ────────────────────────────────────────────────────── */
 .leftPanel {
@@ -499,10 +502,12 @@
   font-size: 20px;
   font-weight: 700;
   letter-spacing: -0.03em;
-  line-height: 1;
+  line-height: 1.2;
   color: var(--devcard-text);
 }
-
+.exporting .statValue {
+  letter-spacing: 0 !important;
+}
 .statValue.cyan {
   background: linear-gradient(135deg, #00d4ff, #38bdf8);
   -webkit-background-clip: text;
@@ -522,6 +527,15 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+.exporting .statValue.cyan,
+.exporting .statValue.purple,
+.exporting .statValue.flame {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: white !important;
+  color: white !important;
 }
 
 .statLabel {
@@ -559,6 +573,8 @@
 
 .badge {
   display: flex;
+  line-height: 16px;
+  min-height: 24px;
   align-items: center;
   gap: 5px;
   padding: 4px 9px 4px 7px;
@@ -641,7 +657,10 @@
   flex-shrink: 0;
   font-weight: 500;
 }
-
+.langName,
+.langPct {
+  line-height: 14px;
+}
 /* ── Empty hint ────────────────────────────────────────────────────── */
 .emptyHint {
   display: flex;
@@ -783,4 +802,28 @@
   .rightPanel {
     padding: 18px 16px 16px;
   }
+}
+.exporting .metaRow,
+.exporting .metaRowLink {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 5px !important;
+  white-space: nowrap !important;
+}
+
+.exporting .badge,
+.exporting .badgeMore,
+.exporting .footerBrand,
+.exporting .footerUrl {
+  display: inline-flex !important;
+  align-items: center !important;
+}
+
+.exporting,
+.exporting * {
+  animation: none !important;
+  transition: none !important;
+  transform: none !important;
 }

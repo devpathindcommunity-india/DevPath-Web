@@ -62,9 +62,16 @@
 }
 
 @media (max-width: 768px) {
+  .links {
+    align-items: center;
+  }
+  .link {
+    justify-content: center;
+  }
   .bottom {
     flex-direction: column;
     gap: 20px;
     text-align: center;
+    align-items: center;
   }
 }

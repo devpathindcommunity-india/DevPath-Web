@@ -5,6 +5,7 @@ import { FloatingParticles } from '@/components/FloatingParticles';
 import dynamic from 'next/dynamic';
 import BackToTop from '@/components/BackToTop';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import CookieConsent from '@/components/CookieConsent';
 
 const Sponsors = dynamic(() => import('@/components/home/Sponsors'));
 const Mission = dynamic(() => import('@/components/home/Mission'));
@@ -20,21 +21,29 @@ export default function Home() {
         <FloatingParticles />
         <Hero />
         <SectionDivider />
+
         <ErrorBoundary>
           <SectionEntrance>
             <Sponsors />
           </SectionEntrance>
+
           <SectionEntrance>
             <Mission />
           </SectionEntrance>
+
           <SectionEntrance>
             <CodingNews />
           </SectionEntrance>
+
           <SectionEntrance>
             <PastCollaborations />
           </SectionEntrance>
         </ErrorBoundary>
+
         <BackToTop />
+
+        {/* COOKIE CONSENT GLOBAL POPUP */}
+        <CookieConsent />
       </main>
     </>
   );
