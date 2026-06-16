@@ -15,6 +15,7 @@ import 'github-markdown-css/github-markdown.css';
 import PageTrackerInit from '@/components/PageTrackerInit';
 import './globals.css';
 import '@/styles/resume-print.css';
+import { MotionConfig } from 'framer-motion';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const spaceGrotesk = Space_Grotesk({
@@ -123,30 +124,32 @@ export default function RootLayout({
         className={`${inter.variable} ${spaceGrotesk.variable} ${barlowCondensed.variable}`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <NotificationProvider>
-            <SyncErrorListener>
-              <script
-                type="application/ld+json"
-                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-              />
-              <AuthProvider>
-                <GamificationProvider>
-                  <RealTimeProvider>
-                    <AnimatedBackground />
-                    {/* <BackgroundMesh /> */}
-                    <RouteAwareChrome>{children}</RouteAwareChrome>
-                  </RealTimeProvider>
-                </GamificationProvider>
-              </AuthProvider>
-            </SyncErrorListener>
-          </NotificationProvider>
-        </ThemeProvider>
+        <MotionConfig reducedMotion="user">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <NotificationProvider>
+              <SyncErrorListener>
+                <script
+                  type="application/ld+json"
+                  dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+                <AuthProvider>
+                  <GamificationProvider>
+                    <RealTimeProvider>
+                      <AnimatedBackground />
+                      {/* <BackgroundMesh /> */}
+                      <RouteAwareChrome>{children}</RouteAwareChrome>
+                    </RealTimeProvider>
+                  </GamificationProvider>
+                </AuthProvider>
+              </SyncErrorListener>
+            </NotificationProvider>
+          </ThemeProvider>
+        </MotionConfig>
       </body>
     </html>
   );
