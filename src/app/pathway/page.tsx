@@ -16,6 +16,14 @@ import {
   Gift,
   Calendar,
   ChartNoAxesCombined,
+  CheckCircle2,
+  GitBranch,
+  GitPullRequest,
+  Heart,
+  MessageSquare,
+  Sparkles,
+  Upload,
+  UserCheck,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -26,6 +34,117 @@ interface LeaderboardEntry {
   photoURL?: string;
   points?: number;
 }
+
+const pointEarningActivities = [
+  {
+    label: 'Daily Login',
+    value: `+${POINTS.DAILY_LOGIN} (+Streak)`,
+    Icon: Flame,
+    iconClassName: 'text-orange-500',
+  },
+  {
+    label: '7-Day Streak',
+    value: `+${POINTS.WEEKLY_STREAK_BONUS}`,
+    Icon: Flame,
+    iconClassName: 'text-red-500',
+  },
+  {
+    label: 'Follow Community',
+    value: `+${POINTS.FOLLOW_COMMUNITY}`,
+    Icon: Users,
+    iconClassName: 'text-blue-500',
+  },
+  {
+    label: 'Gain Follower',
+    value: `+${POINTS.FOLLOWER_GAINED}`,
+    Icon: UserCheck,
+    iconClassName: 'text-green-500',
+  },
+  {
+    label: 'Earn Badge',
+    value: 'Dynamic',
+    Icon: Award,
+    iconClassName: 'text-purple-500',
+  },
+  {
+    label: 'Project Star',
+    value: `+${POINTS.PROJECT_STAR}`,
+    Icon: Star,
+    iconClassName: 'text-yellow-500',
+  },
+  {
+    label: 'Event Participation',
+    value: `+${POINTS.EVENT_PARTICIPATION}`,
+    Icon: Calendar,
+    iconClassName: 'text-pink-500',
+  },
+  {
+    label: 'Hackathon Win',
+    value: `+${POINTS.HACKATHON_WIN}`,
+    Icon: Trophy,
+    iconClassName: 'text-yellow-600',
+  },
+  {
+    label: 'Profile Completion',
+    value: `+${POINTS.PROFILE_COMPLETION}`,
+    Icon: CheckCircle2,
+    iconClassName: 'text-emerald-500',
+  },
+  {
+    label: 'First Project Upload',
+    value: `+${POINTS.FIRST_PROJECT_UPLOAD}`,
+    Icon: Upload,
+    iconClassName: 'text-cyan-500',
+  },
+  {
+    label: 'Repository Contribution',
+    value: `+${POINTS.REPOSITORY_CONTRIBUTION}`,
+    Icon: GitBranch,
+    iconClassName: 'text-sky-500',
+  },
+  {
+    label: 'Pull Request Merged',
+    value: `+${POINTS.PULL_REQUEST_MERGED}`,
+    Icon: GitPullRequest,
+    iconClassName: 'text-violet-500',
+  },
+  {
+    label: 'Issue Resolution',
+    value: `+${POINTS.ISSUE_RESOLUTION}`,
+    Icon: CheckCircle2,
+    iconClassName: 'text-lime-500',
+  },
+  {
+    label: 'Community Post Creation',
+    value: `+${POINTS.COMMUNITY_POST_CREATION}`,
+    Icon: MessageSquare,
+    iconClassName: 'text-teal-500',
+  },
+  {
+    label: 'Helpful Comment Received',
+    value: `+${POINTS.HELPFUL_COMMENT_RECEIVED}`,
+    Icon: Heart,
+    iconClassName: 'text-rose-500',
+  },
+  {
+    label: 'Consecutive Weekly Activity',
+    value: `+${POINTS.CONSECUTIVE_WEEKLY_ACTIVITY}`,
+    Icon: Flame,
+    iconClassName: 'text-amber-500',
+  },
+  {
+    label: 'Open Source Contribution',
+    value: `+${POINTS.OPEN_SOURCE_CONTRIBUTION}`,
+    Icon: GitPullRequest,
+    iconClassName: 'text-indigo-500',
+  },
+  {
+    label: 'Mentor Recognition',
+    value: `+${POINTS.MENTOR_RECOGNITION}`,
+    Icon: Sparkles,
+    iconClassName: 'text-fuchsia-500',
+  },
+];
 
 export default function PathwayPage() {
   const { user } = useAuth();
@@ -416,72 +535,26 @@ export default function PathwayPage() {
             <Star className="text-yellow-500" size={20} />
             How to Earn Points
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Flame size={16} className="text-orange-500" /> Daily Login
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.DAILY_LOGIN} (+Streak)
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Flame size={16} className="text-red-500" /> 7-Day Streak
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.WEEKLY_STREAK_BONUS}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Users size={16} className="text-blue-500" /> Follow Community
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.FOLLOW_COMMUNITY}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Award size={16} className="text-purple-500" /> Earn Badge
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.BADGE_EARNED}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Users size={16} className="text-green-500" /> Gain Follower
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.FOLLOWER_GAINED}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Star size={16} className="text-yellow-500" /> Project Star
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.PROJECT_STAR}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Calendar size={16} className="text-pink-500" /> Event
-                Participation
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.EVENT_PARTICIPATION}
-              </span>
-            </div>
-            <div className="flex justify-between items-center p-3 bg-muted/30 rounded-lg border border-border/50">
-              <span className="flex items-center gap-2 text-sm">
-                <Trophy size={16} className="text-yellow-600" /> Hackathon Win
-              </span>
-              <span className="font-mono font-bold text-sm">
-                +{POINTS.HACKATHON_WIN}
-              </span>
-            </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-4">
+            {pointEarningActivities.map(
+              ({ label, value, Icon, iconClassName }) => (
+                <div
+                  key={label}
+                  className="flex min-h-12 items-center justify-between gap-3 p-3 bg-muted/30 rounded-lg border border-border/50"
+                >
+                  <span className="flex min-w-0 items-center gap-2 text-sm leading-snug">
+                    <Icon
+                      size={16}
+                      className={`${iconClassName} flex-shrink-0`}
+                    />
+                    <span className="break-words">{label}</span>
+                  </span>
+                  <span className="flex-shrink-0 text-right font-mono font-bold text-sm">
+                    {value}
+                  </span>
+                </div>
+              )
+            )}
           </div>
         </div>
 

@@ -50,7 +50,11 @@ jest.mock('@/lib/streakUtils', () => ({
 }));
 
 jest.mock('@/lib/points', () => ({
-  POINTS: { DAILY_LOGIN: 1, WEEKLY_STREAK_BONUS: 20 },
+  POINTS: {
+    DAILY_LOGIN: 1,
+    WEEKLY_STREAK_BONUS: 20,
+    STREAK_BONUS_PER_DAY: 1,
+  },
 }));
 
 function TestHarness() {

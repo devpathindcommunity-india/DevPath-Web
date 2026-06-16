@@ -348,9 +348,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           const { currentStreak } = calculateStreak(loginDates);
 
           if (shouldUpdate || userData.streak !== currentStreak) {
-            // Award 1 XP if streak increased (Daily Login)
+            // Award daily login XP plus a capped streak multiplier.
             if (currentStreak > (userData.streak || 0)) {
-              pointsDelta += POINTS.DAILY_LOGIN;
+              const streakMultiplier = Math.min(
+                Math.max(currentStreak - 1, 0),
+                6
+              );
+              pointsDelta +=
+                POINTS.DAILY_LOGIN +
+                streakMultiplier * POINTS.STREAK_BONUS_PER_DAY;
 
               // 7-Day Streak Bonus
               if (currentStreak % 7 === 0 && currentStreak > 0) {
