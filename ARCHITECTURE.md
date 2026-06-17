@@ -7,6 +7,7 @@ Welcome to the DevPath architecture documentation. This document outlines the sy
 ## 🗺️ System Architecture Overview
 
 DevPath is built on a modern, decoupled architecture:
+
 1. **Frontend (Client-Side)**: A fast, responsive Next.js 16 (App Router) client deployed on Firebase Hosting.
 2. **Backend (Server-Side)**: A lightweight Express.js server responsible for securely calling APIs (e.g., OpenRouter LLM APIs) and managing the floating assistant chat state.
 3. **Database & Infrastructure Services**: Managed by Google Firebase (Authentication, Cloud Firestore, Hosting, and Security Rules).
@@ -18,7 +19,7 @@ DevPath is built on a modern, decoupled architecture:
 graph TD
     %% Clients
     User([User Web Browser])
-    
+
     %% Frontend Layer
     subgraph Frontend [Next.js App Client-Side]
         UI[Tailwind UI Components / Framer Motion / GSAP]
@@ -31,7 +32,7 @@ graph TD
         Hosting[Firebase Hosting]
         Auth[Firebase Authentication]
         Firestore[(Firestore Database)]
-        
+
         subgraph Backend [Express Assistant Backend]
             Router[API Routes]
             Middleware[Rate Limiter & Validation]
@@ -51,12 +52,12 @@ graph TD
     User -->|Interacts with UI| UI
     UI -->|Reads/Writes State| Context
     Context -->|Uses| Hooks
-    
+
     %% Hooks / Firebase client communication
     Hooks -->|Session Token / Google OAuth| Auth
     Hooks -->|NoSQL Reads/Writes| Firestore
     Hooks -->|Syncs Contribution Points| GithubAPI
-    
+
     %% Frontend to Backend Chat Assistant
     UI -->|POST /api/assistant/chat| Router
     Router -->|Validates & Rate Limits| Middleware
@@ -73,20 +74,22 @@ graph TD
 The client application is built on top of React 19 and Next.js 16 utilizing the App Router. The UI layers are styled with Tailwind CSS and animated using Framer Motion and GSAP.
 
 ### 📁 Directory Structure
-*   **`src/app/`**: Next.js App Router folders. Contains page routes, global CSS, layouts, and route handlers.
-*   **`src/components/`**: Modularized, reusable React components (grouped logically into domains like `auth`, `assistant`, `community`, `projects`, `ui`).
-*   **`src/context/`**: Global state management providers using the React Context API:
-    *   `AuthContext.tsx`: Tracks authentication state (Firebase user, login, signup, logout).
-    *   `GamificationContext.tsx`: Manages streak tracking, contribution points, and leaderboard sync status.
-    *   `NotificationContext.tsx`: Manages toast feedback, in-app notifications, and alert center state.
-    *   `RealTimeContext.tsx`: Handles live user count, active pages, or presence updates.
-*   **`src/lib/`**: Business logic integrations:
-    *   `firebase.ts`: SDK initialization for Auth and Firestore.
-    *   `github.ts`: Fetching public repositories, contribution counts, and PR stats.
-    *   `theme.ts`: Custom dark/light mode configurations.
-    *   `streakUtils.ts`: Computes login streaks and calculates XP modifiers.
+
+- **`src/app/`**: Next.js App Router folders. Contains page routes, global CSS, layouts, and route handlers.
+- **`src/components/`**: Modularized, reusable React components (grouped logically into domains like `auth`, `assistant`, `community`, `projects`, `ui`).
+- **`src/context/`**: Global state management providers using the React Context API:
+  - `AuthContext.tsx`: Tracks authentication state (Firebase user, login, signup, logout).
+  - `GamificationContext.tsx`: Manages streak tracking, contribution points, and leaderboard sync status.
+  - `NotificationContext.tsx`: Manages toast feedback, in-app notifications, and alert center state.
+  - `RealTimeContext.tsx`: Handles live user count, active pages, or presence updates.
+- **`src/lib/`**: Business logic integrations:
+  - `firebase.ts`: SDK initialization for Auth and Firestore.
+  - `github.ts`: Fetching public repositories, contribution counts, and PR stats.
+  - `theme.ts`: Custom dark/light mode configurations.
+  - `streakUtils.ts`: Computes login streaks and calculates XP modifiers.
 
 ### ⚡ Client-Side State Flow
+
 ```mermaid
 sequenceDiagram
     participant User as User Browser
@@ -112,12 +115,13 @@ sequenceDiagram
 The Express backend orchestrates heavy or secure calculations, specifically focusing on the AI Chat Assistant capabilities. It runs separately (under the `/backend` directory) and communicates with the client via JSON endpoints.
 
 ### 📂 File Structure (under `backend/src/`)
-*   **`app.js`**: Global middlewares configuration (CORS, Express JSON parser, Request logs with Morgan).
-*   **`routes/assistant.js`**: Defines the assistant pathways. Includes rate-limiting and request payload validator middlewares.
-*   **`controllers/assistantController.js`**: Resolves HTTP requests, handles errors, and returns JSON formatted chat responses.
-*   **`services/openRouterService.js`**: Orchestrates OpenAI/OpenRouter chat generation with failover retry patterns.
-*   **`services/conversationService.js`**: Manages conversational message histories and stores session contexts in Firestore using the Firebase Admin SDK.
-*   **`middlewares/rateLimitMiddleware.js`**: Prevents brute-force requests and keeps cost consumption predictable.
+
+- **`app.js`**: Global middlewares configuration (CORS, Express JSON parser, Request logs with Morgan).
+- **`routes/assistant.js`**: Defines the assistant pathways. Includes rate-limiting and request payload validator middlewares.
+- **`controllers/assistantController.js`**: Resolves HTTP requests, handles errors, and returns JSON formatted chat responses.
+- **`services/openRouterService.js`**: Orchestrates OpenAI/OpenRouter chat generation with failover retry patterns.
+- **`services/conversationService.js`**: Manages conversational message histories and stores session contexts in Firestore using the Firebase Admin SDK.
+- **`middlewares/rateLimitMiddleware.js`**: Prevents brute-force requests and keeps cost consumption predictable.
 
 ### 🚀 LLM Multi-Model Failover Orchestration
 
@@ -128,7 +132,7 @@ flowchart TD
     Start[Receive Chat Message] --> Primary[Try Primary Model: gpt-oss-120b:free]
     Primary -->|Success| Return[Format & Return Response]
     Primary -->|Rate Limit / Timeout / Error| Order[Sort Fallbacks by Weight Override]
-    
+
     subgraph Fallbacks [Fallback Hierarchy]
         F1[nvidia/nemotron-3-super:free]
         F2[deepseek/deepseek-v4-flash:free]
@@ -173,10 +177,12 @@ DevPath utilizes Firebase as a serverless backend helper. Because the frontend t
 ```
 
 ### 🔒 Firestore Security Rules
+
 To avoid data manipulation, `firestore.rules` enforces that:
-*   Users can only read and write their own `/users/{userId}` documents, streaks, and notifications.
-*   Only accounts flagged with the `admin` role are permitted to create, update, or delete entries under `/events` and `/resources`.
-*   Authenticated users can create registrations and write reviews/ratings.
+
+- Users can only read and write their own `/users/{userId}` documents, streaks, and notifications.
+- Only accounts flagged with the `admin` role are permitted to create, update, or delete entries under `/events` and `/resources`.
+- Authenticated users can create registrations and write reviews/ratings.
 
 ---
 
@@ -200,6 +206,7 @@ sequenceDiagram
 ```
 
 ### Point Calculation Rules
-*   **Pull Request Merged**: High XP yield (+50 pts)
-*   **Issue Opened/Resolved**: Medium XP yield (+15 pts)
-*   **Daily Learning Streak**: Consistent daily progress boosts multiplier (up to 1.5x)
+
+- **Pull Request Merged**: High XP yield (+50 pts)
+- **Issue Opened/Resolved**: Medium XP yield (+15 pts)
+- **Daily Learning Streak**: Consistent daily progress boosts multiplier (up to 1.5x)
