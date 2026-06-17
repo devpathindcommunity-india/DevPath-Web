@@ -16,7 +16,8 @@ export function useMaintenance() {
   });
 
   useEffect(() => {
-    if (!db) {
+    // In E2E tests or when db is not available, immediately resolve
+    if (!db || process.env.NEXT_PUBLIC_E2E_TEST === 'true') {
       setState({
         isMaintenanceMode: false,
         maintenanceMessage: '',
