@@ -4,9 +4,13 @@ export interface BookmarkItem {
   id: string;
   title: string;
   description: string;
-  type: 'roadmap' | 'project';
+  type: 'roadmap' | 'project' | 'opportunity';
   color?: string;
   path?: string;
+  company?: string;
+  deadline?: string;
+  tags?: string[];
+  bookmarkedAt?: number;
 }
 
 const listeners = new Set<() => void>();

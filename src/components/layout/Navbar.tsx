@@ -34,6 +34,7 @@ const navLinks = [
   { href: '/community', label: 'Community' },
   { href: '/resources', label: 'Resources' },
   { href: '/events', label: 'Events' },
+  { href: '/opportunities', label: 'Opportunities' },
   { href: '/opensource', label: 'Open Source' },
   { href: '/team', label: 'Team' },
 ];
