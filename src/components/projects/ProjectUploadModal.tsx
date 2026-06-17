@@ -84,6 +84,16 @@ const POPULAR_SKILLS = [
   'Data Science',
 ];
 
+interface ProjectFormData {
+  id?: string;
+  title?: string;
+  description?: string;
+  websiteUrl?: string;
+  skills?: string[];
+  screenshots?: string[];
+  videoUrl?: string;
+}
+
 interface ProjectUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -91,14 +101,13 @@ interface ProjectUploadModalProps {
   userEmail?: string | null;
   userName: string;
   onSuccess: () => void;
-  initialData?: any; // Project data for editing
+  initialData?: ProjectFormData;
 }
 
 export default function ProjectUploadModal({
   isOpen,
   onClose,
   userId,
-  userEmail,
   userName,
   onSuccess,
   initialData,
@@ -239,8 +248,6 @@ export default function ProjectUploadModal({
             achievements: arrayUnion('first_project_upload'),
             points: increment(POINTS.FIRST_PROJECT_UPLOAD),
           });
-        }
-        if (shouldAwardFirstProject) {
           batch.set(
             leaderboardRef,
             {

@@ -1,4 +1,5 @@
-import { BADGE_RARITY_POINTS, BadgeRarity, POINTS } from './points';
+import { BADGE_RARITY_POINTS, POINTS } from './points';
+import type { BadgeRarity } from './points';
 
 export const SOCIAL_BADGES = [
   'social-github',
