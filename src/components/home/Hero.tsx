@@ -19,6 +19,7 @@ import { useEffect, useState, useRef } from 'react';
 
 const HeaderScene = dynamic(() => import('@/components/3d/HeaderScene'), {
   ssr: false,
+  loading: () => null,
 });
 
 function AnimatedCounter({
@@ -86,12 +87,35 @@ export default function Hero() {
     }
   };
 
+  // Defer Three.js / HeaderScene until the hero section enters the viewport.
+  // This removes the ~1 MB Three.js chunk from the critical JS bundle.
+  const [showHeaderScene, setShowHeaderScene] = useState(false);
+  const heroRef = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShowHeaderScene(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.15 }
+    );
+
+    if (heroRef.current) {
+      observer.observe(heroRef.current);
+    }
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
-    <section className={styles.hero}>
+    <section className={styles.hero} ref={heroRef}>
       <InteractiveBackground />
       {/* Background 3D Model */}
       <div className="absolute md:inset-0 bottom-0 left-0 right-0 top-[35%] md:top-0 h-[45vh] md:h-full z-0 opacity-30 md:opacity-80 pointer-events-none overflow-hidden">
-        <HeaderScene />
+        {showHeaderScene ? <HeaderScene /> : null}
       </div>
 
 

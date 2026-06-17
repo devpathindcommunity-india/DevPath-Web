@@ -127,21 +127,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     'devpathind.community@gmail.com';
 
   useEffect(() => {
-    if (!firebaseReady) {
-      setUser({
-        uid: 'mock-user-123',
-        email: 'developer@example.com',
-        name: 'Local Developer',
-        photoURL:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
-        role: 'member',
-        points: 120,
-        streak: 5,
-        loginDates: [],
-        achievements: [],
-        followers: [],
-        following: [],
-      });
+    const isE2E = typeof window !== 'undefined' && window.navigator?.webdriver;
+
+    if (!firebaseReady || process.env.NEXT_PUBLIC_E2E_TEST === 'true' || isE2E) {
+      const isMockAuthEnabled =
+        typeof window !== 'undefined' &&
+        window.localStorage.getItem('e2e_mock_auth') === 'true';
+        
+      setUser(
+        isMockAuthEnabled
+          ? {
+              uid: 'mock-user-123',
+              email: 'developer@example.com',
+              name: 'Local Developer',
+              photoURL:
+                'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100',
+              role: 'member',
+              points: 120,
+              streak: 5,
+              loginDates: [],
+              achievements: [],
+              followers: [],
+              following: [],
+            }
+          : null
+      );
       setIsLoading(false);
       return;
     }
