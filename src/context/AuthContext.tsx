@@ -584,8 +584,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const followUser = async (
     targetUserId: string,
-    targetRole: string = 'member',
-    _targetEmail?: string
+    targetRole: string = 'member'
   ) => {
     if (!firebaseReady || !user) return;
     if (user.uid === targetUserId) return; // Cannot follow self
@@ -662,8 +661,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const unfollowUser = async (
     targetUserId: string,
-    targetRole: string = 'member',
-    _targetEmail?: string
+    targetRole: string = 'member'
   ) => {
     if (!firebaseReady || !user) return;
     if (user.email === SUPER_ADMIN_EMAIL) return; // Super Admin Guard
