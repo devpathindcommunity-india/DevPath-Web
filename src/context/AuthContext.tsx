@@ -242,7 +242,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   email: firebaseUser.email,
                   name: firebaseUser.displayName || '',
                   photoURL: firebaseUser.photoURL || '',
-                  role: 'member',
+                  role: 'member' as const,
                   points: 0,
                   streak: 0,
                   level: 0,
@@ -263,7 +263,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     showInCommunity: true,
                   },
                   preferences: {
-                    theme: 'dark',
+                    theme: 'dark' as const,
                   },
                   githubStats: {
                     connected: false,
