@@ -41,15 +41,17 @@
 
 /* Animated Border */
 .navbar::before {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(135deg,
-      rgba(0, 255, 255, .4),
-      rgba(59, 130, 246, .4),
-      rgba(168, 85, 247, .4));
+  background: linear-gradient(
+    135deg,
+    rgba(0, 255, 255, 0.4),
+    rgba(59, 130, 246, 0.4),
+    rgba(168, 85, 247, 0.4)
+  );
   mask:
     linear-gradient(#fff 0 0) content-box,
     linear-gradient(#fff 0 0);
@@ -61,16 +63,18 @@
 
 /* Glow Line */
 .navbar::after {
-  content: "";
+  content: '';
   position: absolute;
   top: 0;
   left: 20%;
   width: 60%;
   height: 1px;
-  background: linear-gradient(90deg,
-      transparent,
-      rgba(0, 255, 255, .8),
-      transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(0, 255, 255, 0.8),
+    transparent
+  );
 }
 
 /* ===========================
@@ -93,11 +97,7 @@
 
   transform-origin: left center;
 
-  background: linear-gradient(90deg,
-      #00f5ff,
-      #3b82f6,
-      #8b5cf6,
-      #ff00ff);
+  background: linear-gradient(90deg, #00f5ff, #3b82f6, #8b5cf6, #ff00ff);
 
   box-shadow:
     0 0 8px #00f5ff,
@@ -138,7 +138,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  box-shadow: 0 0 30px rgba(59, 130, 246, .4);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.4);
 }
 
 .logoText {
@@ -174,28 +174,28 @@
   position: relative;
   padding: 10px 12px;
   border-radius: 12px;
-  color: rgba(255, 255, 255, .7);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   white-space: nowrap;
-  transition: all .25s ease;
+  transition: all 0.25s ease;
 }
 
 .navLink:hover {
   color: white;
-  background: rgba(255, 255, 255, .05);
+  background: rgba(255, 255, 255, 0.05);
   transform: translateY(-1px);
 }
 
 .navLink.active,
-.navLink[aria-current="page"] {
+.navLink[aria-current='page'] {
   color: white;
 }
 
 .navLink.active::after,
-.navLink[aria-current="page"]::after {
-  content: "";
+.navLink[aria-current='page']::after {
+  content: '';
   position: absolute;
   left: 18%;
   right: 18%;
@@ -225,9 +225,9 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, .08);
-  background: rgba(255, 255, 255, .03);
-  color: rgba(255, 255, 255, .8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.8);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -235,14 +235,14 @@
   backdrop-filter: blur(12px);
   text-decoration: none;
   flex-shrink: 0;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .iconButton:hover {
   transform: translateY(-2px);
   color: white;
-  border-color: rgba(59, 130, 246, .4);
-  box-shadow: 0 0 20px rgba(59, 130, 246, .25);
+  border-color: rgba(59, 130, 246, 0.4);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
 }
 
 /* ===========================
@@ -262,46 +262,46 @@
   font-size: 13px;
   font-weight: 700;
   flex-shrink: 0;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 
   /* ── DARK mode state (default – navbar is dark) ── */
-  background: rgba(255, 255, 255, .06);
-  border: 1px solid rgba(255, 255, 255, .14);
-  color: rgba(255, 255, 255, .90);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.9);
   box-shadow: none;
 }
 
 .themeToggle:hover {
   transform: translateY(-1px);
-  background: rgba(255, 255, 255, .10);
-  border-color: rgba(255, 255, 255, .22);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.22);
 }
 
 /* Moon icon tint in dark mode */
 .themeToggle .themeIcon {
   color: #a78bfa;
   /* soft violet — night feel */
-  transition: color .3s ease;
+  transition: color 0.3s ease;
 }
 
 /* ── LIGHT mode state ── */
 :global(.light) .themeToggle,
-:global([data-theme="light"]) .themeToggle {
-  background: rgba(250, 200, 20, .12);
-  border: 1px solid rgba(250, 200, 20, .35);
+:global([data-theme='light']) .themeToggle {
+  background: rgba(250, 200, 20, 0.12);
+  border: 1px solid rgba(250, 200, 20, 0.35);
   color: #92600a;
-  box-shadow: 0 0 12px rgba(250, 180, 0, .18);
+  box-shadow: 0 0 12px rgba(250, 180, 0, 0.18);
 }
 
 :global(.light) .themeToggle:hover,
-:global([data-theme="light"]) .themeToggle:hover {
-  background: rgba(250, 200, 20, .20);
-  box-shadow: 0 0 20px rgba(250, 180, 0, .28);
+:global([data-theme='light']) .themeToggle:hover {
+  background: rgba(250, 200, 20, 0.2);
+  box-shadow: 0 0 20px rgba(250, 180, 0, 0.28);
 }
 
 /* Sun icon tint in light mode */
 :global(.light) .themeToggle .themeIcon,
-:global([data-theme="light"]) .themeToggle .themeIcon {
+:global([data-theme='light']) .themeToggle .themeIcon {
   color: #f59e0b;
 }
 
@@ -317,15 +317,15 @@
   cursor: pointer;
   display: block;
   flex-shrink: 0;
-  border: 2px solid rgba(59, 130, 246, .35);
-  box-shadow: 0 0 20px rgba(59, 130, 246, .25);
+  border: 2px solid rgba(59, 130, 246, 0.35);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
   text-decoration: none;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .profileAvatar:hover {
   transform: scale(1.08) translateY(-2px);
-  box-shadow: 0 0 30px rgba(59, 130, 246, .5);
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.5);
 }
 
 /* ===========================
@@ -338,23 +338,23 @@
   gap: 8px;
   padding: 9px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, .10);
-  background: rgba(255, 255, 255, .04);
-  color: rgba(255, 255, 255, .80);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   flex-shrink: 0;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
 }
 
 .profileButton:hover {
   transform: translateY(-2px);
   color: white;
-  border-color: rgba(59, 130, 246, .4);
-  background: rgba(59, 130, 246, .10);
-  box-shadow: 0 0 20px rgba(59, 130, 246, .25);
+  border-color: rgba(59, 130, 246, 0.4);
+  background: rgba(59, 130, 246, 0.1);
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.25);
 }
 
 /* ===========================
@@ -366,18 +366,18 @@
   width: 40px;
   height: 40px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, .04);
-  border: 1px solid rgba(255, 255, 255, .08);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   color: white;
   cursor: pointer;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: .3s;
+  transition: 0.3s;
 }
 
 .hamburger:hover {
-  background: rgba(255, 255, 255, .10);
+  background: rgba(255, 255, 255, 0.1);
 }
 
 /* ===========================
@@ -387,7 +387,7 @@
 .mobileBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, .65);
+  background: rgba(0, 0, 0, 0.65);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   z-index: 1001;
@@ -415,7 +415,7 @@
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
 
-  border-left: 1px solid rgba(255, 255, 255, .08);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px 0 0 24px;
 
   display: flex;
@@ -424,7 +424,7 @@
 
   z-index: 1002;
 
-  box-shadow: -20px 0 80px rgba(0, 0, 0, .6);
+  box-shadow: -20px 0 80px rgba(0, 0, 0, 0.6);
   overflow-y: auto;
 }
 
@@ -439,7 +439,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .mobileTitle {
@@ -453,19 +453,19 @@
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, .05);
-  border: 1px solid rgba(255, 255, 255, .10);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: white;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: background .25s ease;
+  transition: background 0.25s ease;
 }
 
 .mobileClose:hover {
-  background: rgba(255, 255, 255, .12);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* ===========================
@@ -483,22 +483,24 @@
   align-items: center;
   padding: 13px 16px;
   border-radius: 14px;
-  color: rgba(255, 255, 255, .70);
+  color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-size: 15px;
   font-weight: 600;
-  transition: background .2s ease, color .2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .mobileLink:hover {
-  background: rgba(255, 255, 255, .06);
+  background: rgba(255, 255, 255, 0.06);
   color: white;
 }
 
-.mobileLink[aria-current="page"] {
+.mobileLink[aria-current='page'] {
   color: #00e5ff;
-  background: rgba(0, 229, 255, .08);
-  border: 1px solid rgba(0, 229, 255, .15);
+  background: rgba(0, 229, 255, 0.08);
+  border: 1px solid rgba(0, 229, 255, 0.15);
 }
 
 /* ===========================
@@ -507,7 +509,7 @@
 
 .mobileActions {
   margin-top: auto;
-  border-top: 1px solid rgba(255, 255, 255, .08);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding-top: 16px;
   display: flex;
   flex-direction: column;
@@ -521,21 +523,24 @@
   width: 100%;
   padding: 13px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, .08);
-  background: rgba(255, 255, 255, .03);
-  color: rgba(255, 255, 255, .80);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 15px;
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
   text-align: left;
-  transition: background .25s ease, color .25s ease, border-color .25s ease;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .mobileProfileButton:hover {
-  background: rgba(59, 130, 246, .10);
+  background: rgba(59, 130, 246, 0.1);
   color: white;
-  border-color: rgba(59, 130, 246, .30);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 
 /* Theme row inside mobile drawer */
@@ -545,17 +550,17 @@
   gap: 12px;
   padding: 10px 16px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, .08);
-  background: rgba(255, 255, 255, .03);
-  color: rgba(255, 255, 255, .70);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 15px;
   font-weight: 600;
   cursor: pointer;
-  transition: background .25s ease;
+  transition: background 0.25s ease;
 }
 
 .mobileActionRow:hover {
-  background: rgba(255, 255, 255, .07);
+  background: rgba(255, 255, 255, 0.07);
 }
 
 /* ===========================
@@ -595,7 +600,7 @@
     display: flex;
   }
 
-  .actions>.iconButton {
+  .actions > .iconButton {
     display: none;
   }
 

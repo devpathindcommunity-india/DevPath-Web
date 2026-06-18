@@ -1,0 +1,26 @@
+name: Auto Comment on Assignment
+
+on:
+  issues:
+    types: [assigned]
+
+permissions:
+  issues: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add comment to issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const assignee = context.payload.assignee.login;
+            const message = `Hi @${assignee}! We have officially assigned this issue to you. Please start working on it, and good luck with your PR!\n\n**ETA: 3 days**\nIssue will be assigned to another contributor if failed to do so!`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });
