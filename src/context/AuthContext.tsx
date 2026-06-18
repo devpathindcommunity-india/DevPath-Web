@@ -129,11 +129,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const isE2E = typeof window !== 'undefined' && window.navigator?.webdriver;
 
-    if (!firebaseReady || process.env.NEXT_PUBLIC_E2E_TEST === 'true' || isE2E) {
+    if (
+      !firebaseReady ||
+      process.env.NEXT_PUBLIC_E2E_TEST === 'true' ||
+      isE2E
+    ) {
       const isMockAuthEnabled =
         typeof window !== 'undefined' &&
         window.localStorage.getItem('e2e_mock_auth') === 'true';
-        
+
       setUser(
         isMockAuthEnabled
           ? {

@@ -201,19 +201,23 @@ export default function DevCard({ user }: { user: any }) {
     if (!docId) return;
 
     const docRef = doc(db, collectionName, docId);
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        setRealTimeUser((prev: any) => ({
-          ...prev,
-          ...data,
-          uid: user.uid,
-          role: user.role,
-        }));
+    const unsubscribe = onSnapshot(
+      docRef,
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setRealTimeUser((prev: any) => ({
+            ...prev,
+            ...data,
+            uid: user.uid,
+            role: user.role,
+          }));
+        }
+      },
+      (error) => {
+        console.error('Error listening to profile changes in DevCard:', error);
       }
-    }, (error) => {
-      console.error("Error listening to profile changes in DevCard:", error);
-    });
+    );
 
     return () => unsubscribe();
   }, [user?.uid, user?.role, user?.email]);
@@ -532,7 +536,9 @@ export default function DevCard({ user }: { user: any }) {
               {(realTimeUser?.city || realTimeUser?.state) && (
                 <span className={styles.metaRow}>
                   <MapPin size={10} />
-                  {[realTimeUser.city, realTimeUser.state].filter(Boolean).join(', ')}
+                  {[realTimeUser.city, realTimeUser.state]
+                    .filter(Boolean)
+                    .join(', ')}
                 </span>
               )}
               <span className={styles.metaRow}>
@@ -697,7 +703,9 @@ export default function DevCard({ user }: { user: any }) {
                     : (realTimeUser?.followers?.length ?? 0)}
                 </span>
                 <span className={styles.statLabel}>
-                  {realTimeUser?.githubStats?.connected ? 'GH Stars' : 'Followers'}
+                  {realTimeUser?.githubStats?.connected
+                    ? 'GH Stars'
+                    : 'Followers'}
                 </span>
               </div>
             </motion.div>

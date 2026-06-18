@@ -55,7 +55,8 @@ export default function Navbar() {
       setBookmarkDrawerOpen(false);
     };
     window.addEventListener('close-all-overlays', handleCloseAll);
-    return () => window.removeEventListener('close-all-overlays', handleCloseAll);
+    return () =>
+      window.removeEventListener('close-all-overlays', handleCloseAll);
   }, []);
 
   const { currentStreak } = useMemo(
@@ -150,9 +151,8 @@ export default function Navbar() {
                 );
               })}
             </div>
-            
-            {/* Scroll Progress Line attached to Pill */}
 
+            {/* Scroll Progress Line attached to Pill */}
           </div>
           <motion.div className={styles.progressBar} style={{ scaleX }} />
 

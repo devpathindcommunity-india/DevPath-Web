@@ -1,7 +1,14 @@
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Keyboard, Search, CornerDownLeft, ArrowLeftRight, HelpCircle } from 'lucide-react';
+import {
+  X,
+  Keyboard,
+  Search,
+  CornerDownLeft,
+  ArrowLeftRight,
+  HelpCircle,
+} from 'lucide-react';
 
 interface ShortcutLegendProps {
   isOpen: boolean;
@@ -62,7 +69,10 @@ const SHORTCUT_SECTIONS: ShortcutSection[] = [
   },
 ];
 
-export default function ShortcutLegend({ isOpen, onClose }: ShortcutLegendProps) {
+export default function ShortcutLegend({
+  isOpen,
+  onClose,
+}: ShortcutLegendProps) {
   return (
     <AnimatePresence>
       {isOpen && (
@@ -98,8 +108,12 @@ export default function ShortcutLegend({ isOpen, onClose }: ShortcutLegendProps)
                     <Keyboard size={20} />
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg text-white">Keyboard Shortcuts</h2>
-                    <p className="text-xs text-slate-400">Accessibility & navigation hotkeys</p>
+                    <h2 className="font-bold text-lg text-white">
+                      Keyboard Shortcuts
+                    </h2>
+                    <p className="text-xs text-slate-400">
+                      Accessibility & navigation hotkeys
+                    </p>
                   </div>
                 </div>
                 <button
@@ -129,7 +143,10 @@ export default function ShortcutLegend({ isOpen, onClose }: ShortcutLegendProps)
                           >
                             <div className="flex items-center gap-3">
                               {Icon && (
-                                <Icon size={16} className="text-slate-400 shrink-0" />
+                                <Icon
+                                  size={16}
+                                  className="text-slate-400 shrink-0"
+                                />
                               )}
                               <span className="text-sm text-slate-300 font-medium">
                                 {item.description}
@@ -137,8 +154,15 @@ export default function ShortcutLegend({ isOpen, onClose }: ShortcutLegendProps)
                             </div>
                             <div className="flex items-center gap-1.5 font-mono">
                               {item.keys.map((key, kIdx) => (
-                                <span key={kIdx} className="flex items-center gap-1">
-                                  {kIdx > 0 && <span className="text-xs text-slate-500">+</span>}
+                                <span
+                                  key={kIdx}
+                                  className="flex items-center gap-1"
+                                >
+                                  {kIdx > 0 && (
+                                    <span className="text-xs text-slate-500">
+                                      +
+                                    </span>
+                                  )}
                                   <kbd className="px-2 py-1 min-w-[24px] text-center bg-slate-900 text-xs font-bold text-slate-200 border border-slate-800 rounded-lg shadow-[0_2px_0_0_rgba(255,255,255,0.05)] select-none">
                                     {key}
                                   </kbd>
@@ -155,7 +179,13 @@ export default function ShortcutLegend({ isOpen, onClose }: ShortcutLegendProps)
 
               {/* Footer */}
               <div className="p-4 border-t border-slate-900 bg-slate-900/10 flex items-center justify-between text-xs text-slate-500 font-mono">
-                <span>Press <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">?</kbd> to toggle</span>
+                <span>
+                  Press{' '}
+                  <kbd className="px-1.5 py-0.5 bg-slate-900 border border-slate-800 rounded text-slate-400">
+                    ?
+                  </kbd>{' '}
+                  to toggle
+                </span>
                 <span className="text-emerald-500 font-semibold flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
                   Master Mode Active
