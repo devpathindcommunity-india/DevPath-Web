@@ -131,7 +131,45 @@ export default function SkillTreeVisualizer({ initialPath }: { initialPath?: "Fr
     window.addEventListener('close-all-overlays', handleCloseAll);
     return () => window.removeEventListener('close-all-overlays', handleCloseAll);
   }, []);
+  if (loading) {
+    return (
+      <div className={`${styles.container} w-full flex flex-col items-center bg-[#0f1115] p-6 rounded-xl border border-slate-800`} aria-busy="true" aria-label="Loading roadmap">
+        <div className="w-full max-w-[800px] mb-8 bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 animate-pulse">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <div className="h-5 w-48 rounded bg-slate-700/50" />
+              <div className="h-3 w-64 rounded bg-slate-700/40" />
+            </div>
+            <div className="flex flex-col sm:items-end gap-2">
+              <div className="h-4 w-32 rounded bg-slate-700/50" />
+              <div className="h-3 w-24 rounded bg-slate-700/40" />
+            </div>
+          </div>
+          <div className="mt-4 h-2.5 w-full rounded-full bg-slate-700/40" />
+        </div>
 
+        <div className={styles.controls}>
+          <div className="h-9 w-32 rounded-lg bg-slate-700/40 animate-pulse" />
+          <div className="h-9 w-32 rounded-lg bg-slate-700/40 animate-pulse" />
+        </div>
+
+        <div className={styles.treeArea}>
+          {pathsData[activePath].map((node) => (
+            <div
+              key={node.id}
+              className={`${styles.node} animate-pulse`}
+              style={{
+                left: `${node.x}%`,
+                top: `${node.y}%`,
+                borderColor: '#30363d',
+                background: 'rgba(48,54,61,0.4)',
+              }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
   return (
     <div className={`${styles.container} w-full flex flex-col items-center bg-[#0f1115] p-6 rounded-xl border border-slate-800`}>
       
