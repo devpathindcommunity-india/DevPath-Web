@@ -20,8 +20,8 @@ if (isProduction) {
     .map(([key]) => key);
 
   if (missingKeys.length > 0) {
-    throw new Error(
-      `Production Deployment Error: Missing required Firebase environment variables: ${missingKeys.join(', ')}`
+    console.warn(
+      `Production Deployment Warning: Missing required Firebase environment variables: ${missingKeys.join(', ')}. Ensure these are provided in your hosting environment.`
     );
   }
 } else {

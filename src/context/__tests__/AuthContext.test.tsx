@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../AuthContext';
+import * as firebaseLib from '@/lib/firebase';
 
 const mockSignIn = jest.fn();
 const mockSignOut = jest.fn();
@@ -9,8 +10,8 @@ const mockSignOut = jest.fn();
 jest.mock('firebase/auth', () => ({
   getAuth: () => ({}),
   onAuthStateChanged: jest.fn(() => jest.fn()),
-  signInWithEmailAndPassword: (...args: any[]) => mockSignIn(...args),
-  signOut: (...args: any[]) => mockSignOut(...args),
+  signInWithEmailAndPassword: (...args: unknown[]) => mockSignIn(...args),
+  signOut: (...args: unknown[]) => mockSignOut(...args),
   setPersistence: jest.fn(() => Promise.resolve()),
   browserLocalPersistence: {},
 }));
@@ -25,18 +26,20 @@ jest.mock('firebase/firestore', () => ({
   doc: jest.fn(() => ({})),
   getDoc: jest.fn(() => Promise.resolve({ exists: () => false })),
   setDoc: jest.fn(() => Promise.resolve()),
-  onSnapshot: jest.fn((_: any, cb: any) => {
-    cb({ exists: () => false });
-    return jest.fn();
-  }),
+  onSnapshot: jest.fn(
+    (_ref: unknown, cb: (snapshot: { exists: () => boolean }) => void) => {
+      cb({ exists: () => false });
+      return jest.fn();
+    }
+  ),
   writeBatch: jest.fn(() => ({
     commit: jest.fn(),
     set: jest.fn(),
     update: jest.fn(),
   })),
   increment: jest.fn((n: number) => n),
-  arrayUnion: jest.fn((...args: any[]) => args),
-  arrayRemove: jest.fn((...args: any[]) => args),
+  arrayUnion: jest.fn((...args: unknown[]) => args),
+  arrayRemove: jest.fn((...args: unknown[]) => args),
   getFirestore: jest.fn(() => ({})),
 }));
 
@@ -50,7 +53,11 @@ jest.mock('@/lib/streakUtils', () => ({
 }));
 
 jest.mock('@/lib/points', () => ({
-  POINTS: { DAILY_LOGIN: 1, WEEKLY_STREAK_BONUS: 20 },
+  POINTS: {
+    DAILY_LOGIN: 1,
+    WEEKLY_STREAK_BONUS: 20,
+    STREAK_BONUS_PER_DAY: 1,
+  },
 }));
 
 function TestHarness() {
@@ -59,8 +66,8 @@ function TestHarness() {
   const handleLogin = async () => {
     try {
       await login('test@test.com', 'pass123');
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e));
     }
   };
   return (
@@ -150,8 +157,7 @@ describe('AuthContext', () => {
     });
 
     it('throws readable error when Firebase is unavailable', async () => {
-      const firebaseLib = require('@/lib/firebase');
-      firebaseLib.firebaseAvailable = false;
+      jest.replaceProperty(firebaseLib, 'firebaseAvailable', false);
 
       let error: string | null = null;
       function TestPage() {
@@ -161,8 +167,8 @@ describe('AuthContext', () => {
             onClick={async () => {
               try {
                 await login('a@b.com', 'p');
-              } catch (e: any) {
-                error = e.message;
+              } catch (e: unknown) {
+                error = e instanceof Error ? e.message : String(e);
               }
             }}
           >
@@ -183,7 +189,7 @@ describe('AuthContext', () => {
         'Firebase is not configured. Login is unavailable in local UI-only mode.'
       );
 
-      firebaseLib.firebaseAvailable = true;
+      jest.replaceProperty(firebaseLib, 'firebaseAvailable', true);
     });
   });
 });

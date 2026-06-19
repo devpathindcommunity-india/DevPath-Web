@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 test('homepage has correct title and essential sections', async ({ page }) => {
-  await page.goto('/');
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
 
   // Check title
   await expect(page).toHaveTitle(/DevPath/i);

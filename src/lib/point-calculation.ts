@@ -1,10 +1,28 @@
-import { POINTS } from './points';
+import { BADGE_RARITY_POINTS, POINTS } from './points';
+import type { BadgeRarity } from './points';
 
 export const SOCIAL_BADGES = [
   'social-github',
   'social-linkedin',
   'social-instagram',
 ];
+
+export const BADGE_RARITY_BY_ID: Record<string, BadgeRarity> = {
+  'profile-perfect': 'uncommon',
+  storyteller: 'common',
+  'face-of-community': 'common',
+  'local-hero': 'common',
+  'connector-social': 'rare',
+  'social-github': 'rare',
+  'social-linkedin': 'rare',
+  'social-instagram': 'rare',
+  'builder-1': 'uncommon',
+  'builder-3': 'rare',
+  'builder-5': 'epic',
+  'builder-10': 'legendary',
+  'streak-7': 'rare',
+  'early-adopter': 'legendary',
+};
 
 export interface UserData {
   uid: string;
@@ -31,6 +49,12 @@ export interface ProjectData {
  * Social badges (GitHub, LinkedIn, Instagram) award more XP than standard badges.
  */
 export function getBadgeXp(badgeId: string): number {
+  const rarity = BADGE_RARITY_BY_ID[badgeId];
+
+  if (rarity) {
+    return BADGE_RARITY_POINTS[rarity];
+  }
+
   return SOCIAL_BADGES.includes(badgeId)
     ? POINTS.SOCIAL_BADGE_EARNED
     : POINTS.BADGE_EARNED;

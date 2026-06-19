@@ -349,3 +349,20 @@ a {
 .markdown-body [width] {
   width: auto;
 }
+
+/*
+   ACCESSIBILITY: Respect prefers-reduced-motion OS preference
+   WCAG 2.3.3 — Animation from Interactions
+   This is a CSS-level safety net that works even before JS loads,
+   catching Tailwind animate classes and any CSS transitions.
+   */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

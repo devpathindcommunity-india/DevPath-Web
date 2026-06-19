@@ -1,10 +1,10 @@
-const AppError = require("../utils/AppError");
+const AppError = require('../utils/AppError');
 const {
   KNOWLEDGE_BASE,
   CONSTRAINTS,
   TONE_AND_GUIDELINES,
   FALLBACK_RESPONSES,
-} = require("../config/chatbotConfig");
+} = require('../config/chatbotConfig');
 
 const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
 const DEFAULT_PRIMARY_MODEL = 'openai/gpt-oss-120b:free';
@@ -31,10 +31,10 @@ const getSystemPrompt = () => {
 ${JSON.stringify(KNOWLEDGE_BASE, null, 2)}
 
 # CONSTRAINTS:
-${CONSTRAINTS.map((c, idx) => `${idx + 1}. ${c}`).join("\n")}
+${CONSTRAINTS.map((c, idx) => `${idx + 1}. ${c}`).join('\n')}
 
 # TONE & GUIDELINES:
-${TONE_AND_GUIDELINES.map((g, idx) => `${idx + 1}. ${g}`).join("\n")}
+${TONE_AND_GUIDELINES.map((g, idx) => `${idx + 1}. ${g}`).join('\n')}
 
 # FALLBACK RESPONSES (USE EXACTLY OR ADAPT GRACEFULLY WHEN A QUERY IS OUT-OF-SCOPE OR UNKNOWN):
 - Out of scope fallback: "${FALLBACK_RESPONSES.outOfScope}"
@@ -45,7 +45,7 @@ Important: If the user query is not related to the DevPath platform, its feature
 
 const buildMessages = (history, message) => {
   const systemMessage = {
-    role: "system",
+    role: 'system',
     content: getSystemPrompt(),
   };
 
