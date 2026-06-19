@@ -1,9 +1,27 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FileText, Video, Code, Terminal, Book, Star, Calendar, Brain, Briefcase, Users, Building2, MessageSquare, Map, GraduationCap, Layout, Rocket, Database } from 'lucide-react';
+import {
+  FileText,
+  Video,
+  Code,
+  Terminal,
+  Book,
+  Star,
+  Calendar,
+  Brain,
+  Briefcase,
+  Users,
+  Building2,
+  MessageSquare,
+  Map,
+  GraduationCap,
+  Layout,
+  Rocket,
+  Database,
+} from 'lucide-react';
 import { PremiumCard } from '../ui/PremiumCard';
 import styles from './Resources.module.css';
 import { placementResources } from '@/data/placementResources';
@@ -14,660 +32,735 @@ import { DeveloperMindsetModal } from '../resources/DeveloperMindsetModal';
 // --- FIREBASE IMPORTS ---
 import { collection, getDocs } from 'firebase/firestore';
 // TODO: Replace with your actual Firebase config import path
-import { db } from '@/lib/firebase'; 
+import { db } from '@/lib/firebase';
 // TODO: Replace with your actual Auth hook/context
-import { useAuth } from '@/context/AuthContext'; 
+import { useAuth } from '@/context/AuthContext';
 
 interface ResourceItem {
-    title: string;
-    description: string;
-    icon: any;
-    color: string;
-    rating: number;
-    status: string;
-    isDetailed?: boolean;
-    isMindsetModal?: boolean;
-    details?: any;
+  title: string;
+  description: string;
+  icon: any;
+  color: string;
+  rating: number;
+  status: string;
+  isDetailed?: boolean;
+  isMindsetModal?: boolean;
+  details?: any;
 }
 
 // --- Original Data (Restored) ---
 const originalResources: Record<string, ResourceItem[]> = {
-    internships: [
-        {
-            title: "Internship Calendar",
-            description: "Track upcoming internship opportunities, application deadlines, and eligibility criteria for top tech companies.",
-            icon: <Calendar size={28} />,
-            color: "#8b5cf6",
-            rating: 5.0,
-            status: 'active'
-        },
-        {
-            title: "Resume Review",
-            description: "Get your resume reviewed by industry experts and seniors to increase your shortlist chances.",
-            icon: <FileText size={28} />,
-            color: "#ec4899",
-            rating: 4.8,
-            status: 'coming_soon'
-        }
-    ],
-    learning: [
-        {
-            title: "Developer Mindset & Engineering Thinking",
-            description: "A comprehensive core guide on problem-solving, debugging, system design, and the true engineering mindset.",
-            icon: <Brain size={28} />,
-            color: "#6366f1",
-            rating: 5.0,
-            status: 'active',
-            isMindsetModal: true
-        },
-        {
-            title: "Documentation Hub",
-            description: "Comprehensive guides and API references for all supported technologies and frameworks.",
-            icon: <FileText size={28} />,
-            color: "#3b82f6",
-            rating: 4.9,
-            status: 'coming_soon'
-        },
-        {
-            title: "Video Tutorials",
-            description: "High-quality video courses covering everything from basics to advanced system design.",
-            icon: <Video size={28} />,
-            color: "#ef4444",
-            rating: 4.8,
-            status: 'coming_soon'
-        },
-        {
-            title: "Cheat Sheets",
-            description: "Quick reference cards for syntax, commands, and best practices across 20+ languages.",
-            icon: <Terminal size={28} />,
-            color: "#f59e0b",
-            rating: 4.7,
-            status: 'coming_soon'
-        }
-    ],
-    practice: [
-        {
-            title: "Coding Challenges",
-            description: "Practice your skills with daily algorithmic problems and real-world coding tasks.",
-            icon: <Code size={28} />,
-            color: "#10b981",
-            rating: 4.9,
-            status: 'coming_soon'
-        },
-        {
-            title: "Interview Prep",
-            description: "Mock interviews, system design questions, and behavioral guides to land your dream job.",
-            icon: <Book size={28} />,
-            color: "#8b5cf6",
-            rating: 5.0,
-            status: 'coming_soon'
-        },
-        {
-            title: "Open Source",
-            description: "Curated list of beginner-friendly open source projects to start contributing to today.",
-            icon: <Star size={28} />,
-            color: "#ec4899",
-            rating: 4.8,
-            status: 'coming_soon'
-        }
-    ],
-    roadmaps: [
-        {
-            title: "Ultimate ML & AI Roadmap 2025",
-            description: "Placement Focused Roadmap: From Foundations to Model Deployment & Productizing.",
-            icon: <Brain size={28} />,
-            color: "#8b5cf6", // Purple for AI
-            rating: 5.0,
-            status: 'active',
-            isDetailed: true,
-            details: {
-                title: "Ultimate ML & AI Roadmap 2025",
-                phases: [
-                    {
-                        title: "Phase 1: Foundations",
-                        duration: "1-2 months",
-                        icon: <Code size={20} />,
-                        items: [
-                            {
-                                subtitle: "Programming",
-                                points: [
-                                    "Deepen expertise in Python. Explore advanced usage (list comprehensions, decorators, context managers).",
-                                    "Optional: Familiarize with C/Java/R if required by specialized solutions or corporate integrations."
-                                ]
-                            },
-                            {
-                                subtitle: "Version Control",
-                                points: [
-                                    "Master Git (branching, rebasing, pull requests, resolving conflicts).",
-                                    "Use GitHub for both project hosting and collaboration."
-                                ]
-                            },
-                            {
-                                subtitle: "Data Structures & Algorithms",
-                                points: [
-                                    "Refine problem-solving using DSA (Leetcode, HackerRank) with a focus on interview patterns, optimizing code for hackathons or coding rounds."
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        title: "Phase 2: Data & Math Core",
-                        duration: "1-2 months",
-                        icon: <Database size={20} />,
-                        items: [
-                            {
-                                subtitle: "SQL",
-                                points: [
-                                    "Gain fluency in database queries, joins, aggregation, filtering, and data pipeline basics.",
-                                    "MySQL / SQLite / PostgreSQL."
-                                ]
-                            },
-                            {
-                                subtitle: "Maths",
-                                points: [
-                                    "Linear Algebra: Vectors, matrices, eigenvalues—use Khan Academy or 3Blue1Brown visual explanations.",
-                                    "Statistics: Basic concepts (mean, median, standard deviation, distributions, Bayes' theorem).",
-                                    "Probability & Calculus: Required for understanding model working and optimization. Apply concepts directly via code (NumPy, custom functions)."
-                                ]
-                            },
-                            {
-                                subtitle: "Data Handling & Visualization",
-                                points: [
-                                    "Master Pandas (dataframes, filtering, groupby, joins) and NumPy (array manipulations).",
-                                    "Use Matplotlib/Seaborn for visualization - build mini-projects for EDA (Exploratory Data Analysis)."
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        title: "Phase 3: Machine Learning Fundamentals",
-                        duration: "2-3 months",
-                        icon: <Brain size={20} />,
-                        items: [
-                            {
-                                subtitle: "Core ML Algorithms",
-                                points: [
-                                    "Linear regression, logistic regression, decision trees, SVMs, clustering (KMeans, PCA, etc.)."
-                                ]
-                            },
-                            {
-                                subtitle: "Hands-On Projects",
-                                points: [
-                                    "Apply each concept on datasets from Kaggle/UCI (start with Titanic, Housing Prices)."
-                                ]
-                            },
-                            {
-                                subtitle: "Frameworks",
-                                points: [
-                                    "Focus on scikit-learn for classical ML; learn model evaluation metrics (accuracy, F1, ROC).",
-                                    "Implement pipelines, cross-validation, and hyperparameter tuning."
-                                ]
-                            },
-                            {
-                                subtitle: "Project Tips",
-                                points: [
-                                    "Document every project clearly on GitHub; include code, README, data source, and results."
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        title: "Phase 4: Advanced AI/ML Topics",
-                        duration: "3-4 months",
-                        icon: <Rocket size={20} />,
-                        items: [
-                            {
-                                subtitle: "Deep Learning",
-                                points: [
-                                    "Learn fundamentals using TensorFlow and PyTorch.",
-                                    "Neural Networks, CNNs, RNNs: Build projects: image classification, sentiment analysis, object detection."
-                                ]
-                            },
-                            {
-                                subtitle: "NLP (Natural Language Processing)",
-                                points: [
-                                    "Tokenization, embeddings, basic LLMs, transfer learning (HuggingFace/Transformers), language model fine-tuning.",
-                                    "Explore GenAI, Prompt Engineering, RAG (retrieval-augmented generation), and agentic workflows (LangChain, Sarvam AI if available)."
-                                ]
-                            },
-                            {
-                                subtitle: "Computer Vision",
-                                points: [
-                                    "OpenCV, image augmentation, using pretrained networks for detection/segmentation."
-                                ]
-                            },
-                            {
-                                subtitle: "MLOps (Optional but recommended)",
-                                points: [
-                                    "Model versioning, model packaging, and basics of CI/CD for ML. Tools: MLflow, DVC, and experiment tracking."
-                                ]
-                            }
-                        ]
-                    },
-                    {
-                        title: "Phase 5: Model Deployment & Productizing",
-                        duration: "1-2 months",
-                        icon: <Briefcase size={20} />,
-                        items: [
-                            {
-                                subtitle: "APIs",
-                                points: [
-                                    "Build RESTful APIs using Flask, FastAPI, or Django; expose ML models as services."
-                                ]
-                            },
-                            {
-                                subtitle: "UI/UX Integration",
-                                points: [
-                                    "Connect APIs to simple React/Figma-based UIs or integrate with WhatsApp/Telegram bots for demoing."
-                                ]
-                            },
-                            {
-                                subtitle: "Containerization & Cloud",
-                                points: [
-                                    "Learn Docker basics; deploy on Heroku, Vercel, or Indian providers (GCP Free Tier by default, consider AWS/GCP for hackathons)."
-                                ]
-                            },
-                            {
-                                subtitle: "Monitoring",
-                                points: [
-                                    "Basic logging and error handling for production models."
-                                ]
-                            }
-                        ]
-                    }
-                ]
-            }
-        },
-        {
-            title: "Frontend Roadmap",
-            description: "Step-by-step guide to becoming a modern Frontend Developer (HTML, CSS, React, Next.js).",
-            icon: <Layout size={28} />,
-            color: "#6366f1",
-            rating: 4.9,
-            status: 'coming_soon'
-        },
-        {
-            title: "Backend Roadmap",
-            description: "Master server-side programming, databases, and API design (Node.js, Python, Go).",
-            icon: <Terminal size={28} />,
-            color: "#10b981",
-            rating: 4.9,
-            status: 'coming_soon'
-        },
-        {
-            title: "DevOps Roadmap",
-            description: "Learn CI/CD, Docker, Kubernetes, and Cloud Infrastructure.",
-            icon: <Briefcase size={28} />,
-            color: "#f97316",
-            rating: 4.8,
-            status: 'coming_soon'
-        }
-    ]
+  internships: [
+    {
+      title: 'Internship Calendar',
+      description:
+        'Track upcoming internship opportunities, application deadlines, and eligibility criteria for top tech companies.',
+      icon: <Calendar size={28} />,
+      color: '#8b5cf6',
+      rating: 5.0,
+      status: 'active',
+    },
+    {
+      title: 'Resume Review',
+      description:
+        'Get your resume reviewed by industry experts and seniors to increase your shortlist chances.',
+      icon: <FileText size={28} />,
+      color: '#ec4899',
+      rating: 4.8,
+      status: 'coming_soon',
+    },
+  ],
+  learning: [
+    {
+      title: 'Developer Mindset & Engineering Thinking',
+      description:
+        'A comprehensive core guide on problem-solving, debugging, system design, and the true engineering mindset.',
+      icon: <Brain size={28} />,
+      color: '#6366f1',
+      rating: 5.0,
+      status: 'active',
+      isMindsetModal: true,
+    },
+    {
+      title: 'Documentation Hub',
+      description:
+        'Comprehensive guides and API references for all supported technologies and frameworks.',
+      icon: <FileText size={28} />,
+      color: '#3b82f6',
+      rating: 4.9,
+      status: 'coming_soon',
+    },
+    {
+      title: 'Video Tutorials',
+      description:
+        'High-quality video courses covering everything from basics to advanced system design.',
+      icon: <Video size={28} />,
+      color: '#ef4444',
+      rating: 4.8,
+      status: 'coming_soon',
+    },
+    {
+      title: 'Cheat Sheets',
+      description:
+        'Quick reference cards for syntax, commands, and best practices across 20+ languages.',
+      icon: <Terminal size={28} />,
+      color: '#f59e0b',
+      rating: 4.7,
+      status: 'coming_soon',
+    },
+  ],
+  practice: [
+    {
+      title: 'Coding Challenges',
+      description:
+        'Practice your skills with daily algorithmic problems and real-world coding tasks.',
+      icon: <Code size={28} />,
+      color: '#10b981',
+      rating: 4.9,
+      status: 'coming_soon',
+    },
+    {
+      title: 'Interview Prep',
+      description:
+        'Mock interviews, system design questions, and behavioral guides to land your dream job.',
+      icon: <Book size={28} />,
+      color: '#8b5cf6',
+      rating: 5.0,
+      status: 'coming_soon',
+    },
+    {
+      title: 'Open Source',
+      description:
+        'Curated list of beginner-friendly open source projects to start contributing to today.',
+      icon: <Star size={28} />,
+      color: '#ec4899',
+      rating: 4.8,
+      status: 'coming_soon',
+    },
+  ],
+  roadmaps: [
+    {
+      title: 'Ultimate ML & AI Roadmap 2025',
+      description:
+        'Placement Focused Roadmap: From Foundations to Model Deployment & Productizing.',
+      icon: <Brain size={28} />,
+      color: '#8b5cf6', // Purple for AI
+      rating: 5.0,
+      status: 'active',
+      isDetailed: true,
+      details: {
+        title: 'Ultimate ML & AI Roadmap 2025',
+        phases: [
+          {
+            title: 'Phase 1: Foundations',
+            duration: '1-2 months',
+            icon: <Code size={20} />,
+            items: [
+              {
+                subtitle: 'Programming',
+                points: [
+                  'Deepen expertise in Python. Explore advanced usage (list comprehensions, decorators, context managers).',
+                  'Optional: Familiarize with C/Java/R if required by specialized solutions or corporate integrations.',
+                ],
+              },
+              {
+                subtitle: 'Version Control',
+                points: [
+                  'Master Git (branching, rebasing, pull requests, resolving conflicts).',
+                  'Use GitHub for both project hosting and collaboration.',
+                ],
+              },
+              {
+                subtitle: 'Data Structures & Algorithms',
+                points: [
+                  'Refine problem-solving using DSA (Leetcode, HackerRank) with a focus on interview patterns, optimizing code for hackathons or coding rounds.',
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Phase 2: Data & Math Core',
+            duration: '1-2 months',
+            icon: <Database size={20} />,
+            items: [
+              {
+                subtitle: 'SQL',
+                points: [
+                  'Gain fluency in database queries, joins, aggregation, filtering, and data pipeline basics.',
+                  'MySQL / SQLite / PostgreSQL.',
+                ],
+              },
+              {
+                subtitle: 'Maths',
+                points: [
+                  'Linear Algebra: Vectors, matrices, eigenvalues—use Khan Academy or 3Blue1Brown visual explanations.',
+                  "Statistics: Basic concepts (mean, median, standard deviation, distributions, Bayes' theorem).",
+                  'Probability & Calculus: Required for understanding model working and optimization. Apply concepts directly via code (NumPy, custom functions).',
+                ],
+              },
+              {
+                subtitle: 'Data Handling & Visualization',
+                points: [
+                  'Master Pandas (dataframes, filtering, groupby, joins) and NumPy (array manipulations).',
+                  'Use Matplotlib/Seaborn for visualization - build mini-projects for EDA (Exploratory Data Analysis).',
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Phase 3: Machine Learning Fundamentals',
+            duration: '2-3 months',
+            icon: <Brain size={20} />,
+            items: [
+              {
+                subtitle: 'Core ML Algorithms',
+                points: [
+                  'Linear regression, logistic regression, decision trees, SVMs, clustering (KMeans, PCA, etc.).',
+                ],
+              },
+              {
+                subtitle: 'Hands-On Projects',
+                points: [
+                  'Apply each concept on datasets from Kaggle/UCI (start with Titanic, Housing Prices).',
+                ],
+              },
+              {
+                subtitle: 'Frameworks',
+                points: [
+                  'Focus on scikit-learn for classical ML; learn model evaluation metrics (accuracy, F1, ROC).',
+                  'Implement pipelines, cross-validation, and hyperparameter tuning.',
+                ],
+              },
+              {
+                subtitle: 'Project Tips',
+                points: [
+                  'Document every project clearly on GitHub; include code, README, data source, and results.',
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Phase 4: Advanced AI/ML Topics',
+            duration: '3-4 months',
+            icon: <Rocket size={20} />,
+            items: [
+              {
+                subtitle: 'Deep Learning',
+                points: [
+                  'Learn fundamentals using TensorFlow and PyTorch.',
+                  'Neural Networks, CNNs, RNNs: Build projects: image classification, sentiment analysis, object detection.',
+                ],
+              },
+              {
+                subtitle: 'NLP (Natural Language Processing)',
+                points: [
+                  'Tokenization, embeddings, basic LLMs, transfer learning (HuggingFace/Transformers), language model fine-tuning.',
+                  'Explore GenAI, Prompt Engineering, RAG (retrieval-augmented generation), and agentic workflows (LangChain, Sarvam AI if available).',
+                ],
+              },
+              {
+                subtitle: 'Computer Vision',
+                points: [
+                  'OpenCV, image augmentation, using pretrained networks for detection/segmentation.',
+                ],
+              },
+              {
+                subtitle: 'MLOps (Optional but recommended)',
+                points: [
+                  'Model versioning, model packaging, and basics of CI/CD for ML. Tools: MLflow, DVC, and experiment tracking.',
+                ],
+              },
+            ],
+          },
+          {
+            title: 'Phase 5: Model Deployment & Productizing',
+            duration: '1-2 months',
+            icon: <Briefcase size={20} />,
+            items: [
+              {
+                subtitle: 'APIs',
+                points: [
+                  'Build RESTful APIs using Flask, FastAPI, or Django; expose ML models as services.',
+                ],
+              },
+              {
+                subtitle: 'UI/UX Integration',
+                points: [
+                  'Connect APIs to simple React/Figma-based UIs or integrate with WhatsApp/Telegram bots for demoing.',
+                ],
+              },
+              {
+                subtitle: 'Containerization & Cloud',
+                points: [
+                  'Learn Docker basics; deploy on Heroku, Vercel, or Indian providers (GCP Free Tier by default, consider AWS/GCP for hackathons).',
+                ],
+              },
+              {
+                subtitle: 'Monitoring',
+                points: [
+                  'Basic logging and error handling for production models.',
+                ],
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      title: 'Frontend Roadmap',
+      description:
+        'Step-by-step guide to becoming a modern Frontend Developer (HTML, CSS, React, Next.js).',
+      icon: <Layout size={28} />,
+      color: '#6366f1',
+      rating: 4.9,
+      status: 'coming_soon',
+    },
+    {
+      title: 'Backend Roadmap',
+      description:
+        'Master server-side programming, databases, and API design (Node.js, Python, Go).',
+      icon: <Terminal size={28} />,
+      color: '#10b981',
+      rating: 4.9,
+      status: 'coming_soon',
+    },
+    {
+      title: 'DevOps Roadmap',
+      description: 'Learn CI/CD, Docker, Kubernetes, and Cloud Infrastructure.',
+      icon: <Briefcase size={28} />,
+      color: '#f97316',
+      rating: 4.8,
+      status: 'coming_soon',
+    },
+  ],
 };
 
 // --- AI Prompts Config ---
-const aiPromptsCategories = ['aptitude', 'technical', 'resume', 'hr', 'networking', 'companies'];
-const categoryConfig: Record<string, { icon: any, color: string }> = {
-    aptitude: { icon: <Brain size={28} />, color: "#8b5cf6" },
-    technical: { icon: <Code size={28} />, color: "#3b82f6" },
-    resume: { icon: <FileText size={28} />, color: "#ef4444" },
-    hr: { icon: <Users size={28} />, color: "#f59e0b" },
-    networking: { icon: <Briefcase size={28} />, color: "#10b981" },
-    companies: { icon: <Building2 size={28} />, color: "#ec4899" },
+const aiPromptsCategories = [
+  'aptitude',
+  'technical',
+  'resume',
+  'hr',
+  'networking',
+  'companies',
+];
+const categoryConfig: Record<string, { icon: any; color: string }> = {
+  aptitude: { icon: <Brain size={28} />, color: '#8b5cf6' },
+  technical: { icon: <Code size={28} />, color: '#3b82f6' },
+  resume: { icon: <FileText size={28} />, color: '#ef4444' },
+  hr: { icon: <Users size={28} />, color: '#f59e0b' },
+  networking: { icon: <Briefcase size={28} />, color: '#10b981' },
+  companies: { icon: <Building2 size={28} />, color: '#ec4899' },
 };
 
 export default function ResourcesTabs() {
-    // Custom Auth Fallback
-    const { user } = useAuth() || { user: { uid: 'test-user-id' } }; 
+  // Custom Auth Fallback
+  const { user } = useAuth() || { user: { uid: 'test-user-id' } };
 
-    // 5 Main Sections - Reordered: Roadmaps First
-    const mainSections = [
-        { id: 'roadmaps', label: 'Roadmaps', icon: <Map size={18} /> },
-        { id: 'ai-prompts', label: 'AI Prompts', icon: <Brain size={18} /> },
-        { id: 'internships', label: 'Internships', icon: <Briefcase size={18} /> },
-        { id: 'learning', label: 'Learning', icon: <GraduationCap size={18} /> },
-        { id: 'practice', label: 'Practice', icon: <Code size={18} /> },
-    ];
+  // 5 Main Sections - Reordered: Roadmaps First
+  const mainSections = [
+    { id: 'roadmaps', label: 'Roadmaps', icon: <Map size={18} /> },
+    { id: 'ai-prompts', label: 'AI Prompts', icon: <Brain size={18} /> },
+    { id: 'internships', label: 'Internships', icon: <Briefcase size={18} /> },
+    { id: 'learning', label: 'Learning', icon: <GraduationCap size={18} /> },
+    { id: 'practice', label: 'Practice', icon: <Code size={18} /> },
+  ];
 
-    const [activeMainTab, setActiveMainTab] = useState('roadmaps');
-    useEffect(() => {
+  const [activeMainTab, setActiveMainTab] = useState('roadmaps');
+  useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
-}, [activeMainTab]);
-    const [activeSubTab, setActiveSubTab] = useState(aiPromptsCategories[0]);
-    const [isInternshipModalOpen, setIsInternshipModalOpen] = useState(false);
-    const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
-    const [isMindsetModalOpen, setIsMindsetModalOpen] = useState(false);
-    const [activeRoadmap, setActiveRoadmap] = useState<any>(null);
+  }, [activeMainTab]);
+  const [activeSubTab, setActiveSubTab] = useState(aiPromptsCategories[0]);
+  const [isInternshipModalOpen, setIsInternshipModalOpen] = useState(false);
+  const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
+  const [isMindsetModalOpen, setIsMindsetModalOpen] = useState(false);
+  const [activeRoadmap, setActiveRoadmap] = useState<any>(null);
 
-    // Progress State mapping roadmap IDs to completion percentages
-    const [progressData, setProgressData] = useState<Record<string, number>>({});
-    const ITEMS_PER_PAGE = 2;
-    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-    const [isLoading, setIsLoading] = useState(false);
-    const observerRef = useRef<HTMLDivElement>(null);
-    const searchParams = useSearchParams();
+  // Progress State mapping roadmap IDs to completion percentages
+  const [progressData, setProgressData] = useState<Record<string, number>>({});
+  const ITEMS_PER_PAGE = 2;
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+  const [isLoading, setIsLoading] = useState(false);
+  const observerRef = useRef<HTMLDivElement>(null);
+  const searchParams = useSearchParams();
 
-    useEffect(() => {
+  useEffect(() => {
     if (activeMainTab !== 'roadmaps') return;
-    
+
     const observer = new IntersectionObserver(
-        (entries) => {
-            if (entries[0].isIntersecting && !isLoading) {
-                const roadmaps = originalResources.roadmaps;
-                if (visibleCount < roadmaps.length) {
-                    setIsLoading(true);
-                    setTimeout(() => {
-                        setVisibleCount(prev => Math.min(prev + ITEMS_PER_PAGE, roadmaps.length));
-                        setIsLoading(false);
-                    }, 800);
-                }
-            }
-        },
-        { threshold: 1.0 }
+      (entries) => {
+        if (entries[0].isIntersecting && !isLoading) {
+          const roadmaps = originalResources.roadmaps;
+          if (visibleCount < roadmaps.length) {
+            setIsLoading(true);
+            setTimeout(() => {
+              setVisibleCount((prev) =>
+                Math.min(prev + ITEMS_PER_PAGE, roadmaps.length)
+              );
+              setIsLoading(false);
+            }, 800);
+          }
+        }
+      },
+      { threshold: 1.0 }
     );
 
     if (observerRef.current) observer.observe(observerRef.current);
     return () => observer.disconnect();
-}, [visibleCount, isLoading, activeMainTab]);
+  }, [visibleCount, isLoading, activeMainTab]);
 
-    useEffect(() => {
-        const openParam = searchParams.get('open');
-        if (openParam === 'internship-calendar') {
-            setActiveMainTab('internships');
-            setIsInternshipModalOpen(true);
-        } else if (openParam === 'developer-mindset') {
-            setActiveMainTab('learning');
-            setIsMindsetModalOpen(true);
-        } else if (openParam === 'roadmap') {
-            const titleParam = searchParams.get('title');
-            if (titleParam) {
-                const found = originalResources.roadmaps.find(r => r.title === titleParam);
-                if (found && found.isDetailed) {
-                    setActiveMainTab('roadmaps');
-                    setActiveRoadmap(found.details);
-                    setIsRoadmapModalOpen(true);
-                }
-            }
+  useEffect(() => {
+    const openParam = searchParams.get('open');
+    if (openParam === 'internship-calendar') {
+      setActiveMainTab('internships');
+      setIsInternshipModalOpen(true);
+    } else if (openParam === 'developer-mindset') {
+      setActiveMainTab('learning');
+      setIsMindsetModalOpen(true);
+    } else if (openParam === 'roadmap') {
+      const titleParam = searchParams.get('title');
+      if (titleParam) {
+        const found = originalResources.roadmaps.find(
+          (r) => r.title === titleParam
+        );
+        if (found && found.isDetailed) {
+          setActiveMainTab('roadmaps');
+          setActiveRoadmap(found.details);
+          setIsRoadmapModalOpen(true);
         }
-    }, [searchParams]);
+      }
+    }
+  }, [searchParams]);
 
-    // Fetch user progress across all roadmaps
-    useEffect(() => {
-        const fetchProgress = async () => {
-            if (!user) return;
-            try {
-                const progressRef = collection(db, 'members', user.uid, 'progress');
-                const snapshot = await getDocs(progressRef);
-                const progressMap: Record<string, number> = {};
-                
-                snapshot.forEach((docSnap) => {
-                    const data = docSnap.data();
-                    const roadmapId = docSnap.id;
-                    
-                    // Find total phases from originalData to calculate %
-                    const matchedRoadmap = originalResources.roadmaps.find(r => 
-                        (r.details?.id || r.title.toLowerCase().replace(/\s+/g, '-')) === roadmapId
-                    );
-                    
-                    if (matchedRoadmap && matchedRoadmap.details?.phases) {
-                        const totalPhases = matchedRoadmap.details.phases.length;
-                        const completed = data.completedPhases?.length || 0;
-                        const percentage = Math.round((completed / totalPhases) * 100);
-                        progressMap[roadmapId] = Math.min(percentage, 100);
-                    }
-                });
-                setProgressData(progressMap);
-            } catch (err) {
-                console.error("Error fetching roadmap progress", err);
-            }
-        };
+  // Fetch user progress across all roadmaps
+  useEffect(() => {
+    const fetchProgress = async () => {
+      if (!user) return;
+      try {
+        const progressRef = collection(db, 'members', user.uid, 'progress');
+        const snapshot = await getDocs(progressRef);
+        const progressMap: Record<string, number> = {};
 
-        // Fetch when user changes, or whenever the Roadmap Modal is closed
-        if (!isRoadmapModalOpen) {
-            fetchProgress();
-        }
-    }, [user, isRoadmapModalOpen]); 
+        snapshot.forEach((docSnap) => {
+          const data = docSnap.data();
+          const roadmapId = docSnap.id;
 
-    const handleAccessNow = (resource: any) => {
-        if (resource.title === "Internship Calendar") {
-            setIsInternshipModalOpen(true);
-        } else if (resource.isDetailed) {
-            setActiveRoadmap(resource.details);
-            setIsRoadmapModalOpen(true);
-        } else if (resource.isMindsetModal) {
-            setIsMindsetModalOpen(true);
-        }
+          // Find total phases from originalData to calculate %
+          const matchedRoadmap = originalResources.roadmaps.find(
+            (r) =>
+              (r.details?.id || r.title.toLowerCase().replace(/\s+/g, '-')) ===
+              roadmapId
+          );
+
+          if (matchedRoadmap && matchedRoadmap.details?.phases) {
+            const totalPhases = matchedRoadmap.details.phases.length;
+            const completed = data.completedPhases?.length || 0;
+            const percentage = Math.round((completed / totalPhases) * 100);
+            progressMap[roadmapId] = Math.min(percentage, 100);
+          }
+        });
+        setProgressData(progressMap);
+      } catch (err) {
+        console.error('Error fetching roadmap progress', err);
+      }
     };
 
-    return (
-        <div className="w-full max-w-7xl mx-auto">
-            <InternshipCalendarModal
-                isOpen={isInternshipModalOpen}
-                onClose={() => setIsInternshipModalOpen(false)}
-            />
+    // Fetch when user changes, or whenever the Roadmap Modal is closed
+    if (!isRoadmapModalOpen) {
+      fetchProgress();
+    }
+  }, [user, isRoadmapModalOpen]);
 
-            <RoadmapModal
-                isOpen={isRoadmapModalOpen}
-                onClose={() => setIsRoadmapModalOpen(false)}
-                roadmap={activeRoadmap}
-            />
+  const handleAccessNow = (resource: any) => {
+    if (resource.title === 'Internship Calendar') {
+      setIsInternshipModalOpen(true);
+    } else if (resource.isDetailed) {
+      setActiveRoadmap(resource.details);
+      setIsRoadmapModalOpen(true);
+    } else if (resource.isMindsetModal) {
+      setIsMindsetModalOpen(true);
+    }
+  };
 
-            <DeveloperMindsetModal
-                isOpen={isMindsetModalOpen}
-                onClose={() => setIsMindsetModalOpen(false)}
-            />
-            {/* Main Navigation (Top Level) */}
-            <div className="flex flex-wrap justify-center gap-4 mb-10">
-                {mainSections.map((section) => {
-                    const isActive = activeMainTab === section.id;
-                    return (
-                        <button aria-label="Action button" 
-                            key={section.id}
-                            onClick={() => setActiveMainTab(section.id)}
-                            className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all border ${isActive
-                                ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25'
-                                : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-blue-400 dark:hover:text-white'
-                                }`}
+  return (
+    <div className="w-full max-w-7xl mx-auto">
+      <InternshipCalendarModal
+        isOpen={isInternshipModalOpen}
+        onClose={() => setIsInternshipModalOpen(false)}
+      />
+
+      <RoadmapModal
+        isOpen={isRoadmapModalOpen}
+        onClose={() => setIsRoadmapModalOpen(false)}
+        roadmap={activeRoadmap}
+      />
+
+      <DeveloperMindsetModal
+        isOpen={isMindsetModalOpen}
+        onClose={() => setIsMindsetModalOpen(false)}
+      />
+      {/* Main Navigation (Top Level) */}
+      <div className="flex flex-wrap justify-center gap-4 mb-10">
+        {mainSections.map((section) => {
+          const isActive = activeMainTab === section.id;
+          return (
+            <button
+              aria-label="Action button"
+              key={section.id}
+              onClick={() => setActiveMainTab(section.id)}
+              className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all border ${
+                isActive
+                  ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25'
+                  : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-blue-400 dark:hover:text-white'
+              }`}
+            >
+              {section.icon}
+              {section.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Content Area */}
+      <div className="min-h-[400px]">
+        {activeMainTab === 'ai-prompts' ? (
+          // --- AI Prompts Section (With Sub-tabs) ---
+          <div>
+            {/* Sub Navigation */}
+            <div className="flex flex-wrap justify-center gap-2 mb-8 bg-card/30 backdrop-blur-sm p-2 rounded-2xl border border-white/5 max-w-4xl mx-auto">
+              {aiPromptsCategories.map((catKey) => {
+                const catData =
+                  placementResources.placementPrep.categories[
+                    catKey as keyof typeof placementResources.placementPrep.categories
+                  ];
+                const isActive = activeSubTab === catKey;
+
+                return (
+                  <button
+                    aria-label="Action button"
+                    key={catKey}
+                    onClick={() => setActiveSubTab(catKey)}
+                    className={`px-4 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${
+                      isActive
+                        ? 'text-white shadow-md'
+                        : 'text-muted-foreground hover:text-blue-400 dark:hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.div
+                        layoutId="activeSubTabBg"
+                        className="absolute inset-0 bg-primary/80"
+                        initial={false}
+                        transition={{
+                          type: 'spring',
+                          bounce: 0.2,
+                          duration: 0.6,
+                        }}
+                      />
+                    )}
+                    <span className="relative z-10">{catData.title}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Prompts Grid */}
+            <div className={styles.grid}>
+              <AnimatePresence mode="wait">
+                {placementResources.placementPrep.categories[
+                  activeSubTab as keyof typeof placementResources.placementPrep.categories
+                ].prompts.map((prompt, index) => (
+                  <motion.div
+                    key={prompt.title}
+                    initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -20, scale: 0.95 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                    className="h-full"
+                  >
+                    <PremiumCard
+                      className={`${styles.resourceCard} h-full group flex flex-col`}
+                    >
+                      <div className="flex items-start justify-between mb-4">
+                        <div
+                          className={styles.iconWrapper}
+                          style={{
+                            background:
+                              categoryConfig[activeSubTab]?.color || '#8b5cf6',
+                          }}
                         >
-                            {section.icon}
-                            {section.label}
+                          {categoryConfig[activeSubTab]?.icon || (
+                            <Star size={28} />
+                          )}
+                        </div>
+                        <div className="bg-white/5 px-3 py-1 rounded-full text-xs font-medium text-muted-foreground border border-white/10">
+                          Prompt
+                        </div>
+                      </div>
+
+                      <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
+                        {prompt.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm mb-6 flex-grow">
+                        {prompt.desc}
+                      </p>
+
+                      <div className="mt-auto pt-4 border-t border-white/5">
+                        <div className="bg-black/40 rounded-lg p-3 text-xs text-slate-300 font-mono border border-white/5 relative group/code">
+                          <div className="absolute right-2 top-2 opacity-0 group-hover/code:opacity-100 transition-opacity">
+                            <span className="text-[10px] bg-primary/20 text-primary px-2 py-1 rounded">
+                              Copy
+                            </span>
+                          </div>
+                          {prompt.example}
+                        </div>
+                        <button
+                          aria-label="Action button"
+                          className="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-lg transition-colors border border-white/10 hover:border-white/20 flex items-center justify-center gap-2 group/btn"
+                        >
+                          Try this Prompt
+                          <Terminal
+                            size={14}
+                            className="group-hover/btn:text-primary transition-colors"
+                          />
                         </button>
-                    );
-                })}
+                      </div>
+                    </PremiumCard>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
             </div>
+          </div>
+        ) : (
+          // --- Other Sections (Standard Cards & Roadmaps) ---
+          <div className={styles.grid}>
+            <AnimatePresence mode="popLayout">
+              {(activeMainTab === 'roadmaps'
+                ? originalResources.roadmaps.slice(0, visibleCount)
+                : originalResources[
+                    activeMainTab as keyof typeof originalResources
+                  ]
+              )?.map((resource, index) => {
+                // Calculate Progress for Roadmaps
+                const roadmapId =
+                  resource.details?.id ||
+                  resource.title.toLowerCase().replace(/\s+/g, '-');
+                const progress = progressData[roadmapId] || 0;
 
-            {/* Content Area */}
-            <div className="min-h-[400px]">
-                {activeMainTab === 'ai-prompts' ? (
-                    // --- AI Prompts Section (With Sub-tabs) ---
-                    <div>
-                        {/* Sub Navigation */}
-                        <div className="flex flex-wrap justify-center gap-2 mb-8 bg-card/30 backdrop-blur-sm p-2 rounded-2xl border border-white/5 max-w-4xl mx-auto">
-                            {aiPromptsCategories.map((catKey) => {
-                                const catData = placementResources.placementPrep.categories[catKey as keyof typeof placementResources.placementPrep.categories];
-                                const isActive = activeSubTab === catKey;
-
-                                return (
-                                    <button aria-label="Action button" 
-                                        key={catKey}
-                                        onClick={() => setActiveSubTab(catKey)}
-                                        className={`px-4 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${isActive
-                                            ? 'text-white shadow-md'
-                                            : 'text-muted-foreground hover:text-blue-400 dark:hover:text-white hover:bg-white/5'
-                                            }`}
-                                    >
-                                        {isActive && (
-                                            <motion.div
-                                                layoutId="activeSubTabBg"
-                                                className="absolute inset-0 bg-primary/80"
-                                                initial={false}
-                                                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                                            />
-                                        )}
-                                        <span className="relative z-10">{catData.title}</span>
-                                    </button>
-                                );
-                            })}
+                return (
+                  <motion.div
+                    key={resource.title}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    className="h-full"
+                  >
+                    <PremiumCard
+                      className={`${styles.resourceCard} h-full group flex flex-col relative overflow-hidden`}
+                      bookmarkItem={
+                        activeMainTab === 'roadmaps' &&
+                        resource.status !== 'coming_soon'
+                          ? {
+                              id: resource.title,
+                              title: resource.title,
+                              description: resource.description,
+                              type: 'roadmap',
+                              color: resource.color,
+                              path: `/resources?open=roadmap&title=${encodeURIComponent(resource.title)}`,
+                            }
+                          : undefined
+                      }
+                    >
+                      {/* Coming Soon Overlay */}
+                      {resource.status === 'coming_soon' && (
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
+                          <div className="bg-black/80 border border-white/10 px-4 py-2 rounded-full text-sm font-medium text-white/80 shadow-xl transform -rotate-12">
+                            Not yet Added
+                          </div>
                         </div>
+                      )}
 
-                        {/* Prompts Grid */}
-                        <div className={styles.grid}>
-                            <AnimatePresence mode="wait">
-                                {placementResources.placementPrep.categories[activeSubTab as keyof typeof placementResources.placementPrep.categories].prompts.map((prompt, index) => (
-                                    <motion.div
-                                        key={prompt.title}
-                                        initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                                        exit={{ opacity: 0, y: -20, scale: 0.95 }}
-                                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                                        className="h-full"
-                                    >
-                                        <PremiumCard className={`${styles.resourceCard} h-full group flex flex-col`}>
-                                            <div className="flex items-start justify-between mb-4">
-                                                <div
-                                                    className={styles.iconWrapper}
-                                                    style={{ background: categoryConfig[activeSubTab]?.color || "#8b5cf6" }}
-                                                >
-                                                    {categoryConfig[activeSubTab]?.icon || <Star size={28} />}
-                                                </div>
-                                                <div className="bg-white/5 px-3 py-1 rounded-full text-xs font-medium text-muted-foreground border border-white/10">
-                                                    Prompt
-                                                </div>
-                                            </div>
+                      <div
+                        className={styles.iconWrapper}
+                        style={{ background: resource.color }}
+                      >
+                        {resource.icon}
+                      </div>
 
-                                            <h3 className="text-xl font-bold text-white mb-3 group-hover:text-primary transition-colors">
-                                                {prompt.title}
-                                            </h3>
-                                            <p className="text-muted-foreground text-sm mb-6 flex-grow">
-                                                {prompt.desc}
-                                            </p>
+                      <h3 className={styles.resourceTitle}>{resource.title}</h3>
+                      <p className={styles.resourceDesc}>
+                        {resource.description}
+                      </p>
 
-                                            <div className="mt-auto pt-4 border-t border-white/5">
-                                                <div className="bg-black/40 rounded-lg p-3 text-xs text-slate-300 font-mono border border-white/5 relative group/code">
-                                                    <div className="absolute right-2 top-2 opacity-0 group-hover/code:opacity-100 transition-opacity">
-                                                        <span className="text-[10px] bg-primary/20 text-primary px-2 py-1 rounded">Copy</span>
-                                                    </div>
-                                                    {prompt.example}
-                                                </div>
-                                                <button aria-label="Action button"  className="w-full mt-4 py-2 bg-white/5 hover:bg-white/10 text-white text-sm font-medium rounded-lg transition-colors border border-white/10 hover:border-white/20 flex items-center justify-center gap-2 group/btn">
-                                                    Try this Prompt
-                                                    <Terminal size={14} className="group-hover/btn:text-primary transition-colors" />
-                                                </button>
-                                            </div>
-                                        </PremiumCard>
-                                    </motion.div>
-                                ))}
-                            </AnimatePresence>
-                        </div>
-                    </div>
-                ) : (
-                    // --- Other Sections (Standard Cards & Roadmaps) ---
-                    <div className={styles.grid}>
-                        <AnimatePresence mode="popLayout">
-                            {(activeMainTab === 'roadmaps' 
-                            ? originalResources.roadmaps.slice(0, visibleCount) 
-                            : originalResources[activeMainTab as keyof typeof originalResources]
-                            )?.map((resource, index) => {
-                                // Calculate Progress for Roadmaps
-                                const roadmapId = resource.details?.id || resource.title.toLowerCase().replace(/\s+/g, '-');
-                                const progress = progressData[roadmapId] || 0;
-                                
-                                return (
-                                    <motion.div
-                                        key={resource.title}
-                                        initial={{ opacity: 0, y: 20 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        exit={{ opacity: 0, y: -20 }}
-                                        transition={{ duration: 0.3, delay: index * 0.1 }}
-                                        className="h-full"
-                                    >
-                                        <PremiumCard 
-                                            className={`${styles.resourceCard} h-full group flex flex-col relative overflow-hidden`}
-                                            bookmarkItem={
-                                                activeMainTab === 'roadmaps' && resource.status !== 'coming_soon'
-                                                    ? {
-                                                          id: resource.title,
-                                                          title: resource.title,
-                                                          description: resource.description,
-                                                          type: 'roadmap',
-                                                          color: resource.color,
-                                                          path: `/resources?open=roadmap&title=${encodeURIComponent(resource.title)}`
-                                                      }
-                                                    : undefined
-                                            }
-                                        >
-                                            {/* Coming Soon Overlay */}
-                                            {resource.status === 'coming_soon' && (
-                                                <div className="absolute inset-0 bg-black/60 backdrop-blur-[2px] z-20 flex items-center justify-center">
-                                                    <div className="bg-black/80 border border-white/10 px-4 py-2 rounded-full text-sm font-medium text-white/80 shadow-xl transform -rotate-12">
-                                                        Not yet Added
-                                                    </div>
-                                                </div>
-                                            )}
-
-                                            <div
-                                                className={styles.iconWrapper}
-                                                style={{ background: resource.color }}
-                                            >
-                                                {resource.icon}
-                                            </div>
-
-                                            <h3 className={styles.resourceTitle}>{resource.title}</h3>
-                                            <p className={styles.resourceDesc}>{resource.description}</p>
-                                            
-                                            <div className="mt-auto">
-                                                {/* Progress Bar (Only visible if progress > 0 and it's an active roadmap) */}
-                                                {activeMainTab === 'roadmaps' && resource.status !== 'coming_soon' && progress > 0 && (
-                                                    <div className="mb-4">
-                                                        <div className="flex justify-between text-xs text-muted-foreground mb-1 font-medium">
-                                                            <span>Course Progress</span>
-                                                            <span className="text-primary">{progress}%</span>
-                                                        </div>
-                                                        <div className="w-full h-[6px] bg-muted/30 rounded-full overflow-hidden border border-white/5">
-                                                            <motion.div 
-                                                                initial={{ width: 0 }}
-                                                                animate={{ width: `${progress}%` }}
-                                                                transition={{ duration: 1, ease: "easeOut" }}
-                                                                className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.5)]"
-                                                            />
-                                                        </div>
-                                                    </div>
-                                                )}
-
-                                                <div className={styles.footer}>
-                                                    <div className={styles.rating}>
-                                                        <Star size={16} fill="currentColor" />
-                                                        {resource.rating}
-                                                    </div>
-                                                    <button aria-label="Action button" 
-                                                        className={`${styles.action} ${resource.status === 'coming_soon' ? 'opacity-50 cursor-not-allowed' : ''}`}
-                                                        onClick={() => resource.status !== 'coming_soon' && handleAccessNow(resource)}
-                                                        disabled={resource.status === 'coming_soon'}
-                                                    >
-                                                        {resource.isDetailed ? (progress > 0 ? "Resume Learning" : "View Roadmap") : "Access Now"}
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        </PremiumCard>
-                                    </motion.div>
-                                );
-                            })}
-                        </AnimatePresence>
-                        
-                        {/* Infinite Scroll Observer */}
-                        {activeMainTab === 'roadmaps' && (
-                            <div ref={observerRef} className="w-full py-4 flex justify-center">
-                                {isLoading && (
-                                    <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                                        <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                        Loading more...
-                                    </div>
-                                )}
+                      <div className="mt-auto">
+                        {/* Progress Bar (Only visible if progress > 0 and it's an active roadmap) */}
+                        {activeMainTab === 'roadmaps' &&
+                          resource.status !== 'coming_soon' &&
+                          progress > 0 && (
+                            <div className="mb-4">
+                              <div className="flex justify-between text-xs text-muted-foreground mb-1 font-medium">
+                                <span>Course Progress</span>
+                                <span className="text-primary">
+                                  {progress}%
+                                </span>
+                              </div>
+                              <div className="w-full h-[6px] bg-muted/30 rounded-full overflow-hidden border border-white/5">
+                                <motion.div
+                                  initial={{ width: 0 }}
+                                  animate={{ width: `${progress}%` }}
+                                  transition={{ duration: 1, ease: 'easeOut' }}
+                                  className="h-full bg-gradient-to-r from-primary to-purple-500 rounded-full shadow-[0_0_10px_rgba(139,92,246,0.5)]"
+                                />
+                              </div>
                             </div>
-                        )}
-                    </div>
+                          )}
+
+                        <div className={styles.footer}>
+                          <div className={styles.rating}>
+                            <Star size={16} fill="currentColor" />
+                            {resource.rating}
+                          </div>
+                          <button
+                            aria-label="Action button"
+                            className={`${styles.action} ${resource.status === 'coming_soon' ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            onClick={() =>
+                              resource.status !== 'coming_soon' &&
+                              handleAccessNow(resource)
+                            }
+                            disabled={resource.status === 'coming_soon'}
+                          >
+                            {resource.isDetailed
+                              ? progress > 0
+                                ? 'Resume Learning'
+                                : 'View Roadmap'
+                              : 'Access Now'}
+                          </button>
+                        </div>
+                      </div>
+                    </PremiumCard>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+
+            {/* Infinite Scroll Observer */}
+            {activeMainTab === 'roadmaps' && (
+              <div
+                ref={observerRef}
+                className="w-full py-4 flex justify-center"
+              >
+                {isLoading && (
+                  <div className="flex items-center gap-2 text-muted-foreground text-sm">
+                    <div className="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                    Loading more...
+                  </div>
                 )}
-            </div>
-        </div>
-    );
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

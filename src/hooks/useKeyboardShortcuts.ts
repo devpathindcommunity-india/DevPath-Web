@@ -91,9 +91,13 @@ export function useKeyboardShortcuts(customShortcuts?: ShortcutConfig) {
       }
 
       // 2. Default Global Mappings (runs if no custom handler matched the combo)
-      
+
       // Ctrl+K / Cmd+K -> Toggle Search
-      if (matchesCombo('ctrl+k', e) || matchesCombo('meta+k', e) || matchesCombo('cmd+k', e)) {
+      if (
+        matchesCombo('ctrl+k', e) ||
+        matchesCombo('meta+k', e) ||
+        matchesCombo('cmd+k', e)
+      ) {
         e.preventDefault();
         setSearchOpen(!isSearchOpen);
         return;

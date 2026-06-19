@@ -26,9 +26,12 @@ jobs:
             // Post a welcome comment
             const message = `Welcome to DevPath Community's Official Repository! 🎉 Thank you for bringing this up and starting your contributions to our project. \n\nPlease do star ⭐ the repo and keep growing in your Open Source Journey! 🚀\n\n@${context.actor}, @Aditya948351 or @devpathindcommunity-india will review this and assign you this issue ASAP by checking if it is really needed for the website.`;
             
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: message
-            });
+            // Only comment if the creator is not the repository owner
+            if (context.actor !== 'Aditya948351') {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: message
+              });
+            }

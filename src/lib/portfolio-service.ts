@@ -46,14 +46,19 @@ export async function getPortfolioByUserId(
 export async function getPublicProfileByUsername(
   username: string
 ): Promise<UserPortfolioProfile | null> {
-  const q = query(
-    profilesCol(),
-    where('username', '==', username),
-    where('isPublic', '==', true)
-  );
-  const snap = await getDocs(q);
-  if (snap.empty) return null;
-  return fromFirestore(snap.docs[0].data());
+  try {
+    const q = query(
+      profilesCol(),
+      where('username', '==', username),
+      where('isPublic', '==', true)
+    );
+    const snap = await getDocs(q);
+    if (snap.empty) return null;
+    return fromFirestore(snap.docs[0].data());
+  } catch (error) {
+    console.warn(`[Build Warning] Failed to fetch profile ${username}:`, error);
+    return null;
+  }
 }
 
 // ─── Write ───────────────────────────────────────────────────────────────────

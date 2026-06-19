@@ -69,7 +69,7 @@ export function NotificationDropdown() {
   }, [isOpen, closePanel]);
 
   useEffect(() => {
-    if (!user) {
+    if (!user || !db) {
       let cancelled = false;
       window.queueMicrotask(() => {
         if (cancelled) return;
@@ -109,7 +109,7 @@ export function NotificationDropdown() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = async (id: string) => {
-    if (!user) return;
+    if (!user || !db) return;
     // Optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n.id === id ? { ...n, read: true } : n))
@@ -124,7 +124,7 @@ export function NotificationDropdown() {
   };
 
   const markAllAsRead = async () => {
-    if (!user) return;
+    if (!user || !db) return;
     // Optimistic update
     setNotifications((prev) => prev.map((n) => ({ ...n, read: true })));
     try {

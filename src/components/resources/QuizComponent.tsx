@@ -1,5 +1,5 @@
 import { useEffect, useReducer, useRef } from 'react';
-import confetti from 'canvas-confetti';
+
 import {
   Trophy,
   Zap,
@@ -188,7 +188,12 @@ export default function QuizComponent({
     }, 1200);
   };
 
-  const triggerConfetti = () => {
+  const triggerConfetti = async () => {
+    // Dynamically import canvas-confetti only when the user achieves a perfect
+    // score. This keeps the library out of the initial JavaScript bundle,
+    // reducing page-load weight for all users.
+    const confetti = (await import('canvas-confetti')).default;
+
     const duration = 3000;
     const animationEnd = Date.now() + duration;
     const defaults = {

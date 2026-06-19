@@ -38,7 +38,7 @@ export default function NotFoundView() {
               aria-label="Go back to home"
               variant="primary"
               icon={<Home className="w-5 h-5" />}
-              className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl"
+              className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
               Back to Safety
             </Button>
@@ -48,7 +48,7 @@ export default function NotFoundView() {
               aria-label="Explore courses"
               variant="secondary"
               icon={<Map className="w-5 h-5" />}
-              className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl border-white/20 hover:bg-white/5"
+              className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl border-white/20 hover:bg-white/5 transition-all duration-300 hover:scale-105 hover:shadow-xl"
             >
               Explore Courses
             </Button>

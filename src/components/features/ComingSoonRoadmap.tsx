@@ -9,7 +9,10 @@ interface ComingSoonRoadmapProps {
   techDetails: string;
 }
 
-export default function ComingSoonRoadmap({ title, techDetails }: ComingSoonRoadmapProps) {
+export default function ComingSoonRoadmap({
+  title,
+  techDetails,
+}: ComingSoonRoadmapProps) {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -32,7 +35,10 @@ export default function ComingSoonRoadmap({ title, techDetails }: ComingSoonRoad
           href="/paths"
           className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group"
         >
-          <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft
+            size={16}
+            className="group-hover:-translate-x-1 transition-transform"
+          />
           <span>Back to Learning Paths</span>
         </Link>
 
@@ -51,24 +57,37 @@ export default function ComingSoonRoadmap({ title, techDetails }: ComingSoonRoad
                   {title}
                 </h1>
                 <p className="text-sm text-slate-400 leading-relaxed">
-                  We are currently crafting a comprehensive curriculum for <strong className="text-slate-200">{title}</strong>. This roadmap will outline step-by-step topics, milestones, and guided project recommendations.
+                  We are currently crafting a comprehensive curriculum for{' '}
+                  <strong className="text-slate-200">{title}</strong>. This
+                  roadmap will outline step-by-step topics, milestones, and
+                  guided project recommendations.
                 </p>
               </div>
 
               {/* Stack Preview */}
               <div className="p-4 bg-slate-900/30 border border-slate-900 rounded-xl space-y-1.5">
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">Curriculum Highlights</span>
-                <p className="text-sm text-emerald-400 font-semibold">{techDetails}</p>
+                <span className="text-xs font-bold text-slate-400 uppercase tracking-widest font-mono">
+                  Curriculum Highlights
+                </span>
+                <p className="text-sm text-emerald-400 font-semibold">
+                  {techDetails}
+                </p>
               </div>
 
               {/* Form */}
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-1">
-                  <label htmlFor="email" className="text-xs font-semibold text-slate-400">
+                  <label
+                    htmlFor="email"
+                    className="text-xs font-semibold text-slate-400"
+                  >
                     Get notified when this roadmap launches
                   </label>
                   <div className="relative">
-                    <Mail size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <Mail
+                      size={18}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+                    />
                     <input
                       id="email"
                       type="email"
@@ -95,9 +114,15 @@ export default function ComingSoonRoadmap({ title, techDetails }: ComingSoonRoad
                 ✨
               </div>
               <div className="space-y-2">
-                <h3 className="text-2xl font-bold text-white">You&apos;re on the list!</h3>
+                <h3 className="text-2xl font-bold text-white">
+                  You&apos;re on the list!
+                </h3>
                 <p className="text-sm text-slate-400 max-w-sm mx-auto">
-                  Thank you! We have registered your email <strong className="text-slate-200">{email}</strong>. We will reach out as soon as the <strong className="text-slate-200">{title}</strong> learning path is published.
+                  Thank you! We have registered your email{' '}
+                  <strong className="text-slate-200">{email}</strong>. We will
+                  reach out as soon as the{' '}
+                  <strong className="text-slate-200">{title}</strong> learning
+                  path is published.
                 </p>
               </div>
               <button

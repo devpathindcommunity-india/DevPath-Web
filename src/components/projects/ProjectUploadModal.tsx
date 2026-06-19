@@ -19,6 +19,8 @@ import {
   doc,
   serverTimestamp,
   increment,
+  getDoc,
+  arrayUnion,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { POINTS } from '@/lib/points';
@@ -82,6 +84,16 @@ const POPULAR_SKILLS = [
   'Data Science',
 ];
 
+interface ProjectFormData {
+  id?: string;
+  title?: string;
+  description?: string;
+  websiteUrl?: string;
+  skills?: string[];
+  screenshots?: string[];
+  videoUrl?: string;
+}
+
 interface ProjectUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -89,14 +101,13 @@ interface ProjectUploadModalProps {
   userEmail?: string | null;
   userName: string;
   onSuccess: () => void;
-  initialData?: any; // Project data for editing
+  initialData?: ProjectFormData;
 }
 
 export default function ProjectUploadModal({
   isOpen,
   onClose,
   userId,
-  userEmail,
   userName,
   onSuccess,
   initialData,
@@ -220,23 +231,35 @@ export default function ProjectUploadModal({
         const memberRef = doc(db, 'members', userId);
         const leaderboardRef = doc(db, 'leaderboard', userId);
         const today = new Date().toISOString().split('T')[0];
+        const memberSnap = await getDoc(memberRef);
+        const achievements = memberSnap.exists()
+          ? memberSnap.data().achievements || []
+          : [];
+        const shouldAwardFirstProject = !achievements.includes(
+          'first_project_upload'
+        );
 
         batch.set(rootRef, newProjectData);
         batch.set(subRef, newProjectData);
         // XP award is part of the same atomic batch — it only lands if both
         // project writes succeed.
-        batch.update(memberRef, { points: increment(POINTS.CREATE_PROJECT) });
-        batch.set(
-          leaderboardRef,
-          {
-            uid: userId,
-            name: userName,
-            points: increment(POINTS.CREATE_PROJECT),
-            role: 'member',
-            lastActive: today,
-          },
-          { merge: true }
-        );
+        if (shouldAwardFirstProject) {
+          batch.update(memberRef, {
+            achievements: arrayUnion('first_project_upload'),
+            points: increment(POINTS.FIRST_PROJECT_UPLOAD),
+          });
+          batch.set(
+            leaderboardRef,
+            {
+              uid: userId,
+              name: userName,
+              points: increment(POINTS.FIRST_PROJECT_UPLOAD),
+              role: 'member',
+              lastActive: today,
+            },
+            { merge: true }
+          );
+        }
       }
 
       await batch.commit();
