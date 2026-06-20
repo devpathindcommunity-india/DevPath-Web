@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "node ./node_modules/next/dist/bin/next dev --webpack",
-    "build": "node ./node_modules/next/dist/bin/next build",
+    "build": "node ./node_modules/next/dist/bin/next build --webpack",
     "start": "node ./node_modules/next/dist/bin/next start",
     "lint": "eslint",
     "format:check": "prettier --check .",
@@ -49,6 +49,7 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
+    "@ducanh2912/next-pwa": "^10.2.9",
     "@playwright/test": "^1.40.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
@@ -61,15 +62,15 @@
     "@types/react-dom": "^19",
     "@types/three": "^0.184.1",
     "autoprefixer": "^10.4.22",
-    "babel-jest": "^25.0.0",
+    "babel-jest": "^30.4.1",
     "babel-plugin-react-compiler": "1.0.0",
     "clsx": "^2.1.1",
     "cross-env": "^10.1.0",
     "dotenv": "^17.2.3",
-    "eslint": "^9",
+    "eslint": "^9.39.4",
     "eslint-config-next": "16.0.10",
     "firebase-tools": "^13.27.0",
-    "jest": "^25.0.0",
+    "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
     "postcss": "^8.5.10",
     "postcss-nesting": "^13.0.2",
@@ -78,6 +79,7 @@
     "tailwindcss": "^3.4.17",
     "tailwindcss-animate": "^1.0.7",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "webpack": "^5.107.2"
   }
 }

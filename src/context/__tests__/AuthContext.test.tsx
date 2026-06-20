@@ -2,10 +2,16 @@ import '@testing-library/jest-dom';
 import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import { AuthProvider, useAuth } from '../AuthContext';
-import * as firebaseLib from '@/lib/firebase';
 
 const mockSignIn = jest.fn();
 const mockSignOut = jest.fn();
+
+const firebaseMock = {
+  auth: {},
+  db: {},
+  firebaseAvailable: true,
+  firebaseConfig: {},
+};
 
 jest.mock('firebase/auth', () => ({
   getAuth: () => ({}),
@@ -17,9 +23,18 @@ jest.mock('firebase/auth', () => ({
 }));
 
 jest.mock('@/lib/firebase', () => ({
-  auth: {},
-  db: {},
-  firebaseAvailable: true,
+  get auth() {
+    return firebaseMock.auth;
+  },
+  get db() {
+    return firebaseMock.db;
+  },
+  get firebaseAvailable() {
+    return firebaseMock.firebaseAvailable;
+  },
+  get firebaseConfig() {
+    return firebaseMock.firebaseConfig;
+  },
 }));
 
 jest.mock('firebase/firestore', () => ({
@@ -157,7 +172,7 @@ describe('AuthContext', () => {
     });
 
     it('throws readable error when Firebase is unavailable', async () => {
-      jest.replaceProperty(firebaseLib, 'firebaseAvailable', false);
+      firebaseMock.firebaseAvailable = false;
 
       let error: string | null = null;
       function TestPage() {
@@ -189,7 +204,7 @@ describe('AuthContext', () => {
         'Firebase is not configured. Login is unavailable in local UI-only mode.'
       );
 
-      jest.replaceProperty(firebaseLib, 'firebaseAvailable', true);
+      firebaseMock.firebaseAvailable = true;
     });
   });
 });

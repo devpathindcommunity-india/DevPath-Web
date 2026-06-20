@@ -1,7 +1,8 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
+import { createFirestoreWithOfflineSupport } from '@/lib/firestore-offline';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -61,7 +62,7 @@ if (!app) {
 // `app` may be null when Firebase isn't configured; in that case we provide
 // a minimal cast to satisfy TypeScript while keeping runtime behavior safe.
 const db: Firestore = app
-  ? (getFirestore(app) as Firestore)
+  ? createFirestoreWithOfflineSupport(app)
   : (null as unknown as Firestore);
 const auth: Auth = app ? (getAuth(app) as Auth) : ({} as Auth);
 const firebaseAvailable = Boolean(app);
