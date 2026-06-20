@@ -9,6 +9,8 @@ import { searchArticles } from '@/utils/wikiSearch';
 import { wikiSearchIndex } from '@/data/wikiSearchIndex';
 import styles from './SearchModal.module.css';
 
+import { useDebounce } from '@/hooks/useDebounce';
+
 const STATIC_PAGES = [
   { title: 'Home', href: '/', category: 'Navigation' },
   { title: 'Courses', href: '/courses', category: 'Navigation' },
@@ -24,8 +26,13 @@ export default function SearchModal() {
   const router = useRouter();
   const isSearchOpen = useSearchOpen();
   const setSearchOpen = useSetSearchOpen();
+
+  // State for the input field (updates instantly)
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // 2. CREATED DEBOUNCED QUERY (300ms delay)
+  const debouncedQuery = useDebounce(query, 300);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -53,15 +60,17 @@ export default function SearchModal() {
     wasOpenRef.current = isSearchOpen;
   }, [isSearchOpen]);
 
+  // 3. REPLACED `query` WITH `debouncedQuery` IN USEMEMO
   const wikiResults = useMemo(() => {
-    return searchArticles(wikiSearchIndex, query);
-  }, [query]);
+    return searchArticles(wikiSearchIndex, debouncedQuery);
+  }, [debouncedQuery]);
 
+  // 4. REPLACED `query` WITH `debouncedQuery` IN USEMEMO
   const pageResults = useMemo(() => {
-    if (!query.trim()) return [];
-    const q = query.toLowerCase();
+    if (!debouncedQuery.trim()) return [];
+    const q = debouncedQuery.toLowerCase();
     return STATIC_PAGES.filter((p) => p.title.toLowerCase().includes(q));
-  }, [query]);
+  }, [debouncedQuery]);
 
   const selectItem = (href: string) => {
     router.push(href);
@@ -111,7 +120,8 @@ export default function SearchModal() {
               </div>
 
               <div className={styles.resultsArea}>
-                {!query.trim() ? (
+                {/* 5. DISPLAY RESULTS BASED ON DEBOUNCED QUERY */}
+                {!debouncedQuery.trim() ? (
                   <div className={styles.suggestions}>
                     <p className={styles.sectionTitle}>Quick Navigation</p>
                     <div className={styles.navGrid}>
@@ -182,7 +192,9 @@ export default function SearchModal() {
                     {pageResults.length === 0 && wikiResults.length === 0 && (
                       <div className={styles.noResults}>
                         <FileText size={32} className={styles.noResultsIcon} />
-                        <p>No results found for &ldquo;{query}&rdquo;</p>
+                        <p>
+                          No results found for &ldquo;{debouncedQuery}&rdquo;
+                        </p>
                       </div>
                     )}
                   </div>
