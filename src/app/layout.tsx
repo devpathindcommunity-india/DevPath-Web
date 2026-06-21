@@ -1,18 +1,15 @@
-﻿const APP_URL =
-  process.env.NEXT_PUBLIC_APP_URL ?? 'https://devpath-website.web.app';
+﻿const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://devpath-website.web.app';
 import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk, Barlow_Condensed } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
 import { GamificationProvider } from '@/context/GamificationContext';
 import { RealTimeProvider } from '@/context/RealTimeContext';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import BackgroundMesh from '@/components/layout/BackgroundMesh';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { NotificationProvider } from '@/context/NotificationContext';
 import { SyncErrorListener } from '@/components/providers/sync-error-listener';
 import RouteAwareChrome from '@/components/layout/RouteAwareChrome';
 import 'github-markdown-css/github-markdown.css';
-import PageTrackerInit from '@/components/PageTrackerInit';
 import './globals.css';
 import '@/styles/resume-print.css';
 import { MotionConfig } from 'framer-motion';
@@ -155,7 +152,7 @@ export default function RootLayout({
                   <GamificationProvider>
                     <RealTimeProvider>
                       <AnimatedBackground />
-                      {/* <BackgroundMesh /> */}
+                    
                       <RouteAwareChrome>{children}</RouteAwareChrome>
                     </RealTimeProvider>
                   </GamificationProvider>
