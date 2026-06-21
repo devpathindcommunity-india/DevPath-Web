@@ -153,14 +153,22 @@ export default function SkillTreeVisualizer({
   useKeyboardShortcuts({
     arrowright: () => {
       if (nodes.length === 0) return;
-      const currentIndex = selectedNode ? nodes.findIndex((n) => n.id === selectedNode.id) : -1;
-      const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % nodes.length;
+      const currentIndex = selectedNode
+        ? nodes.findIndex((n) => n.id === selectedNode.id)
+        : -1;
+      const nextIndex =
+        currentIndex === -1 ? 0 : (currentIndex + 1) % nodes.length;
       setSelectedNode(nodes[nextIndex]);
     },
     arrowleft: () => {
       if (nodes.length === 0) return;
-      const currentIndex = selectedNode ? nodes.findIndex((n) => n.id === selectedNode.id) : -1;
-      const prevIndex = currentIndex === -1 ? nodes.length - 1 : (currentIndex - 1 + nodes.length) % nodes.length;
+      const currentIndex = selectedNode
+        ? nodes.findIndex((n) => n.id === selectedNode.id)
+        : -1;
+      const prevIndex =
+        currentIndex === -1
+          ? nodes.length - 1
+          : (currentIndex - 1 + nodes.length) % nodes.length;
       setSelectedNode(nodes[prevIndex]);
     },
   });
@@ -171,11 +179,16 @@ export default function SkillTreeVisualizer({
       setSelectedNode(null);
     };
     window.addEventListener('close-all-overlays', handleCloseAll);
-    return () => window.removeEventListener('close-all-overlays', handleCloseAll);
+    return () =>
+      window.removeEventListener('close-all-overlays', handleCloseAll);
   }, []);
   if (loading) {
     return (
-      <div className={`${styles.container} w-full flex flex-col items-center bg-[#0f1115] p-6 rounded-xl border border-slate-800`} aria-busy="true" aria-label="Loading roadmap">
+      <div
+        className={`${styles.container} w-full flex flex-col items-center bg-[#0f1115] p-6 rounded-xl border border-slate-800`}
+        aria-busy="true"
+        aria-label="Loading roadmap"
+      >
         <div className="w-full max-w-[800px] mb-8 bg-slate-900/40 border border-slate-800/80 rounded-xl p-5 animate-pulse">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="space-y-2">

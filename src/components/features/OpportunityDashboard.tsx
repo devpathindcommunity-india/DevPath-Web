@@ -21,7 +21,8 @@ const MOCK_OPPORTUNITIES: BookmarkItem[] = [
   {
     id: 'opp-1',
     title: 'Open Source Contributor',
-    description: 'GSoC is a global program focused on bringing student developers into open source software development.',
+    description:
+      'GSoC is a global program focused on bringing student developers into open source software development.',
     type: 'opportunity',
     company: 'Google',
     deadline: '2026-06-25T23:59:59Z',
@@ -31,7 +32,8 @@ const MOCK_OPPORTUNITIES: BookmarkItem[] = [
   {
     id: 'opp-2',
     title: 'Software Engineering Intern',
-    description: "Join Meta's product teams to build technologies that help people connect, find communities, and grow businesses.",
+    description:
+      "Join Meta's product teams to build technologies that help people connect, find communities, and grow businesses.",
     type: 'opportunity',
     company: 'Meta',
     deadline: '2026-06-20T23:59:59Z',
@@ -41,7 +43,8 @@ const MOCK_OPPORTUNITIES: BookmarkItem[] = [
   {
     id: 'opp-3',
     title: 'Hackathon Participant',
-    description: 'Our annual 48-hour hackathon to build open-source projects for community welfare. Compete for cash prizes and mentorship.',
+    description:
+      'Our annual 48-hour hackathon to build open-source projects for community welfare. Compete for cash prizes and mentorship.',
     type: 'opportunity',
     company: 'DevPath',
     deadline: '2026-06-18T18:00:00Z',
@@ -51,7 +54,8 @@ const MOCK_OPPORTUNITIES: BookmarkItem[] = [
   {
     id: 'opp-4',
     title: 'GitHub Octernship Fellow',
-    description: 'The GitHub Octernships program connects students with industry partners for paid internship opportunities.',
+    description:
+      'The GitHub Octernships program connects students with industry partners for paid internship opportunities.',
     type: 'opportunity',
     company: 'GitHub',
     deadline: '2026-07-15T23:59:59Z',
@@ -61,7 +65,8 @@ const MOCK_OPPORTUNITIES: BookmarkItem[] = [
   {
     id: 'opp-5',
     title: 'Developer Participant',
-    description: 'Build next-generation payment integrations and financial tools using Stripe API.',
+    description:
+      'Build next-generation payment integrations and financial tools using Stripe API.',
     type: 'opportunity',
     company: 'Stripe',
     deadline: '2026-06-01T23:59:59Z',
@@ -93,16 +98,24 @@ const calculateDeadlineStatus = (deadlineStr: string): DeadlineStatus => {
   } else if (daysLeft <= 2) {
     return { text: 'Closing tomorrow', status: 'closing-tomorrow', daysLeft };
   } else {
-    return { text: `${Math.ceil(daysLeft)} days left`, status: 'upcoming', daysLeft };
+    return {
+      text: `${Math.ceil(daysLeft)} days left`,
+      status: 'upcoming',
+      daysLeft,
+    };
   }
 };
 
 export default function OpportunityDashboard() {
   const { bookmarks, toggleBookmark, isBookmarked } = useBookmarks();
-  const [activeTab, setActiveTab] = useState<'explore' | 'bookmarked'>('explore');
+  const [activeTab, setActiveTab] = useState<'explore' | 'bookmarked'>(
+    'explore'
+  );
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [searchQuery, setSearchQuery] = useState('');
-  const [sortBy, setSortBy] = useState<'deadline' | 'recent' | 'alpha'>('deadline');
+  const [sortBy, setSortBy] = useState<'deadline' | 'recent' | 'alpha'>(
+    'deadline'
+  );
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -182,7 +195,8 @@ export default function OpportunityDashboard() {
             Opportunity Hub
           </h2>
           <p className="text-xs text-slate-400">
-            Track applications, countdown deadlines, and save high-value career opportunities.
+            Track applications, countdown deadlines, and save high-value career
+            opportunities.
           </p>
         </div>
 
@@ -190,7 +204,10 @@ export default function OpportunityDashboard() {
         <div className="flex flex-wrap items-center gap-3">
           {/* Search Bar */}
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" size={16} />
+            <Search
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500"
+              size={16}
+            />
             <input
               type="text"
               placeholder="Search title, company, tag..."
@@ -208,9 +225,15 @@ export default function OpportunityDashboard() {
               onChange={(e) => setSortBy(e.target.value as any)}
               className="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer"
             >
-              <option value="deadline" className="bg-slate-950">Closest Deadline</option>
-              <option value="recent" className="bg-slate-950">Recently Bookmarked</option>
-              <option value="alpha" className="bg-slate-950">Alphabetical</option>
+              <option value="deadline" className="bg-slate-950">
+                Closest Deadline
+              </option>
+              <option value="recent" className="bg-slate-950">
+                Recently Bookmarked
+              </option>
+              <option value="alpha" className="bg-slate-950">
+                Alphabetical
+              </option>
             </select>
           </div>
 
@@ -241,7 +264,9 @@ export default function OpportunityDashboard() {
         <button
           onClick={() => setActiveTab('explore')}
           className={`pb-3 px-4 text-sm font-bold relative transition-colors ${
-            activeTab === 'explore' ? 'text-white' : 'text-slate-500 hover:text-slate-300'
+            activeTab === 'explore'
+              ? 'text-white'
+              : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           Explore
@@ -255,7 +280,9 @@ export default function OpportunityDashboard() {
         <button
           onClick={() => setActiveTab('bookmarked')}
           className={`pb-3 px-4 text-sm font-bold relative transition-colors flex items-center gap-1.5 ${
-            activeTab === 'bookmarked' ? 'text-white' : 'text-slate-500 hover:text-slate-300'
+            activeTab === 'bookmarked'
+              ? 'text-white'
+              : 'text-slate-500 hover:text-slate-300'
           }`}
         >
           My Bookmarks
@@ -285,7 +312,9 @@ export default function OpportunityDashboard() {
             <div className="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mb-4 text-slate-500">
               <Bookmark size={20} />
             </div>
-            <h3 className="text-md font-bold text-white mb-1">No Opportunities Found</h3>
+            <h3 className="text-md font-bold text-white mb-1">
+              No Opportunities Found
+            </h3>
             <p className="text-xs text-slate-500 max-w-xs">
               {activeTab === 'bookmarked'
                 ? 'Save opportunities from the Explore tab to track deadlines here.'
@@ -295,11 +324,17 @@ export default function OpportunityDashboard() {
         ) : (
           <motion.div
             layout
-            className={viewMode === 'grid' ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6' : 'space-y-4'}
+            className={
+              viewMode === 'grid'
+                ? 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'
+                : 'space-y-4'
+            }
           >
             {processedOpportunities.map((opp) => {
               const saved = isBookmarked(opp.id);
-              const status = opp.deadline ? calculateDeadlineStatus(opp.deadline) : null;
+              const status = opp.deadline
+                ? calculateDeadlineStatus(opp.deadline)
+                : null;
 
               // Deadline badge styling configuration
               let badgeColor = 'bg-slate-900 text-slate-400 border-slate-800';
@@ -307,11 +342,14 @@ export default function OpportunityDashboard() {
                 if (status.status === 'expired') {
                   badgeColor = 'bg-red-500/10 text-red-400 border-red-500/20';
                 } else if (status.status === 'closing-today') {
-                  badgeColor = 'bg-orange-500/10 text-orange-400 border-orange-500/20 animate-pulse';
+                  badgeColor =
+                    'bg-orange-500/10 text-orange-400 border-orange-500/20 animate-pulse';
                 } else if (status.status === 'closing-tomorrow') {
-                  badgeColor = 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+                  badgeColor =
+                    'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
                 } else {
-                  badgeColor = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+                  badgeColor =
+                    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
                 }
               }
 
@@ -324,7 +362,9 @@ export default function OpportunityDashboard() {
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.25 }}
                   className={`bg-slate-950/40 border border-slate-900 rounded-2xl relative overflow-hidden backdrop-blur-md group hover:border-primary/20 transition-all ${
-                    viewMode === 'list' ? 'p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4' : 'p-6 flex flex-col justify-between min-h-[260px]'
+                    viewMode === 'list'
+                      ? 'p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4'
+                      : 'p-6 flex flex-col justify-between min-h-[260px]'
                   }`}
                 >
                   {/* Accent Side Line */}
@@ -334,7 +374,9 @@ export default function OpportunityDashboard() {
                   ></div>
 
                   {/* Body Content */}
-                  <div className={`space-y-3.5 pl-2 ${viewMode === 'list' ? 'flex-1' : ''}`}>
+                  <div
+                    className={`space-y-3.5 pl-2 ${viewMode === 'list' ? 'flex-1' : ''}`}
+                  >
                     {/* Header Row: Company and Title */}
                     <div className="space-y-1">
                       <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
@@ -366,7 +408,9 @@ export default function OpportunityDashboard() {
                   {/* Action Footer (List layout alignment) */}
                   <div
                     className={`pl-2 pt-3 flex flex-wrap items-center justify-between gap-3 ${
-                      viewMode === 'list' ? 'sm:border-t-0 sm:pt-0 sm:flex-col sm:items-end justify-end' : 'border-t border-slate-900 mt-4'
+                      viewMode === 'list'
+                        ? 'sm:border-t-0 sm:pt-0 sm:flex-col sm:items-end justify-end'
+                        : 'border-t border-slate-900 mt-4'
                     }`}
                   >
                     {/* Deadline & Countdown */}
@@ -375,15 +419,20 @@ export default function OpportunityDashboard() {
                         <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
                           <Calendar size={12} className="text-primary" />
                           <span>
-                            {new Date(opp.deadline).toLocaleDateString(undefined, {
-                              month: 'short',
-                              day: 'numeric',
-                              year: 'numeric',
-                            })}
+                            {new Date(opp.deadline).toLocaleDateString(
+                              undefined,
+                              {
+                                month: 'short',
+                                day: 'numeric',
+                                year: 'numeric',
+                              }
+                            )}
                           </span>
                         </div>
                         {mounted ? (
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border w-fit ${badgeColor}`}>
+                          <span
+                            className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase border w-fit ${badgeColor}`}
+                          >
                             <Clock size={10} />
                             {status?.text}
                           </span>
@@ -401,7 +450,9 @@ export default function OpportunityDashboard() {
                           ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
                           : 'bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/10'
                       }`}
-                      title={saved ? 'Remove from bookmarks' : 'Add to bookmarks'}
+                      title={
+                        saved ? 'Remove from bookmarks' : 'Add to bookmarks'
+                      }
                     >
                       {saved ? (
                         <>
