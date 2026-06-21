@@ -3,12 +3,10 @@
 import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
 import Button from '../ui/Button';
 import InteractiveBackground from '../ui/InteractiveBackground';
 import styles from './Hero.module.css';
 
-import { MagneticText } from '../ui/magnetic-text';
 
 const LatestEventsHighlight = dynamic(() => import('./LatestEventsHighlight'));
 const InternshipCalendarCard = dynamic(
