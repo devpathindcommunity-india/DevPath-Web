@@ -163,7 +163,7 @@ export default function InteractiveBackground() {
 
     let animationFrameId: number;
     let lines: TypeLine[] = [];
-    let logoAngle = 0;
+    const logoAngle = 0;
     let frame = 0;
 
     // Logo instances — scattered, slow spin, very subtle

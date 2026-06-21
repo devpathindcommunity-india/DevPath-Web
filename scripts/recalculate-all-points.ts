@@ -92,7 +92,7 @@ async function recalculatePoints() {
       // Fetch projects subcollection
       const projectsRef = collection(db, 'members', uid, 'projects');
       const projectsSnap = await getDocs(projectsRef);
-      let projectCount = projectsSnap.size;
+      const projectCount = projectsSnap.size;
       let totalStars = 0;
       projectsSnap.forEach((p) => {
         totalStars += (p.data().stars || []).length;

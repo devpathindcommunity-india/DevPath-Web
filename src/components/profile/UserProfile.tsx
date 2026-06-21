@@ -335,8 +335,8 @@ export default function UserProfile() {
       const users = await Promise.all(
         uids.map(async (uid) => {
           // Try members first
-          let docRef = doc(db, 'members', uid);
-          let snap = await getDoc(docRef);
+          const docRef = doc(db, 'members', uid);
+          const snap = await getDoc(docRef);
 
           if (snap.exists()) {
             return { uid: snap.id, ...snap.data() };
