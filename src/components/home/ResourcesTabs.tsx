@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FileText, Video, Code, Terminal, Book, Star, Calendar, Brain, Briefcase, Users, Building2, MessageSquare, Map, GraduationCap, Layout, Rocket, Database } from 'lucide-react';
 import { PremiumCard } from '../ui/PremiumCard';
@@ -329,10 +329,14 @@ export default function ResourcesTabs() {
         { id: 'practice', label: 'Practice', icon: <Code size={18} /> },
     ];
 
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+
     const [activeMainTab, setActiveMainTab] = useState('roadmaps');
     useEffect(() => {
-    setVisibleCount(ITEMS_PER_PAGE);
-}, [activeMainTab]);
+        setVisibleCount(ITEMS_PER_PAGE);
+    }, [activeMainTab]);
     const [activeSubTab, setActiveSubTab] = useState(aiPromptsCategories[0]);
     const [isInternshipModalOpen, setIsInternshipModalOpen] = useState(false);
     const [isRoadmapModalOpen, setIsRoadmapModalOpen] = useState(false);
@@ -345,7 +349,24 @@ export default function ResourcesTabs() {
     const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
     const [isLoading, setIsLoading] = useState(false);
     const observerRef = useRef<HTMLDivElement>(null);
-    const searchParams = useSearchParams();
+
+    useEffect(() => {
+        // Sync states on mount from URL parameters
+        const tab = searchParams.get('tab');
+        if (tab) {
+            setActiveMainTab(tab);
+        }
+        const subtab = searchParams.get('subtab');
+        if (subtab) {
+            setActiveSubTab(subtab);
+        }
+    }, []);
+
+    const updateQueryParam = (key: string, value: string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set(key, value);
+        router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    };
 
     useEffect(() => {
     if (activeMainTab !== 'roadmaps') return;
@@ -463,7 +484,10 @@ export default function ResourcesTabs() {
                     return (
                         <button aria-label="Action button" 
                             key={section.id}
-                            onClick={() => setActiveMainTab(section.id)}
+                            onClick={() => {
+                                setActiveMainTab(section.id);
+                                updateQueryParam('tab', section.id);
+                            }}
                             className={`flex items-center gap-2 px-6 py-3 rounded-full text-sm font-medium transition-all border ${isActive
                                 ? 'bg-primary text-white border-primary shadow-lg shadow-primary/25'
                                 : 'bg-white/5 text-muted-foreground border-white/10 hover:bg-white/10 hover:text-blue-400 dark:hover:text-white'
@@ -490,7 +514,10 @@ export default function ResourcesTabs() {
                                 return (
                                     <button aria-label="Action button" 
                                         key={catKey}
-                                        onClick={() => setActiveSubTab(catKey)}
+                                        onClick={() => {
+                                            setActiveSubTab(catKey);
+                                            updateQueryParam('subtab', catKey);
+                                        }}
                                         className={`px-4 py-2 rounded-xl text-sm font-medium transition-all relative overflow-hidden ${isActive
                                             ? 'text-white shadow-md'
                                             : 'text-muted-foreground hover:text-blue-400 dark:hover:text-white hover:bg-white/5'
