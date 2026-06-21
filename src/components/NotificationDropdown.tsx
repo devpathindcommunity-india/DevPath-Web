@@ -213,7 +213,7 @@ export function NotificationDropdown() {
               {/* Notifications List */}
               <div className="overflow-y-auto max-h-[500px]">
                 {notifications.length === 0 ? (
-                  <div className="p-8 text-center text-gray-500">
+                  <div className="p-8 text-center text-slate-600">
                     <Bell className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>No notifications yet</p>
                   </div>
@@ -260,10 +260,10 @@ export function NotificationDropdown() {
                           <p className="font-semibold text-sm text-gray-900 dark:text-white">
                             {notif.title}
                           </p>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mt-1 line-clamp-2">
+                          <p className="text-sm text-slate-600 dark:text-gray-400 mt-1 line-clamp-2">
                             {notif.message}
                           </p>
-                          <p className="text-xs text-gray-500 mt-2">
+                          <p className="text-xs text-slate-600 mt-2">
                             {notif.createdAt?.seconds
                               ? new Date(
                                   notif.createdAt.seconds * 1000

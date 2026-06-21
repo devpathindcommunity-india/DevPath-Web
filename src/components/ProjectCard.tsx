@@ -50,7 +50,7 @@ export function ProjectCard({ project }: { project: Project }) {
           {/* Author */}
           <div className="flex items-center gap-2 mb-2">
             <div className="w-6 h-6 rounded-full bg-black/10 dark:bg-white/10" />
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-gray-400">
               {project.author}
             </p>
           </div>
@@ -79,7 +79,7 @@ export function ProjectCard({ project }: { project: Project }) {
           </div>
 
           {/* Stats */}
-          <div className="flex items-center gap-6 text-sm text-gray-500 dark:text-gray-400 mt-4 pt-4 border-t border-black/5 dark:border-white/10">
+          <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-gray-400 mt-4 pt-4 border-t border-black/5 dark:border-white/10">
             <button
               aria-label="Action button"
               onClick={(e) => {
@@ -147,7 +147,7 @@ export function ProjectCard({ project }: { project: Project }) {
                   <h2 className="text-3xl font-bold mb-2 text-gray-900 dark:text-white">
                     {project.title}
                   </h2>
-                  <p className="text-gray-600 dark:text-gray-400">
+                  <p className="text-slate-600 dark:text-gray-400">
                     by {project.author}
                   </p>
                 </div>
