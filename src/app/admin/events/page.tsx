@@ -141,7 +141,7 @@ export default function AdminEventsPage() {
               key={event.id}
               className="bg-card border border-border rounded-xl overflow-hidden flex flex-col"
             >
-              <div className="h-48 bg-muted relative">
+              <div className="w-full aspect-video bg-muted relative">
                 {event.image ? (
                   <Image
                     src={event.image}

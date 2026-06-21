@@ -273,7 +273,7 @@ export default function PathwayPage() {
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-8">
               <div className="flex-shrink-0">
                 <div className="w-24 h-24 rounded-full border-4 border-primary/20 p-1">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-muted">
+                  <div className="w-full h-full aspect-square rounded-full overflow-hidden bg-muted">
                     {user.photoURL ? (
                       <Image
                         src={user.photoURL}
@@ -395,7 +395,7 @@ export default function PathwayPage() {
                           </div>
                           <div className="p-4 min-w-0">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className="w-8 h-8 rounded-full bg-muted overflow-hidden flex-shrink-0">
+                              <div className="w-8 h-8 aspect-square rounded-full bg-muted overflow-hidden flex-shrink-0">
                                 {entry.photoURL ? (
                                   <Image
                                     src={entry.photoURL}

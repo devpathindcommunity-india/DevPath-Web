@@ -243,7 +243,7 @@ export default function ContributorsPage() {
                   </div>
                 )}
                 <div
-                  className={styles.avatar}
+                  className={`${styles.avatar} aspect-square w-full`}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
