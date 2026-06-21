@@ -1,6 +1,6 @@
 ﻿const APP_URL =
   process.env.NEXT_PUBLIC_APP_URL ?? 'https://devpath-website.web.app';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Inter, Space_Grotesk, Barlow_Condensed } from 'next/font/google';
 import { AuthProvider } from '@/context/AuthContext';
 import { GamificationProvider } from '@/context/GamificationContext';
@@ -30,6 +30,8 @@ const barlowCondensed = Barlow_Condensed({
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
+  applicationName: 'DevPath Community',
+  manifest: '/manifest.json',
   title: {
     default: 'DevPath Community',
     template: '%s | DevPath Community',
@@ -89,6 +91,18 @@ export const metadata: Metadata = {
     icon: '/DevPath-logo.webp',
     apple: '/DevPath-logo.webp',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'DevPath Community',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0ea5e9',
 };
 
 const jsonLd = {

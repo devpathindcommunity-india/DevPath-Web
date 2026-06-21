@@ -27,7 +27,7 @@ export default function RouteAwareChrome({
   // Bind global navigation shortcuts
   useKeyboardShortcuts({
     '?': () => setLegendOpen((prev) => !prev),
-    'escape': () => setLegendOpen(false),
+    escape: () => setLegendOpen(false),
   });
 
   return (
@@ -44,7 +44,10 @@ export default function RouteAwareChrome({
       {!isAuthRoute && <FloatingAssistant />}
       <ToastContainer />
       <SearchModal />
-      <ShortcutLegend isOpen={isLegendOpen} onClose={() => setLegendOpen(false)} />
+      <ShortcutLegend
+        isOpen={isLegendOpen}
+        onClose={() => setLegendOpen(false)}
+      />
     </>
   );
 }

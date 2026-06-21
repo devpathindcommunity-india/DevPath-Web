@@ -253,8 +253,8 @@ export default function PathwayPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background pt-24 pb-12 px-4 md:px-8">
-      <div className="max-w-7xl mx-auto space-y-12">
+    <div className="min-h-screen w-full bg-background pt-24 pb-12 px-4 md:px-8">
+      <div className="w-full max-w-7xl mx-auto space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-red-600">

@@ -23,11 +23,37 @@ jobs:
               labels: ['gssoc26']
             });
             
-            // Post a welcome comment
-            const message = `Welcome to DevPath Community's Official Repository! 🎉 Thank you for bringing this up and starting your contributions to our project. \n\nPlease do star ⭐ the repo and keep growing in your Open Source Journey! 🚀\n\n@${context.actor}, @Aditya948351 or @devpathindcommunity-india will review this and assign you this issue ASAP by checking if it is really needed for the website.`;
-            
             // Only comment if the creator is not the repository owner
             if (context.actor !== 'Aditya948351') {
+              const { data: issues } = await github.rest.issues.listForRepo({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                creator: context.actor,
+                state: 'all'
+              });
+
+              // Filter to only include actual issues, not PRs
+              const actualIssues = issues.filter(issue => !issue.pull_request);
+
+              let message = '';
+              if (actualIssues.length <= 1) {
+                // First time issue creator
+                message = `Welcome to DevPath Community's Official Repository! 🎉 Thank you for bringing this up and starting your contributions to our project. \n\nPlease do star ⭐ the repo and keep growing in your Open Source Journey! 🚀\n\n@${context.actor}, @Aditya948351 or @devpathindcommunity-india will review this and assign you this issue ASAP by checking if it is really needed for the website.\n\n---\n**Follow the Community Here:** https://www.linkedin.com/company/devpath-community/`;
+              } else {
+                // Returning contributor
+                const quotes = [
+                  "\"The only way to do great work is to love what you do.\" – Steve Jobs",
+                  "\"Code is like humor. When you have to explain it, it’s bad.\" – Cory House",
+                  "\"First, solve the problem. Then, write the code.\" – John Johnson",
+                  "\"Experience is the name everyone gives to their mistakes.\" – Oscar Wilde",
+                  "\"Make it work, make it right, make it fast.\" – Kent Beck",
+                  "\"Continuous improvement is better than delayed perfection.\" – Mark Twain",
+                  "\"Any fool can write code that a computer can understand. Good programmers write code that humans can understand.\" – Martin Fowler"
+                ];
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                message = `Welcome back, @${context.actor}! Thanks for opening another issue. Our maintainers will review it shortly.\n\nHere is your motivating thought for the day:\n> ${randomQuote}`;
+              }
+
               await github.rest.issues.createComment({
                 issue_number: context.issue.number,
                 owner: context.repo.owner,

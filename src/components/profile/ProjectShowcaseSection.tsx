@@ -1,6 +1,7 @@
 // src/components/profile/ProjectShowcaseSection.tsx
 'use client';
 
+import { useState } from 'react';
 import { ExternalLink, Github } from 'lucide-react';
 import type { PortfolioProject } from '@/types/portfolio';
 
@@ -8,8 +9,15 @@ interface Props {
   projects: PortfolioProject[];
 }
 
+const ITEMS_PER_PAGE = 6;
+
 export function ProjectShowcaseSection({ projects }: Props) {
+  const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+
   if (!projects?.length) return null;
+
+  const visibleProjects = projects.slice(0, visibleCount);
+  const hasMore = visibleCount < projects.length;
 
   return (
     <section>
@@ -22,10 +30,24 @@ export function ProjectShowcaseSection({ projects }: Props) {
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {projects.map((project) => (
+        {visibleProjects.map((project) => (
           <ProjectCard key={project.nodeId} project={project} />
         ))}
       </div>
+      {hasMore && (
+        <div className="flex justify-center mt-6">
+          <button
+            onClick={() =>
+              setVisibleCount((prev) =>
+                Math.min(prev + ITEMS_PER_PAGE, projects.length)
+              )
+            }
+            className="px-5 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-sm font-medium text-white transition-colors"
+          >
+            Load More ({projects.length - visibleCount} remaining)
+          </button>
+        </div>
+      )}
     </section>
   );
 }

@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   User,
   Mail,
@@ -19,33 +19,33 @@ import {
   Sparkles,
   ShieldCheck,
   CheckCircle,
-} from "lucide-react";
-import Link from "next/link";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { doc, setDoc, getDoc, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "@/lib/firebase";
-import { sanitizeSocialLinks } from "@/lib/safe-social-url";
+} from 'lucide-react';
+import Link from 'next/link';
+import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
+import { sanitizeSocialLinks } from '@/lib/safe-social-url';
 
 export default function SignupPage() {
   const [currentStep, setCurrentStep] = useState(1);
   const totalSteps = 5;
 
   // Form States
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mobile, setMobile] = useState("");
-  const [countryCode, setCountryCode] = useState("+91");
-  const [state, setState] = useState("");
-  const [city, setCity] = useState("");
-  const [district, setDistrict] = useState("");
-  const [linkedin, setLinkedin] = useState("");
-  const [github, setGithub] = useState("");
-  const [instagram, setInstagram] = useState("");
-  const [adminKey, setAdminKey] = useState("");
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
+  const [state, setState] = useState('');
+  const [city, setCity] = useState('');
+  const [district, setDistrict] = useState('');
+  const [linkedin, setLinkedin] = useState('');
+  const [github, setGithub] = useState('');
+  const [instagram, setInstagram] = useState('');
+  const [adminKey, setAdminKey] = useState('');
   const [isAdminSignup, setIsAdminSignup] = useState(false);
 
-  const [error, setError] = useState("");
+  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { user, isLoading: authLoading } = useAuth();
@@ -60,7 +60,7 @@ export default function SignupPage() {
 
   useEffect(() => {
     if (user) {
-      router.push("/profile");
+      router.push('/profile');
     }
   }, [user, router]);
 
@@ -68,26 +68,26 @@ export default function SignupPage() {
 
   // Step Validation
   const validateStep = (step: number): boolean => {
-    setError("");
+    setError('');
 
     switch (step) {
       case 1:
         if (!name.trim()) {
-          setError("Full name is required.");
+          setError('Full name is required.');
           return false;
         }
         if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          setError("Please enter a valid email address.");
+          setError('Please enter a valid email address.');
           return false;
         }
         if (!/^\d{10}$/.test(mobile)) {
-          setError("Please enter a valid 10-digit mobile number.");
+          setError('Please enter a valid 10-digit mobile number.');
           return false;
         }
         return true;
       case 2:
         if (!state.trim() || !city.trim() || !district.trim()) {
-          setError("Please fill in all location fields.");
+          setError('Please fill in all location fields.');
           return false;
         }
         return true;
@@ -95,11 +95,11 @@ export default function SignupPage() {
         return true; // Social links optional
       case 4:
         if (!password || password.length < 6) {
-          setError("Password must be at least 6 characters long.");
+          setError('Password must be at least 6 characters long.');
           return false;
         }
         if (isAdminSignup && !adminKey.trim()) {
-          setError("Admin key is required for admin registration.");
+          setError('Admin key is required for admin registration.');
           return false;
         }
         return true;
@@ -117,31 +117,31 @@ export default function SignupPage() {
   };
 
   const goToPrevious = () => {
-    setError("");
+    setError('');
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
 
   const handleSignup = async () => {
-    setError("");
+    setError('');
     setLoading(true);
 
     try {
       if (isAdminSignup) {
-        const keyDoc = await getDoc(doc(db, "admin_keys", "config"));
+        const keyDoc = await getDoc(doc(db, 'admin_keys', 'config'));
         if (!keyDoc.exists()) {
-          throw new Error("System Configuration Error: Admin Key not found.");
+          throw new Error('System Configuration Error: Admin Key not found.');
         }
         const currentAdminKey = keyDoc.data().value;
 
         if (adminKey !== currentAdminKey) {
-          throw new Error("Invalid Admin Key. Please contact the Super Admin.");
+          throw new Error('Invalid Admin Key. Please contact the Super Admin.');
         }
       }
 
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
       const firebaseUser = userCredential.user;
 
@@ -154,7 +154,7 @@ export default function SignupPage() {
 
       if (isAdminSignup) {
         await setDoc(
-          doc(db, "admins", email),
+          doc(db, 'admins', email),
           {
             uid: firebaseUser.uid,
             name,
@@ -164,10 +164,10 @@ export default function SignupPage() {
             district,
             ...safeSocialLinks,
           },
-          { merge: true },
+          { merge: true }
         );
       } else {
-        await setDoc(doc(db, "members", firebaseUser.uid), {
+        await setDoc(doc(db, 'members', firebaseUser.uid), {
           uid: firebaseUser.uid,
           name,
           email,
@@ -176,7 +176,7 @@ export default function SignupPage() {
           city,
           district,
           ...safeSocialLinks,
-          role: "member",
+          role: 'member',
           createdAt: serverTimestamp(),
           points: 0,
           rank: 0,
@@ -188,7 +188,7 @@ export default function SignupPage() {
       setCurrentStep(6); // Success screen
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to create account.");
+      setError(err.message || 'Failed to create account.');
     } finally {
       setLoading(false);
     }
@@ -202,10 +202,10 @@ export default function SignupPage() {
             key={index}
             className={`h-2.5 w-2.5 rounded-full transition-all duration-300 ${
               index + 1 === currentStep
-                ? "bg-cyan-400 scale-125"
+                ? 'bg-cyan-400 scale-125'
                 : index + 1 < currentStep
-                  ? "bg-cyan-400/70"
-                  : "bg-white/20"
+                  ? 'bg-cyan-400/70'
+                  : 'bg-white/20'
             }`}
           />
         ))}
@@ -291,7 +291,7 @@ export default function SignupPage() {
                     type="tel"
                     value={mobile}
                     onChange={(e) =>
-                      setMobile(e.target.value.replace(/\D/g, ""))
+                      setMobile(e.target.value.replace(/\D/g, ''))
                     }
                     className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10"
                     placeholder="98765 43210"
@@ -461,7 +461,7 @@ export default function SignupPage() {
               {isAdminSignup && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
+                  animate={{ opacity: 1, height: 'auto' }}
                   className="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-500/10 p-5"
                 >
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-cyan-200">
@@ -499,11 +499,11 @@ export default function SignupPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-5">
                   <div>
                     <div className="text-white/50 text-xs mb-1">FULL NAME</div>
-                    <div className="font-medium">{name || "—"}</div>
+                    <div className="font-medium">{name || '—'}</div>
                   </div>
                   <div>
                     <div className="text-white/50 text-xs mb-1">EMAIL</div>
-                    <div className="font-medium">{email || "—"}</div>
+                    <div className="font-medium">{email || '—'}</div>
                   </div>
                   <div>
                     <div className="text-white/50 text-xs mb-1">MOBILE</div>
@@ -548,7 +548,7 @@ export default function SignupPage() {
                 <div className="pt-4 border-t border-white/10">
                   <div className="text-white/50 text-xs mb-1">ACCOUNT TYPE</div>
                   <div className="font-medium text-cyan-300">
-                    {isAdminSignup ? "Administrator" : "Community Member"}
+                    {isAdminSignup ? 'Administrator' : 'Community Member'}
                   </div>
                 </div>
               </div>
@@ -579,7 +579,7 @@ export default function SignupPage() {
             </p>
 
             <button
-              onClick={() => router.push("/profile")}
+              onClick={() => router.push('/profile')}
               className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-3.5 font-semibold text-slate-950 hover:brightness-110 transition-all"
             >
               Go to Profile
@@ -725,12 +725,12 @@ export default function SignupPage() {
                 </div>
                 <h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
                   {currentStep === 6
-                    ? "Welcome aboard!"
-                    : "Create your account"}
+                    ? 'Welcome aboard!'
+                    : 'Create your account'}
                 </h2>
                 <p className="mt-2 text-sm text-muted-foreground">
                   {currentStep === 6
-                    ? "Your DevPath journey begins now."
+                    ? 'Your DevPath journey begins now.'
                     : `Step ${currentStep} of ${totalSteps}`}
                 </p>
               </div>
@@ -785,7 +785,7 @@ export default function SignupPage() {
                         disabled={loading}
                         className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 py-3.5 font-semibold text-slate-950 transition-all hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
                       >
-                        {loading ? "Creating Account..." : "Create Account"}
+                        {loading ? 'Creating Account...' : 'Create Account'}
                         <ArrowRight size={18} />
                       </button>
                     )}
@@ -795,7 +795,7 @@ export default function SignupPage() {
 
               {currentStep === 1 && (
                 <div className="mt-6 text-center text-sm text-muted-foreground lg:text-left">
-                  Already have an account?{" "}
+                  Already have an account?{' '}
                   <Link
                     href="/login"
                     className="font-medium text-cyan-300 transition-colors hover:text-cyan-200"

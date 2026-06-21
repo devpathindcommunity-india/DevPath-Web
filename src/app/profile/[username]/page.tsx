@@ -15,10 +15,7 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return [
-    { username: 'dummy' },
-    { username: 'kew7p1pbj7WoX66uGH2ZMcg79RB3' }
-  ];
+  return [{ username: 'dummy' }, { username: 'kew7p1pbj7WoX66uGH2ZMcg79RB3' }];
 }
 
 export const dynamicParams = false;

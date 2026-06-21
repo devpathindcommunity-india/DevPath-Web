@@ -1,4 +1,4 @@
-name: Lint Check
+name: Production Build Check
 
 on:
   pull_request:
@@ -7,19 +7,16 @@ on:
       - main
 
 jobs:
-  lint:
-    name: ESLint & Prettier Check
+  build:
+    name: Next.js Build Check
     runs-on: ubuntu-latest
     permissions:
-      contents: write
       pull-requests: write
       issues: write
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -30,18 +27,8 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Run ESLint
-        run: npx eslint . --ext .js,.jsx,.ts,.tsx
-        continue-on-error: true # Prevents the workflow from immediately stopping if lint fails, allowing prettier to run
-
-      - name: Auto-format with Prettier
-        run: npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}"
-
-      - name: Commit formatting changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style: auto-format with Prettier"
-          branch: ${{ github.head_ref }}
+      - name: Run Next.js Build
+        run: npm run build
 
       - name: Comment on Failure
         if: failure() && github.event_name == 'pull_request'

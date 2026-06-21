@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 import { useEffect, useState } from 'react';
 import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { getTier } from '@/lib/gamification';
+import Image from 'next/image';
 
 export function Leaderboard() {
   const [users, setUsers] = useState<any[]>([]);
@@ -48,9 +50,12 @@ export function Leaderboard() {
               <span className="text-gray-400 w-6 text-center font-mono">
                 #{i + 1}
               </span>
-              <img
+              <Image
                 src={u.photoURL ?? '/default-avatar.png'}
-                className="w-8 h-8 rounded-full"
+                alt={u.displayName ?? 'User avatar'}
+                width={32}
+                height={32}
+                className="rounded-full"
               />
               <span className="flex-1 font-medium">
                 {u.displayName ?? 'Anonymous'}

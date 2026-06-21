@@ -23,39 +23,45 @@ interface RoadmapConfig {
 const ROADMAPS_CONFIG: Record<string, RoadmapConfig> = {
   frontend: {
     title: 'Frontend Developer Roadmap',
-    description: 'Master modern frontend development with our curated step-by-step Frontend developer roadmap. Learn HTML/CSS, JavaScript, React, and Next.js.',
+    description:
+      'Master modern frontend development with our curated step-by-step Frontend developer roadmap. Learn HTML/CSS, JavaScript, React, and Next.js.',
     techDetails: 'HTML/CSS, JavaScript, React, Next.js',
     isAvailable: true,
     visualizerPath: 'Frontend',
   },
   backend: {
     title: 'Backend Developer Roadmap',
-    description: 'Learn backend engineering with our curated backend roadmap. Master databases, Node.js, and API development.',
+    description:
+      'Learn backend engineering with our curated backend roadmap. Master databases, Node.js, and API development.',
     techDetails: 'Databases, Node.js, API design',
     isAvailable: true,
     visualizerPath: 'Backend',
   },
   devops: {
     title: 'DevOps Mastery Roadmap',
-    description: 'DevOps learning path: Docker, Kubernetes, CI/CD, and AWS infrastructure.',
+    description:
+      'DevOps learning path: Docker, Kubernetes, CI/CD, and AWS infrastructure.',
     techDetails: 'Docker & Kubernetes, CI/CD Pipelines, AWS Infrastructure',
     isAvailable: false,
   },
   'python-ai': {
     title: 'Python for AI Roadmap',
-    description: 'Learn AI and machine learning: PyTorch, Neural Networks, and LLM Integration.',
+    description:
+      'Learn AI and machine learning: PyTorch, Neural Networks, and LLM Integration.',
     techDetails: 'PyTorch Fundamentals, Neural Networks, LLM Integration',
     isAvailable: false,
   },
   'full-stack-react': {
     title: 'Full Stack React Roadmap',
-    description: 'Master Next.js App Router, Server Actions, PostgreSQL, and Prisma.',
+    description:
+      'Master Next.js App Router, Server Actions, PostgreSQL, and Prisma.',
     techDetails: 'Next.js App Router, Server Actions, PostgreSQL & Prisma',
     isAvailable: false,
   },
   'web3-development': {
     title: 'Web3 Development Roadmap',
-    description: 'Step into Web3: Solidity Smart Contracts, Ethers.js, and DApp Architecture.',
+    description:
+      'Step into Web3: Solidity Smart Contracts, Ethers.js, and DApp Architecture.',
     techDetails: 'Solidity Smart Contracts, Ethers.js, DApp Architecture',
     isAvailable: false,
   },
@@ -114,8 +120,12 @@ export default async function RoadmapPage({ params }: Props) {
   if (!config) {
     return (
       <div className="min-h-screen bg-[#0b0c10] text-slate-100 flex flex-col items-center justify-center p-6 text-center">
-        <h1 className="text-3xl font-extrabold text-white mb-2">Roadmap Not Found</h1>
-        <p className="text-slate-400 text-sm mb-4">The requested roadmap does not exist.</p>
+        <h1 className="text-3xl font-extrabold text-white mb-2">
+          Roadmap Not Found
+        </h1>
+        <p className="text-slate-400 text-sm mb-4">
+          The requested roadmap does not exist.
+        </p>
         <Link href="/paths" className="text-primary hover:underline text-sm">
           Return to Learning Paths
         </Link>
@@ -124,7 +134,12 @@ export default async function RoadmapPage({ params }: Props) {
   }
 
   if (!config.isAvailable) {
-    return <ComingSoonRoadmap title={config.title} techDetails={config.techDetails} />;
+    return (
+      <ComingSoonRoadmap
+        title={config.title}
+        techDetails={config.techDetails}
+      />
+    );
   }
 
   return (
@@ -135,11 +150,18 @@ export default async function RoadmapPage({ params }: Props) {
             href="/paths"
             className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors group w-fit"
           >
-            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft
+              size={16}
+              className="group-hover:-translate-x-1 transition-transform"
+            />
             <span>Back to Paths</span>
           </Link>
-          <h1 className="text-3xl font-extrabold text-white mt-2">{config.title}</h1>
-          <p className="text-sm text-slate-400 max-w-2xl">{config.description}</p>
+          <h1 className="text-3xl font-extrabold text-white mt-2">
+            {config.title}
+          </h1>
+          <p className="text-sm text-slate-400 max-w-2xl">
+            {config.description}
+          </p>
         </div>
 
         <SkillTreeVisualizer initialPath={config.visualizerPath} />

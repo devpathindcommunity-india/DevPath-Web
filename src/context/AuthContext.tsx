@@ -129,11 +129,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const isE2E = typeof window !== 'undefined' && window.navigator?.webdriver;
 
-    if (!firebaseReady || process.env.NEXT_PUBLIC_E2E_TEST === 'true' || isE2E) {
+    if (
+      !firebaseReady ||
+      process.env.NEXT_PUBLIC_E2E_TEST === 'true' ||
+      isE2E
+    ) {
       const isMockAuthEnabled =
         typeof window !== 'undefined' &&
         window.localStorage.getItem('e2e_mock_auth') === 'true';
-        
+
       setUser(
         isMockAuthEnabled
           ? {
@@ -242,7 +246,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                   email: firebaseUser.email,
                   name: firebaseUser.displayName || '',
                   photoURL: firebaseUser.photoURL || '',
-                  role: 'member',
+                  role: 'member' as const,
                   points: 0,
                   streak: 0,
                   level: 0,
@@ -263,7 +267,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     showInCommunity: true,
                   },
                   preferences: {
-                    theme: 'dark',
+                    theme: 'dark' as const,
                   },
                   githubStats: {
                     connected: false,
@@ -281,7 +285,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
                 // Create the new member document
                 await setDoc(memberDocRef, defaultUserData);
-                userData = { ...userData, ...defaultUserData };
+                userData = { ...userData, ...defaultUserData } as any;
               }
             } catch (error) {
               console.error('Error fetching/creating member data:', error);

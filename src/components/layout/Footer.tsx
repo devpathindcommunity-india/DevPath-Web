@@ -9,7 +9,8 @@ import {
   Code,
   MessageSquare,
   Shield,
-  HelpCircle, // ← Added
+  HelpCircle,
+  Mail, // ← Added for Contact Us
 } from 'lucide-react';
 import logo from '@/assets/logo.webp';
 import styles from './Footer.module.css';
@@ -56,8 +57,6 @@ export default function Footer() {
                 <Book size={16} /> Wiki & Docs
               </Link>
               <Link href="/faq" className={styles.link}>
-                {' '}
-                {/* ← Added */}
                 <HelpCircle size={16} /> FAQ
               </Link>
               <Link href="/flags" className={styles.link}>
@@ -79,6 +78,9 @@ export default function Footer() {
               />
             </div>
             <div className={styles.links}>
+              <Link href="/contactus" className={styles.link}>
+                <Mail size={16} /> Contact Us
+              </Link>
               <Link href="/complaints" className={styles.link}>
                 <MessageSquare size={16} /> Community Complaint
               </Link>

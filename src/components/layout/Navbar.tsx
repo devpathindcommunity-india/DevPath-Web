@@ -34,6 +34,7 @@ const navLinks = [
   { href: '/community', label: 'Community' },
   { href: '/resources', label: 'Resources' },
   { href: '/events', label: 'Events' },
+  { href: '/opportunities', label: 'Opportunities' },
   { href: '/opensource', label: 'Open Source' },
   { href: '/team', label: 'Team' },
 ];
@@ -55,7 +56,8 @@ export default function Navbar() {
       setBookmarkDrawerOpen(false);
     };
     window.addEventListener('close-all-overlays', handleCloseAll);
-    return () => window.removeEventListener('close-all-overlays', handleCloseAll);
+    return () =>
+      window.removeEventListener('close-all-overlays', handleCloseAll);
   }, []);
 
   const { currentStreak } = useMemo(
@@ -150,9 +152,8 @@ export default function Navbar() {
                 );
               })}
             </div>
-            
-            {/* Scroll Progress Line attached to Pill */}
 
+            {/* Scroll Progress Line attached to Pill */}
           </div>
           <motion.div className={styles.progressBar} style={{ scaleX }} />
 
