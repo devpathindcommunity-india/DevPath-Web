@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import {
   Github,
   Code,
@@ -340,13 +341,17 @@ export default function ContributorsPage() {
           >
             View Open Issues
           </Button>
-          <Button
-            aria-label="Action button"
-            variant="secondary"
-            icon={<ExternalLink size={20} />}
-          >
-            Read Contributing Guide
-          </Button>
+
+          <Link href="/contributing" passHref>
+            <Button
+              aria-label="Action button"
+              variant="secondary"
+              icon={<ExternalLink size={20} />}
+              asChild
+            >
+              Read Contributing Guide
+            </Button>
+          </Link>
         </div>
       </div>
     </div>
