@@ -634,7 +634,6 @@ function ProfileContent({ uid }: { uid?: string }) {
                   />
                 )}
                 <button
-                  aria-label="Action button"
                   onClick={handleShareProfile}
                   className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-all duration-200 font-medium text-sm"
                 >
@@ -1023,7 +1022,6 @@ function ProfileContent({ uid }: { uid?: string }) {
                         {stripHtml(project.description)}
                       </p>
                       <button
-                        aria-label="Action button"
                         onClick={() => setSelectedProject(project)}
                         className="text-primary text-xs font-medium hover:underline hover:opacity-80 transition-all duration-200 mt-1"
                       >
@@ -1052,7 +1050,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                     <div className="flex items-center justify-between pt-3 border-t border-border">
                       <div className="flex items-center gap-4">
                         <button
-                          aria-label="Action button"
+                          aria-label={currentUser && project.likes.includes(currentUser.uid) ? "Unlike project" : "Like project"}
                           onClick={() =>
                             handleLikeProject(project.id, project.likes)
                           }
@@ -1070,7 +1068,6 @@ function ProfileContent({ uid }: { uid?: string }) {
                           <span>{project.likes.length}</span>
                         </button>
                         <button
-                          aria-label="Action button"
                           onClick={() => handleShareProject(project.id)}
                           className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-primary transition-colors"
                         >
@@ -1141,7 +1138,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                 {selectedProject.title}
               </h2>
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 onClick={() => setSelectedProject(null)}
                 className="p-2 hover:bg-muted hover:scale-110 rounded-full transition-all duration-200"
               >

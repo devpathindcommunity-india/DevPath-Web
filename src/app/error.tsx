@@ -49,7 +49,6 @@ export default function Error({
 
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
-            aria-label="Action button"
             variant="primary"
             icon={<RotateCcw className="w-5 h-5" />}
             className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl bg-destructive hover:bg-destructive/90 text-white"
@@ -59,7 +58,6 @@ export default function Error({
           </Button>
           <Link href="/" passHref>
             <Button
-              aria-label="Action button"
               variant="secondary"
               icon={<Home className="w-5 h-5" />}
               className="w-full sm:w-auto text-lg px-8 py-6 rounded-2xl border-white/20 hover:bg-white/5"

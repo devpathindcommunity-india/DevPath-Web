@@ -28,7 +28,7 @@ test.describe('Roadmap navigation', () => {
   test('learning paths page shows the h1 heading', async ({ page }) => {
     await page.goto('/paths', GOTO_OPTS);
     await expect(
-      page.getByRole('heading', { name: /learning paths/i })
+      page.getByRole('heading', { name: 'Learning Paths', exact: true })
     ).toBeVisible({ timeout: 15000 });
   });
 
@@ -67,7 +67,7 @@ test.describe('Roadmap navigation', () => {
 
     expect(page.url()).toContain('/paths');
     await expect(
-      page.getByRole('heading', { name: /learning paths/i })
+      page.getByRole('heading', { name: 'Learning Paths', exact: true })
     ).toBeVisible({ timeout: 15000 });
   });
 

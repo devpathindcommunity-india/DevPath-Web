@@ -128,7 +128,6 @@ function RankingRow({ item }: { item: Ranking }) {
             {item.total} pts
           </span>
           <button
-            aria-label="Action button"
             className={`flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${isOpen ? 'bg-primary text-white' : 'bg-white/10 text-slate-300 hover:bg-white/20'}`}
           >
             {isOpen ? 'Close' : 'View Feedback'}

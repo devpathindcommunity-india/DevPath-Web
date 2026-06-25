@@ -55,7 +55,7 @@ export default function RepoModal({ isOpen, onClose, repo }: RepoModalProps) {
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             >
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 className={styles.closeButton}
                 onClick={onClose}
               >
@@ -120,7 +120,6 @@ export default function RepoModal({ isOpen, onClose, repo }: RepoModalProps) {
                   className="flex-1"
                 >
                   <Button
-                    aria-label="Action button"
                     variant="primary"
                     className="w-full justify-center gap-2"
                   >
@@ -137,7 +136,6 @@ export default function RepoModal({ isOpen, onClose, repo }: RepoModalProps) {
                     className="flex-1"
                   >
                     <Button
-                      aria-label="Action button"
                       variant="secondary"
                       className="w-full justify-center gap-2"
                     >

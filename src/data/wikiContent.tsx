@@ -353,7 +353,7 @@ export const wikiContent: Record<string, WikiArticle> = {
 export default function Counter() {
     const [count, setCount] = useState(0);
     return (
-        <button aria-label="Action button" onClick={() => setCount(count + 1)}>
+        <button onClick={() => setCount(count + 1)}>
             Count: {count}
         </button>
     );

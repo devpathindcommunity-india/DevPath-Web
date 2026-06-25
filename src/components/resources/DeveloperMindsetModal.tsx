@@ -87,7 +87,7 @@ export function DeveloperMindsetModal({
                 </span>
               </button>
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 onClick={onClose}
                 className="p-2 hover:bg-muted rounded-full transition-colors text-muted-foreground hover:text-foreground"
               >

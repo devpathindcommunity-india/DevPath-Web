@@ -298,7 +298,7 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                         className="flex items-center gap-2 flex-grow last:flex-grow-0"
                       >
                         <button
-                          aria-label="Action button"
+                          aria-label={`Go to phase ${idx + 1}`}
                           onClick={() => {
                             markPhaseComplete(currentPhaseIndex);
                             setCurrentPhaseIndex(idx);
@@ -398,7 +398,6 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                 <div className="flex items-center justify-between pt-6 border-t border-border mt-8">
                   {currentPhaseIndex > 0 ? (
                     <button
-                      aria-label="Action button"
                       onClick={handleBack}
                       className="flex items-center gap-2 px-5 py-2.5 bg-muted hover:bg-muted/80 rounded-xl"
                     >
@@ -411,7 +410,6 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
 
                   {currentPhaseIndex < roadmap.phases.length - 1 ? (
                     <button
-                      aria-label="Action button"
                       onClick={handleNext}
                       className="flex items-center gap-2 px-6 py-2.5 bg-primary hover:bg-primary/95 text-white rounded-xl"
                     >
@@ -421,7 +419,6 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                   ) : (
                     <div className="flex gap-3">
                       <button
-                        aria-label="Action button"
                         onClick={() => setShowQuiz(true)}
                         className="px-6 py-2.5 rounded-xl bg-purple-600 hover:bg-purple-700 text-white font-semibold"
                       >
@@ -429,7 +426,6 @@ export function RoadmapModal({ isOpen, onClose, roadmap }: RoadmapModalProps) {
                       </button>
 
                       <button
-                        aria-label="Action button"
                         onClick={handleComplete}
                         className="flex items-center gap-2 px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl"
                       >

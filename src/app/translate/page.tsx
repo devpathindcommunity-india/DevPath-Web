@@ -89,7 +89,6 @@ export default function TranslatePage() {
             developers worldwide.
           </p>
           <Button
-            aria-label="Action button"
             variant="primary"
             icon={<Languages size={20} />}
           >
@@ -136,7 +135,6 @@ export default function TranslatePage() {
               </div>
 
               <Button
-                aria-label="Action button"
                 variant="secondary"
                 className="w-full"
               >
@@ -191,7 +189,6 @@ export default function TranslatePage() {
               className={styles.input}
             />
             <Button
-              aria-label="Action button"
               variant="primary"
               icon={<Plus size={20} />}
             >

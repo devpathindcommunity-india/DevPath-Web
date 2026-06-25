@@ -284,7 +284,7 @@ export default function ProjectUploadModal({
             {initialData ? 'Edit Project' : 'Add New Project'}
           </h2>
           <button
-            aria-label="Action button"
+            aria-label="Close modal"
             onClick={onClose}
             className="p-2 hover:bg-muted rounded-full transition-colors"
           >
@@ -313,7 +313,6 @@ export default function ProjectUploadModal({
                 <label className="block text-sm font-medium">Description</label>
                 <div className="flex bg-muted rounded-lg p-1">
                   <button
-                    aria-label="Action button"
                     type="button"
                     onClick={() => setDescTab('write')}
                     className={`px-3 py-1 text-xs rounded-md transition-all ${descTab === 'write' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -321,7 +320,6 @@ export default function ProjectUploadModal({
                     Write
                   </button>
                   <button
-                    aria-label="Action button"
                     type="button"
                     onClick={() => setDescTab('preview')}
                     className={`px-3 py-1 text-xs rounded-md transition-all ${descTab === 'preview' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -388,7 +386,7 @@ export default function ProjectUploadModal({
                   >
                     {skill}
                     <button
-                      aria-label="Action button"
+                      aria-label={`Remove ${skill}`}
                       type="button"
                       onClick={() => handleRemoveSkill(skill)}
                       className="hover:text-red-500"
@@ -420,7 +418,6 @@ export default function ProjectUploadModal({
                   <div className="absolute z-10 w-full mt-1 bg-card border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
                     {filteredSkills.map((skill) => (
                       <button
-                        aria-label="Action button"
                         key={skill}
                         type="button"
                         onClick={() => handleAddSkill(skill)}
@@ -439,7 +436,6 @@ export default function ProjectUploadModal({
               </label>
               <div className="flex gap-4 mb-4">
                 <button
-                  aria-label="Action button"
                   type="button"
                   onClick={() => setMediaType('images')}
                   className={`flex-1 py-2 px-4 rounded-lg border flex items-center justify-center gap-2 transition-colors ${
@@ -451,7 +447,6 @@ export default function ProjectUploadModal({
                   <ImageIcon size={18} /> Screenshots
                 </button>
                 <button
-                  aria-label="Action button"
                   type="button"
                   onClick={() => setMediaType('video')}
                   className={`flex-1 py-2 px-4 rounded-lg border flex items-center justify-center gap-2 transition-colors ${
@@ -479,7 +474,7 @@ export default function ProjectUploadModal({
                       disabled={screenshots.length >= 5}
                     />
                     <button
-                      aria-label="Action button"
+                      aria-label="Add screenshot"
                       type="button"
                       onClick={handleAddScreenshot}
                       disabled={!screenshotInput || screenshots.length >= 5}
@@ -503,7 +498,7 @@ export default function ProjectUploadModal({
                             className="object-cover"
                           />
                           <button
-                            aria-label="Action button"
+                            aria-label={`Remove screenshot ${index + 1}`}
                             type="button"
                             onClick={() => handleRemoveScreenshot(index)}
                             className="absolute top-1 right-1 p-1 bg-red-500/80 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
@@ -542,7 +537,6 @@ export default function ProjectUploadModal({
 
             <div className="pt-4 flex justify-end gap-3">
               <button
-                aria-label="Action button"
                 type="button"
                 onClick={onClose}
                 className="px-6 py-2 rounded-lg hover:bg-muted transition-colors"
@@ -550,7 +544,6 @@ export default function ProjectUploadModal({
                 Cancel
               </button>
               <button
-                aria-label="Action button"
                 type="submit"
                 disabled={loading}
                 className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"

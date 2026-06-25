@@ -265,7 +265,6 @@ export default function QuizComponent({
 
         <div className={styles.actionButtons}>
           <button
-            aria-label="Action button"
             className={styles.retryButton}
             onClick={() => {
               dispatchQuiz({ type: 'reset' });
@@ -275,7 +274,6 @@ export default function QuizComponent({
           </button>
           {onComplete && (
             <button
-              aria-label="Action button"
               className={styles.completeButton}
               onClick={onComplete}
             >
@@ -326,7 +324,6 @@ export default function QuizComponent({
 
             return (
               <button
-                aria-label="Action button"
                 key={option}
                 className={optionClass}
                 disabled={quizState.showFeedback}
@@ -361,7 +358,6 @@ export default function QuizComponent({
         )}
 
         <button
-          aria-label="Action button"
           className={styles.nextButton}
           disabled={!quizState.selectedAnswer || quizState.showFeedback}
           onClick={handleQuizSubmit}

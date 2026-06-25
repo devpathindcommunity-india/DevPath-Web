@@ -135,7 +135,6 @@ export default function CommunityPage() {
           <div className="flex items-center gap-3">
             {activeTab === 'discussions' && (
               <button
-                aria-label="Action button"
                 onClick={() => {
                   if (!user) {
                     alert('Please login to start a discussion.');
@@ -154,7 +153,6 @@ export default function CommunityPage() {
         {/* Tabs */}
         <div className="flex border-b border-border mb-8">
           <button
-            aria-label="Action button"
             onClick={() => setActiveTab('discussions')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
               activeTab === 'discussions'
@@ -165,7 +163,6 @@ export default function CommunityPage() {
             <MessageSquare size={18} /> Discussions
           </button>
           <button
-            aria-label="Action button"
             onClick={() => setActiveTab('showcase')}
             className={`flex items-center gap-2 px-6 py-3 border-b-2 transition-colors ${
               activeTab === 'showcase'
@@ -182,14 +179,12 @@ export default function CommunityPage() {
           <div className="flex justify-end mb-6">
             <div className="flex bg-gray-200 dark:bg-white/5 rounded-lg p-1">
               <button
-                aria-label="Action button"
                 onClick={() => setSortOption('newest')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all mr-1 ${sortOption === 'newest' ? 'bg-background shadow-sm text-foreground' : 'text-foreground hover:bg-slate-200 dark:hover:bg-white/5'}`}
               >
                 Newest
               </button>
               <button
-                aria-label="Action button"
                 onClick={() => setSortOption('popular')}
                 className={`px-3 py-1 text-xs font-medium rounded-md transition-all ${sortOption === 'popular' ? 'bg-background shadow-sm text-foreground' : 'text-foreground hover:bg-slate-200 dark:hover:bg-white/5'}`}
               >
@@ -311,7 +306,7 @@ export default function CommunityPage() {
                 {selectedProject.title}
               </h2>
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 onClick={() => setSelectedProject(null)}
                 className="p-2 hover:bg-muted rounded-full transition-colors"
               >

@@ -265,7 +265,6 @@ export default function DiscussionViewClient() {
     <div className="min-h-screen bg-background text-foreground pt-24 pb-12">
       <div className="container mx-auto px-4 max-w-4xl">
         <button
-          aria-label="Action button"
           onClick={() => router.push('/community')}
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground mb-6 transition-colors"
         >
@@ -312,7 +311,6 @@ export default function DiscussionViewClient() {
             <div className="flex items-center gap-4">
               <div className="relative">
                 <button
-                  aria-label="Action button"
                   onClick={() => setShowReactionPicker(!showReactionPicker)}
                   className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border hover:bg-muted transition-colors text-sm"
                 >
@@ -324,7 +322,7 @@ export default function DiscussionViewClient() {
                   <div className="absolute bottom-full left-0 mb-2 bg-card border border-border rounded-xl shadow-lg p-2 flex gap-2 animate-in fade-in zoom-in-95 z-10">
                     {REACTIONS.map((reaction) => (
                       <button
-                        aria-label="Action button"
+                        aria-label={reaction.label}
                         key={reaction.emoji}
                         onClick={() => handleReaction(reaction.emoji)}
                         className="p-2 hover:bg-muted rounded-lg transition-colors text-xl"
@@ -343,7 +341,7 @@ export default function DiscussionViewClient() {
                   const reaction = REACTIONS.find((r) => r.emoji === emoji);
                   return (
                     <button
-                      aria-label="Action button"
+                      aria-label={`${reaction?.label || emoji} reaction`}
                       key={emoji}
                       onClick={() => handleReaction(emoji)}
                       className={`flex items-center gap-1 px-2 py-1 rounded-full border text-xs transition-colors ${
@@ -367,7 +365,6 @@ export default function DiscussionViewClient() {
                 <span>{replies.length} replies</span>
               </div>
               <button
-                aria-label="Action button"
                 onClick={handleShare}
                 className="flex items-center gap-2 hover:text-foreground transition-colors"
               >
@@ -425,7 +422,6 @@ export default function DiscussionViewClient() {
                 <h4 className="font-semibold">Leave a reply</h4>
                 <div className="flex bg-secondary border border-border/30 rounded-lg p-1">
                   <button
-                    aria-label="Action button"
                     type="button"
                     onClick={() => setReplyTab('write')}
                     className={`px-3 py-1 text-xs rounded-md transition-all ${replyTab === 'write' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -433,7 +429,6 @@ export default function DiscussionViewClient() {
                     Write
                   </button>
                   <button
-                    aria-label="Action button"
                     type="button"
                     onClick={() => setReplyTab('preview')}
                     className={`px-3 py-1 text-xs rounded-md transition-all ${replyTab === 'preview' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
@@ -468,7 +463,6 @@ export default function DiscussionViewClient() {
               )}
               <div className="flex justify-end">
                 <button
-                  aria-label="Action button"
                   type="submit"
                   disabled={submitting || !newReply.trim()}
                   className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

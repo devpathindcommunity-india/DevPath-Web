@@ -15,14 +15,12 @@ export default function LearningPathsPage() {
         {/* Toggle Button */}
         <div className="flex gap-2 bg-github-dark p-1 rounded-lg border border-github-border">
           <button
-            aria-label="Action button"
             onClick={() => setView('card')}
             className={`px-4 py-2 rounded-md ${view === 'card' ? 'bg-github-green text-white' : 'text-github-muted'}`}
           >
             Card View
           </button>
           <button
-            aria-label="Action button"
             onClick={() => setView('tree')}
             className={`px-4 py-2 rounded-md ${view === 'tree' ? 'bg-github-green text-white' : 'text-github-muted'}`}
           >

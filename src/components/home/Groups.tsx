@@ -57,7 +57,6 @@ export default function Groups() {
                 className="block"
               >
                 <Button
-                  aria-label="Action button"
                   variant="secondary"
                   className="w-full justify-between group-hover:bg-primary group-hover:text-white transition-colors"
                 >

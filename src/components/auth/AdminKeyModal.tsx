@@ -97,7 +97,6 @@ export default function AdminKeyModal({
 
                 <div className="flex gap-3 mt-6">
                   <button
-                    aria-label="Action button"
                     type="button"
                     onClick={onCancel}
                     className="flex-1 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg hover:bg-secondary/80 transition-colors"
@@ -105,7 +104,6 @@ export default function AdminKeyModal({
                     Cancel
                   </button>
                   <button
-                    aria-label="Action button"
                     type="submit"
                     disabled={isLoading || !key}
                     className="flex-1 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"

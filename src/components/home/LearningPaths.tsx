@@ -197,7 +197,7 @@ export default function LearningPaths() {
               </div>
 
               <Button
-                aria-label="Action button"
+                aria-label={path.status === 'coming-soon' ? 'Notify me' : 'View path'}
                 variant="ghost"
                 className="!p-2"
                 onClick={(e) => {
@@ -244,7 +244,7 @@ export default function LearningPaths() {
         >
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <button
-              aria-label="Action button"
+              aria-label="Close modal"
               className={styles.closeButton}
               onClick={() => setShowNotifyModal(false)}
             >
@@ -272,7 +272,6 @@ export default function LearningPaths() {
                     required
                   />
                   <Button
-                    aria-label="Action button"
                     variant="primary"
                     type="submit"
                   >
@@ -286,7 +285,6 @@ export default function LearningPaths() {
                 <h3>You&apos;re on the list!</h3>
                 <p>We&apos;ll email you when {selectedPath} is ready.</p>
                 <Button
-                  aria-label="Action button"
                   variant="secondary"
                   onClick={() => setShowNotifyModal(false)}
                 >

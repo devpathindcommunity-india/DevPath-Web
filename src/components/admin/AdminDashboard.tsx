@@ -843,7 +843,6 @@ export default function AdminDashboard({
               </p>
             </div>
             <button
-              aria-label="Action button"
               onClick={async () => {
                 try {
                   const newState = !maintenanceMode;
@@ -871,7 +870,6 @@ export default function AdminDashboard({
               className="w-full p-2 bg-muted border border-border rounded-md"
             />
             <button
-              aria-label="Action button"
               onClick={async () => {
                 try {
                   await updateDoc(doc(db, 'settings', 'general'), {
@@ -894,7 +892,6 @@ export default function AdminDashboard({
         {hasMore && (
           <div className="flex justify-center mt-6">
             <button
-              aria-label="Action button"
               onClick={loadMoreMembers}
               disabled={loadingMore}
               className="px-6 py-2 bg-primary text-white rounded-md font-bold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"

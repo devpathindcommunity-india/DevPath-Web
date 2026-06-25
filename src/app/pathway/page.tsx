@@ -617,7 +617,6 @@ export default function PathwayPage() {
                       {reward.cost.toLocaleString()} pts
                     </span>
                     <button
-                      aria-label="Action button"
                       className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
                     >
                       Redeem
@@ -682,7 +681,6 @@ export default function PathwayPage() {
                       {reward.cost.toLocaleString()} pts
                     </span>
                     <button
-                      aria-label="Action button"
                       className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
                     >
                       Redeem
@@ -753,7 +751,6 @@ export default function PathwayPage() {
                       {reward.cost.toLocaleString()} pts
                     </span>
                     <button
-                      aria-label="Action button"
                       className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
                     >
                       Redeem
@@ -806,7 +803,6 @@ export default function PathwayPage() {
                       {reward.cost.toLocaleString()} pts
                     </span>
                     <button
-                      aria-label="Action button"
                       className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
                     >
                       Redeem

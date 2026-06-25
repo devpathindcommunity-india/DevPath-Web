@@ -58,7 +58,7 @@ export function ThemeToggle() {
   if (!isThemeMounted) {
     return (
       <Button
-        aria-label="Action button"
+        aria-label="Toggle theme"
         variant="ghost"
         disabled
         aria-hidden="true"

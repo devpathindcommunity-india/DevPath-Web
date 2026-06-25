@@ -199,7 +199,6 @@ export default function SubmitWizard() {
                 be live on the showcase within 24 hours.
               </p>
               <Button
-                aria-label="Action button"
                 variant="primary"
                 className="mt-8"
                 onClick={() => (window.location.href = '/')}
@@ -394,7 +393,6 @@ export default function SubmitWizard() {
                         {(formData.thumbnail.size / 1024).toFixed(2)} KB
                       </p>
                       <button
-                        aria-label="Action button"
                         type="button"
                         onClick={handleRemoveThumbnail}
                         style={{
@@ -522,7 +520,6 @@ export default function SubmitWizard() {
 
           <div className={styles.actions}>
             <Button
-              aria-label="Action button"
               variant="ghost"
               onClick={handleBack}
               disabled={currentStep === 0}
@@ -531,7 +528,6 @@ export default function SubmitWizard() {
               <ArrowLeft size={20} /> Back
             </Button>
             <Button
-              aria-label="Action button"
               variant="primary"
               onClick={handleNext}
               disabled={isSubmitting}

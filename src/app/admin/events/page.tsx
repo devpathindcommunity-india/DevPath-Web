@@ -113,7 +113,6 @@ export default function AdminEventsPage() {
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Manage Events</h1>
         <button
-          aria-label="Action button"
           onClick={() => {
             setEditingEvent(null);
             setFormData({
@@ -174,14 +173,12 @@ export default function AdminEventsPage() {
                 </div>
                 <div className="flex gap-2 mt-4 pt-4 border-t border-border">
                   <button
-                    aria-label="Action button"
                     onClick={() => handleEdit(event)}
                     className="flex-1 flex items-center justify-center gap-1 text-sm bg-muted hover:bg-muted/80 py-2 rounded"
                   >
                     <Edit2 size={14} /> Edit
                   </button>
                   <button
-                    aria-label="Action button"
                     onClick={() => handleDelete(event.id)}
                     className="flex-1 flex items-center justify-center gap-1 text-sm bg-red-500/10 text-red-500 hover:bg-red-500/20 py-2 rounded"
                   >
@@ -202,7 +199,7 @@ export default function AdminEventsPage() {
                 {editingEvent ? 'Edit Event' : 'New Event'}
               </h3>
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 onClick={() => setIsModalOpen(false)}
               >
                 <X size={24} />
@@ -292,7 +289,6 @@ export default function AdminEventsPage() {
               </div>
               <div className="flex justify-end gap-2 pt-4">
                 <button
-                  aria-label="Action button"
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                   className="px-4 py-2 rounded-lg hover:bg-muted"
@@ -300,7 +296,6 @@ export default function AdminEventsPage() {
                   Cancel
                 </button>
                 <button
-                  aria-label="Action button"
                   type="submit"
                   className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
                 >

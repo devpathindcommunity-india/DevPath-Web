@@ -334,14 +334,12 @@ export default function ContributorsPage() {
         <h2 className={styles.ctaTitle}>Want to see your name here?</h2>
         <div className={styles.ctaButtons}>
           <Button
-            aria-label="Action button"
             variant="primary"
             icon={<Github size={20} />}
           >
             View Open Issues
           </Button>
           <Button
-            aria-label="Action button"
             variant="secondary"
             icon={<ExternalLink size={20} />}
           >

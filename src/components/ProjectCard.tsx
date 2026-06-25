@@ -81,7 +81,7 @@ export function ProjectCard({ project }: { project: Project }) {
           {/* Stats */}
           <div className="flex items-center gap-6 text-sm text-slate-600 dark:text-gray-400 mt-4 pt-4 border-t border-black/5 dark:border-white/10">
             <button
-              aria-label="Action button"
+              aria-label="Star project"
               onClick={(e) => {
                 e.stopPropagation();
                 setIsStarred(!isStarred);
@@ -127,7 +127,7 @@ export function ProjectCard({ project }: { project: Project }) {
             >
               {/* Close button */}
               <button
-                aria-label="Action button"
+                aria-label="Close modal"
                 onClick={() => setIsModalOpen(false)}
                 className="absolute top-4 right-4 w-10 h-10 rounded-full bg-black/5 dark:bg-white/10 hover:bg-black/10 dark:hover:bg-white/20 flex items-center justify-center transition-colors text-gray-900 dark:text-white"
               >

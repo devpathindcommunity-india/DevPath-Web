@@ -265,7 +265,6 @@ export default function FlagsPage() {
 
         <div className={styles.actions}>
           <Button
-            aria-label="Action button"
             variant="ghost"
             icon={<RotateCcw size={18} />}
             onClick={resetFlags}

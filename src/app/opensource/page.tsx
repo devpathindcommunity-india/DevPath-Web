@@ -331,7 +331,6 @@ export default function OpenSourcePage() {
                 </div>
                 {!accessToken && (
                   <button
-                    aria-label="Action button"
                     onClick={handleConnectGitHub}
                     className="text-sm text-muted-foreground hover:text-primary underline"
                   >
@@ -341,7 +340,6 @@ export default function OpenSourcePage() {
               </div>
             ) : (
               <button
-                aria-label="Action button"
                 onClick={handleConnectGitHub}
                 disabled={connecting}
                 className="flex items-center gap-2 px-6 py-3 bg-github-surface text-white rounded-full hover:bg-github-border transition-colors font-medium disabled:opacity-50"

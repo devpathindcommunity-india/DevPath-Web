@@ -144,7 +144,7 @@ export default function InteractiveSteps() {
               </code>
               {steps[activeStep].id !== 1 && (
                 <button
-                  aria-label="Action button"
+                  aria-label="Copy command"
                   className={styles.copyButton}
                   onClick={() => handleCopy(steps[activeStep].command)}
                 >

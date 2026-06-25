@@ -29,7 +29,6 @@ export default function Community() {
             style={{ textDecoration: 'none' }}
           >
             <Button
-              aria-label="Action button"
               variant="primary"
               icon={<MessageCircle size={20} />}
             >

@@ -171,7 +171,6 @@ export default function SourceCodePage() {
                 )}
               </div>
               <Button
-                aria-label="Action button"
                 variant={repo.status === 'public' ? 'primary' : 'ghost'}
                 className="w-full"
                 onClick={() => setSelectedRepo(repo)}

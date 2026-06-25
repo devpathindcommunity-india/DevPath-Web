@@ -244,7 +244,7 @@ export default function ProjectCard({
 
         {isOwner && (
           <button
-            aria-label="Action button"
+            aria-label="Edit project"
             onClick={(e) => {
               e.stopPropagation();
               onEdit?.(project);
@@ -289,7 +289,7 @@ export default function ProjectCard({
           </p>
 
           <button
-            aria-label="Action button"
+            aria-label="Star project"
             onClick={handleToggleStar}
             disabled={isStarring}
             className={`flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-full transition-colors ${
@@ -337,7 +337,6 @@ export default function ProjectCard({
         </div>
 
         <button
-          aria-label="Action button"
           onClick={() =>
             onReadMore
               ? onReadMore(project)
