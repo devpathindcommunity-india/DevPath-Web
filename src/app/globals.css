@@ -130,10 +130,12 @@
   }
 }
 
-html,
-body {
+html {
   max-width: 100vw;
   overflow-x: hidden;
+}
+
+body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-inter), sans-serif;

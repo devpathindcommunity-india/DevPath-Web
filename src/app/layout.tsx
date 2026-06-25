@@ -131,6 +131,10 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192400464044260"
           crossOrigin="anonymous"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body
         className={`${inter.variable} ${spaceGrotesk.variable} ${barlowCondensed.variable}`}
@@ -145,10 +149,6 @@ export default function RootLayout({
           >
             <NotificationProvider>
               <SyncErrorListener>
-                <script
-                  type="application/ld+json"
-                  dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-                />
                 <AuthProvider>
                   <GamificationProvider>
                     <RealTimeProvider>
