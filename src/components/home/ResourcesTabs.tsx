@@ -371,6 +371,9 @@ export default function ResourcesTabs() {
     const searchParams = useSearchParams();
 
     const [activeMainTab, setActiveMainTab] = useState('roadmaps');
+    const ITEMS_PER_PAGE = 2;
+    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
+    
     useEffect(() => {
         setVisibleCount(ITEMS_PER_PAGE);
     }, [activeMainTab]);
@@ -382,8 +385,6 @@ export default function ResourcesTabs() {
 
     // Progress State mapping roadmap IDs to completion percentages
     const [progressData, setProgressData] = useState<Record<string, number>>({});
-    const ITEMS_PER_PAGE = 2;
-    const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
     const [isLoading, setIsLoading] = useState(false);
     const observerRef = useRef<HTMLDivElement>(null);
 
