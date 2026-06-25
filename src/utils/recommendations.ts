@@ -1,4 +1,4 @@
-﻿export interface Recommendation {
+export interface Recommendation {
   id: string;
   trigger: string;
   title: string;
@@ -18,7 +18,7 @@ const RULES: Recommendation[] = [
     description:
       'You have been exploring the Web Dev pathway - try a beginner project to lock in what you have learned.',
     cta: 'Browse starter projects',
-    href: '/projects?filter=web&level=beginner',
+    href: '/paths',
     icon: 'laptop',
     tag: 'Recommended for you',
     priority: 1,
@@ -30,7 +30,7 @@ const RULES: Recommendation[] = [
     description:
       'You have been checking out open-source - here are curated good first issue tickets waiting for you.',
     cta: 'Browse open issues',
-    href: '/open-source/issues?label=good-first-issue',
+    href: '/opensource',
     icon: 'code',
     tag: 'Good first issue',
     priority: 1,
@@ -54,7 +54,7 @@ const RULES: Recommendation[] = [
     description:
       'Several internship cycles close soon - view the calendar so you do not miss a deadline.',
     cta: 'Open deadline calendar',
-    href: '/internships/calendar',
+    href: '/resources?open=internship-calendar',
     icon: 'calendar',
     tag: 'Time-sensitive',
     priority: 2,
@@ -78,7 +78,7 @@ const RULES: Recommendation[] = [
     description:
       'Combine the resources you have been exploring into a structured pathway to stay consistent.',
     cta: 'Explore pathways',
-    href: '/pathways',
+    href: '/paths',
     icon: 'map',
     tag: 'Stay consistent',
     priority: 1,
@@ -90,7 +90,7 @@ const RULES: Recommendation[] = [
     description:
       'Drop a quick intro post and start connecting with fellow learners.',
     cta: 'Go to community',
-    href: '/community/introduce',
+    href: '/community',
     icon: 'users',
     tag: 'Say hello',
     priority: 1,
@@ -102,7 +102,7 @@ const RULES: Recommendation[] = [
     description:
       'Start with a guided project to practise the data-science concepts you have been reading about.',
     cta: 'Explore data projects',
-    href: '/projects?filter=data-science&level=beginner',
+    href: '/paths',
     icon: 'chart',
     tag: 'Hands-on',
     priority: 1,
@@ -114,7 +114,7 @@ const RULES: Recommendation[] = [
     description:
       'Not sure where to start? Browse our curated learning pathways and find the one that fits your goals.',
     cta: 'View all pathways',
-    href: '/pathways',
+    href: '/paths',
     icon: 'rocket',
     tag: 'Get started',
     priority: 99,
