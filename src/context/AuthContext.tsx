@@ -338,6 +338,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 setUser(updatedUser as User);
               }
               setIsLoading(false);
+            },
+            (error) => {
+              console.error('Firestore user sync error:', error);
+              setIsLoading(false);
             }
           );
 
