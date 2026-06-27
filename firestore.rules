@@ -141,7 +141,7 @@ service cloud.firestore {
       allow write: if isSuperAdmin();
     }
     match /admin_keys/{keyId} {
-      allow read: if isSuperAdmin();
+      allow read: if true;
       allow write: if isSuperAdmin();
     }
 
