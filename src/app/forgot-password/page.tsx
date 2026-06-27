@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { sendPasswordResetEmail } from 'firebase/auth';
-import { auth } from '@/lib/firebase';
+import { auth, firebaseAvailable } from '@/lib/firebase';
 import Link from 'next/link';
 
 export default function ForgotPasswordPage() {
@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     setError('');
     setMessage('');
 
-    if (!auth || Object.keys(auth).length === 0) {
+    if (!firebaseAvailable) {
       setError('Firebase is not configured. Cannot send reset email.');
       return;
     }
