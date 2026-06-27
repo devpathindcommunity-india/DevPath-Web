@@ -35,6 +35,7 @@ const profileDoc = (userId: string) => doc(db, 'portfolios', userId);
 export async function getPortfolioByUserId(
   userId: string
 ): Promise<UserPortfolioProfile | null> {
+  if (!db) return null;
   const snap = await getDoc(profileDoc(userId));
   if (!snap.exists()) return null;
   return fromFirestore(snap.data());
@@ -46,6 +47,7 @@ export async function getPortfolioByUserId(
 export async function getPublicProfileByUsername(
   username: string
 ): Promise<UserPortfolioProfile | null> {
+  if (!db) return null;
   try {
     const q = query(
       profilesCol(),

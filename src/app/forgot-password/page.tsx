@@ -16,8 +16,13 @@ export default function ForgotPasswordPage() {
     setError('');
     setMessage('');
 
+    if (!auth || Object.keys(auth).length === 0) {
+      setError('Firebase is not configured. Cannot send reset email.');
+      return;
+    }
+
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth as any, email);
 
       setMessage('Password reset instructions have been sent to your email.');
     } catch (err: any) {
