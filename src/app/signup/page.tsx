@@ -44,6 +44,7 @@ export default function SignupPage() {
   const [instagram, setInstagram] = useState('');
   const [adminKey, setAdminKey] = useState('');
   const [isAdminSignup, setIsAdminSignup] = useState(false);
+  const [isForcedAdmin, setIsForcedAdmin] = useState(false);
 
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -110,8 +111,24 @@ export default function SignupPage() {
     }
   };
 
-  const goToNext = () => {
+  const goToNext = async () => {
     if (validateStep(currentStep)) {
+      if (currentStep === 1) {
+        setLoading(true);
+        try {
+          const adminDoc = await getDoc(doc(db, 'admins', email.toLowerCase()));
+          if (adminDoc.exists()) {
+            setIsAdminSignup(true);
+            setIsForcedAdmin(true);
+          } else {
+            setIsForcedAdmin(false);
+          }
+        } catch (err) {
+          console.error('Error checking admin status:', err);
+        } finally {
+          setLoading(false);
+        }
+      }
       setCurrentStep((prev) => Math.min(prev + 1, totalSteps));
     }
   };
@@ -126,12 +143,24 @@ export default function SignupPage() {
     setLoading(true);
 
     try {
-      if (isAdminSignup) {
+      let effectiveIsAdmin = isAdminSignup;
+      if (!effectiveIsAdmin) {
+        const checkDoc = await getDoc(doc(db, 'admins', email.toLowerCase()));
+        if (checkDoc.exists()) {
+          effectiveIsAdmin = true;
+        }
+      }
+
+      if (effectiveIsAdmin) {
         const keyDoc = await getDoc(doc(db, 'admin_keys', 'config'));
         if (!keyDoc.exists()) {
           throw new Error('System Configuration Error: Admin Key not found.');
         }
         const currentAdminKey = keyDoc.data().value;
+
+        if (!adminKey.trim()) {
+          throw new Error('Admin key is required for admin registration.');
+        }
 
         if (adminKey !== currentAdminKey) {
           throw new Error('Invalid Admin Key. Please contact the Super Admin.');
@@ -152,9 +181,9 @@ export default function SignupPage() {
         instagram,
       });
 
-      if (isAdminSignup) {
+      if (effectiveIsAdmin) {
         await setDoc(
-          doc(db, 'admins', email),
+          doc(db, 'admins', email.toLowerCase()),
           {
             uid: firebaseUser.uid,
             name,
@@ -451,14 +480,15 @@ export default function SignupPage() {
                 <input
                   type="checkbox"
                   id="isAdminToggle"
-                  checked={isAdminSignup}
+                  checked={isAdminSignup || isForcedAdmin}
                   onChange={(e) => setIsAdminSignup(e.target.checked)}
-                  className="h-4 w-4 rounded border-border text-cyan-400 focus:ring-cyan-400/60"
+                  disabled={isForcedAdmin}
+                  className="h-4 w-4 rounded border-border text-cyan-400 focus:ring-cyan-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <span>Register as Admin</span>
+                <span>Register as Admin {isForcedAdmin && '(Required for your email)'}</span>
               </label>
 
-              {isAdminSignup && (
+              {(isAdminSignup || isForcedAdmin) && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
@@ -548,7 +578,7 @@ export default function SignupPage() {
                 <div className="pt-4 border-t border-white/10">
                   <div className="text-white/50 text-xs mb-1">ACCOUNT TYPE</div>
                   <div className="font-medium text-cyan-300">
-                    {isAdminSignup ? 'Administrator' : 'Community Member'}
+                    {isAdminSignup || isForcedAdmin ? 'Administrator' : 'Community Member'}
                   </div>
                 </div>
               </div>
