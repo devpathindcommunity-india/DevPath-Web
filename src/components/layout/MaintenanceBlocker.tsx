@@ -12,14 +12,19 @@ export default function MaintenanceBlocker({
   const { isMaintenanceMode, loading: maintenanceLoading } = useMaintenance();
   const { user, isLoading: authLoading } = useAuth();
 
-  // If still checking database or auth, show nothing or a tiny spinner
-  if (maintenanceLoading || authLoading) return null;
+  const isLoading = maintenanceLoading || authLoading;
 
-  // THE CORE LOGIC: If maintenance is ON and user is NOT an admin, BLOCK THEM.
-  if (isMaintenanceMode && !(user as any)?.isAdmin) {
+  // If maintenance is ON and user is NOT an admin, BLOCK THEM.
+  if (!isLoading && isMaintenanceMode && !(user as any)?.isAdmin) {
     return <MaintenanceOverlay />;
   }
 
-  // Otherwise, let them see the site normally
-  return <>{children}</>;
+  return (
+    <div
+      className={isLoading ? 'opacity-0 pointer-events-none' : ''}
+      aria-hidden={isLoading}
+    >
+      {children}
+    </div>
+  );
 }
