@@ -3,7 +3,6 @@ import { SectionDivider } from '@/components/SectionDivider';
 import { SectionEntrance } from '@/components/ui/SectionEntrance';
 import { FloatingParticles } from '@/components/FloatingParticles';
 import dynamic from 'next/dynamic';
-import BackToTop from '@/components/BackToTop';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CookieConsent from '@/components/CookieConsent';
 
@@ -39,8 +38,6 @@ export default function Home() {
             <Sponsors />
           </SectionEntrance>
         </ErrorBoundary>
-
-        <BackToTop />
 
         {/* COOKIE CONSENT GLOBAL POPUP */}
         <CookieConsent />

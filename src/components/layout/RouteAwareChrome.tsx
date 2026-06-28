@@ -14,6 +14,7 @@ import { ToastContainer } from '@/components/ui/ToastContainer';
 import SearchModal from '@/components/layout/SearchModal';
 import ShortcutLegend from '@/components/layout/ShortcutLegend';
 import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import BackToTop from '@/components/BackToTop';
 
 export default function RouteAwareChrome({
   children,
@@ -24,7 +25,6 @@ export default function RouteAwareChrome({
   const isAuthRoute = pathname === '/login' || pathname === '/signup';
   const [isLegendOpen, setLegendOpen] = useState(false);
 
-  // Bind global navigation shortcuts
   useKeyboardShortcuts({
     '?': () => setLegendOpen((prev) => !prev),
     escape: () => setLegendOpen(false),
@@ -42,6 +42,7 @@ export default function RouteAwareChrome({
 
       {!isAuthRoute && <FooterWrapper />}
       {!isAuthRoute && <FloatingAssistant />}
+      {!isAuthRoute && <BackToTop />}
       <ToastContainer />
       <SearchModal />
       <ShortcutLegend
