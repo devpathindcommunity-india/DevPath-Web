@@ -185,16 +185,16 @@ export default function OpportunityDashboard() {
   };
 
   return (
-    <div className="w-full space-y-6 text-slate-100">
+    <div className="w-full space-y-6 text-foreground">
       {/* Header and Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-slate-950/40 border border-slate-900 rounded-2xl backdrop-blur-xl relative overflow-hidden">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-6 bg-muted/40 dark:bg-slate-950/40 border border-border dark:border-slate-900 rounded-2xl backdrop-blur-xl relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent"></div>
         <div className="space-y-1">
-          <h2 className="text-2xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground flex items-center gap-2">
             <SlidersHorizontal className="text-primary" size={22} />
             Opportunity Hub
           </h2>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-muted-foreground">
             Track applications, countdown deadlines, and save high-value career
             opportunities.
           </p>
@@ -213,35 +213,35 @@ export default function OpportunityDashboard() {
               placeholder="Search title, company, tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 bg-slate-950/80 border border-slate-800 focus:border-primary/50 focus:outline-none rounded-xl text-xs text-white placeholder:text-slate-600 transition-colors"
+              className="w-full pl-10 pr-4 py-2 bg-background border border-border focus:border-primary/50 focus:outline-none rounded-xl text-xs text-foreground placeholder:text-muted-foreground transition-colors"
             />
           </div>
 
           {/* Sort Dropdown */}
-          <div className="flex items-center gap-2 bg-slate-950/80 border border-slate-800 rounded-xl px-3 py-2">
+          <div className="flex items-center gap-2 bg-background border border-border rounded-xl px-3 py-2">
             <ArrowUpDown size={14} className="text-slate-500" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent text-xs text-slate-300 focus:outline-none cursor-pointer"
+              className="bg-transparent text-xs text-foreground focus:outline-none cursor-pointer"
             >
-              <option value="deadline" className="bg-slate-950">
+              <option value="deadline" className="bg-background">
                 Closest Deadline
               </option>
-              <option value="recent" className="bg-slate-950">
+              <option value="recent" className="bg-background">
                 Recently Bookmarked
               </option>
-              <option value="alpha" className="bg-slate-950">
+              <option value="alpha" className="bg-background">
                 Alphabetical
               </option>
             </select>
           </div>
 
           {/* Grid/List toggler */}
-          <div className="flex items-center bg-slate-950/80 border border-slate-800 rounded-xl p-1">
+          <div className="flex items-center bg-background border border-border rounded-xl p-1">
             <button
               onClick={() => setViewMode('grid')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'grid' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               title="Grid View"
               aria-label="Switch to grid view"
             >
@@ -249,9 +249,11 @@ export default function OpportunityDashboard() {
             </button>
             <button
               onClick={() => setViewMode('list')}
-              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary text-white' : 'text-slate-500 hover:text-slate-300'}`}
+              className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               title="List View"
               aria-label="Switch to list view"
+
+
             >
               <List size={15} />
             </button>
@@ -260,13 +262,13 @@ export default function OpportunityDashboard() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-2 border-b border-slate-900 pb-px">
+      <div className="flex gap-2 border-b border-border pb-px">
         <button
           onClick={() => setActiveTab('explore')}
           className={`pb-3 px-4 text-sm font-bold relative transition-colors ${
             activeTab === 'explore'
-              ? 'text-white'
-              : 'text-slate-500 hover:text-slate-300'
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
           }`}
         >
           Explore
@@ -281,8 +283,9 @@ export default function OpportunityDashboard() {
           onClick={() => setActiveTab('bookmarked')}
           className={`pb-3 px-4 text-sm font-bold relative transition-colors flex items-center gap-1.5 ${
             activeTab === 'bookmarked'
-              ? 'text-white'
-              : 'text-slate-500 hover:text-slate-300'
+              ? 'text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+
           }`}
         >
           My Bookmarks
@@ -307,15 +310,15 @@ export default function OpportunityDashboard() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 10 }}
-            className="flex flex-col items-center justify-center p-12 bg-slate-950/20 border border-slate-900 rounded-2xl text-center"
+            className="flex flex-col items-center justify-center p-12 bg-muted/20 dark:bg-slate-950/20 border border-border dark:border-slate-900 rounded-2xl text-center"
           >
-            <div className="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center mb-4 text-slate-500">
+            <div className="w-12 h-12 rounded-full bg-muted dark:bg-slate-900 flex items-center justify-center mb-4 text-muted-foreground">
               <Bookmark size={20} />
             </div>
-            <h3 className="text-md font-bold text-white mb-1">
+            <h3 className="text-md font-bold text-foreground mb-1">
               No Opportunities Found
             </h3>
-            <p className="text-xs text-slate-500 max-w-xs">
+            <p className="text-xs text-muted-foreground max-w-xs">
               {activeTab === 'bookmarked'
                 ? 'Save opportunities from the Explore tab to track deadlines here.'
                 : 'No opportunities match your current filter query.'}
@@ -337,7 +340,8 @@ export default function OpportunityDashboard() {
                 : null;
 
               // Deadline badge styling configuration
-              let badgeColor = 'bg-slate-900 text-slate-400 border-slate-800';
+              let badgeColor = 'bg-muted dark:bg-slate-900 text-muted-foreground border-border dark:border-slate-800';
+
               if (status) {
                 if (status.status === 'expired') {
                   badgeColor = 'bg-red-500/10 text-red-400 border-red-500/20';
@@ -361,7 +365,7 @@ export default function OpportunityDashboard() {
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.97 }}
                   transition={{ duration: 0.25 }}
-                  className={`bg-slate-950/40 border border-slate-900 rounded-2xl relative overflow-hidden backdrop-blur-md group hover:border-primary/20 transition-all ${
+                  className={`bg-muted/40 dark:bg-slate-950/40 border border-border dark:border-slate-900 rounded-2xl relative overflow-hidden backdrop-blur-md group hover:border-primary/20 transition-all ${
                     viewMode === 'list'
                       ? 'p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4'
                       : 'p-6 flex flex-col justify-between min-h-[260px]'
@@ -379,16 +383,16 @@ export default function OpportunityDashboard() {
                   >
                     {/* Header Row: Company and Title */}
                     <div className="space-y-1">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-muted-foreground uppercase tracking-widest font-mono">
                         <Building size={11} className="text-primary" />
                         {opp.company}
                       </span>
-                      <h3 className="text-md font-bold text-white group-hover:text-primary transition-colors line-clamp-1">
+                      <h3 className="text-md font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
                         {opp.title}
                       </h3>
                     </div>
 
-                    <p className="text-xs text-slate-400 line-clamp-2 leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {opp.description}
                     </p>
 
@@ -397,7 +401,7 @@ export default function OpportunityDashboard() {
                       {opp.tags?.map((tag) => (
                         <span
                           key={tag}
-                          className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-900 border border-slate-800/60 text-slate-400 uppercase tracking-wider"
+                          className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-muted dark:bg-slate-900 border border-border dark:border-slate-800/60 text-muted-foreground uppercase tracking-wider"
                         >
                           {tag}
                         </span>
@@ -410,13 +414,13 @@ export default function OpportunityDashboard() {
                     className={`pl-2 pt-3 flex flex-wrap items-center justify-between gap-3 ${
                       viewMode === 'list'
                         ? 'sm:border-t-0 sm:pt-0 sm:flex-col sm:items-end justify-end'
-                        : 'border-t border-slate-900 mt-4'
+                        : 'border-t border-border mt-4'
                     }`}
                   >
                     {/* Deadline & Countdown */}
                     {opp.deadline && (
                       <div className="flex flex-col gap-1.5 text-left sm:text-right">
-                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-slate-400">
+                        <div className="flex items-center gap-1.5 text-[10px] font-semibold text-muted-foreground">
                           <Calendar size={12} className="text-primary" />
                           <span>
                             {new Date(opp.deadline).toLocaleDateString(
@@ -437,7 +441,7 @@ export default function OpportunityDashboard() {
                             {status?.text}
                           </span>
                         ) : (
-                          <div className="h-4 w-16 bg-slate-900 animate-pulse rounded-full"></div>
+                          <div className="h-4 w-16 bg-muted dark:bg-slate-900 animate-pulse rounded-full"></div>
                         )}
                       </div>
                     )}
@@ -448,7 +452,7 @@ export default function OpportunityDashboard() {
                       className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all duration-300 w-full sm:w-auto justify-center ${
                         saved
                           ? 'bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20'
-                          : 'bg-primary hover:bg-primary/95 text-white shadow-lg shadow-primary/10'
+                          : 'bg-primary hover:bg-primary/95 text-foreground shadow-lg shadow-primary/10'
                       }`}
                       title={
                         saved ? 'Remove from bookmarks' : 'Add to bookmarks'
