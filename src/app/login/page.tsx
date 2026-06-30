@@ -223,7 +223,9 @@ export default function LoginPage() {
       console.error(err);
 
       if (err?.code === 'auth/account-exists-with-different-credential') {
-        const credential = OAuthProvider.credentialFromError(err);
+        const credential = providerName === 'google' 
+          ? GoogleAuthProvider.credentialFromError(err) 
+          : GithubAuthProvider.credentialFromError(err);
         const email = err.customData?.email;
         if (email && credential) {
           setLinkingEmail(email);
