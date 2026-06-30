@@ -23,6 +23,10 @@ import {
   GithubAuthProvider,
   GoogleAuthProvider,
   signInWithPopup,
+  OAuthProvider,
+  signInWithEmailAndPassword,
+  linkWithCredential,
+  AuthCredential,
 } from 'firebase/auth';
 import AdminKeyModal from '@/components/auth/AdminKeyModal';
 import { useAuth } from '@/context/AuthContext';
@@ -44,6 +48,11 @@ export default function LoginPage() {
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [showAdminKeyModal, setShowAdminKeyModal] = useState(false);
   const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
+
+  // Account linking states
+  const [linkingEmail, setLinkingEmail] = useState('');
+  const [pendingCredential, setPendingCredential] = useState<AuthCredential | null>(null);
+  const [linkingPassword, setLinkingPassword] = useState('');
 
   const { login, user, isLoading, logout, isAdminVerified } = useAuth();
   const { showSuccess, showError, showInfo } = useNotificationActions();
@@ -147,6 +156,34 @@ export default function LoginPage() {
     }
   };
 
+  const handleLinkAccount = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!pendingCredential || !linkingEmail || !linkingPassword) return;
+    
+    setError('');
+    setIsSubmitting(true);
+    try {
+      // First sign in with existing password
+      const result = await signInWithEmailAndPassword(auth, linkingEmail, linkingPassword);
+      // Then link the pending credential
+      await linkWithCredential(result.user, pendingCredential);
+      
+      showSuccess('Accounts linked successfully! Signed in.');
+      setPendingCredential(null);
+      setLinkingEmail('');
+      setLinkingPassword('');
+    } catch (err: any) {
+      console.error('Linking error:', err);
+      const msg = err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential' 
+        ? 'Incorrect password. Please try again.' 
+        : 'Failed to link accounts.';
+      setError(msg);
+      showError(msg);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleProviderLogin = async (providerName: 'google' | 'github') => {
     if (
       isMaintenanceMode ||
@@ -184,6 +221,21 @@ export default function LoginPage() {
       setIsCheckingAdmin(false);
     } catch (err: any) {
       console.error(err);
+
+      if (err?.code === 'auth/account-exists-with-different-credential') {
+        const credential = OAuthProvider.credentialFromError(err);
+        const email = err.customData?.email;
+        if (email && credential) {
+          setLinkingEmail(email);
+          setPendingCredential(credential);
+          setError(`An account already exists for ${email}. Please enter your password to link your accounts.`);
+          showError(`Account exists for ${email}. Please enter your password.`);
+          setIsCheckingAdmin(false);
+          setActiveProvider(null);
+          return;
+        }
+      }
+
       const message =
         err?.code === 'auth/popup-closed-by-user'
           ? 'Sign-in popup closed before finishing.'
@@ -263,18 +315,96 @@ export default function LoginPage() {
           </div>
 
           <div className="p-6 sm:p-8 lg:p-10">
-            <div className="mb-8 text-center lg:text-left">
-              <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200">
-                <LogIn size={14} />
-                Sign In
+            {pendingCredential ? (
+              <div className="space-y-4">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1 text-xs font-medium text-amber-200">
+                  <AlertTriangle size={14} />
+                  Account Linking Required
+                </div>
+                <h2 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  Link Your Accounts
+                </h2>
+                <p className="text-sm text-muted-foreground mt-2 mb-6">
+                  An account already exists with <strong className="text-white">{linkingEmail}</strong>. Please enter your password to securely link your credentials.
+                </p>
+
+                <form onSubmit={handleLinkAccount} className="space-y-4">
+                  <div>
+                    <label className="mb-2 block text-sm font-medium text-foreground">
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        value={linkingPassword}
+                        onChange={(e) => setLinkingPassword(e.target.value)}
+                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="••••••••"
+                        required
+                        disabled={isSubmitting}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((current) => !current)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100"
+                      >
+                        <AlertCircle className="mt-0.5 shrink-0 text-red-300" size={18} />
+                        <p>{error}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  <div className="pt-2 flex flex-col gap-3">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3.5 font-semibold text-slate-950 transition-all hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
+                      {isSubmitting ? 'Linking Accounts...' : 'Link Accounts'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPendingCredential(null);
+                        setLinkingPassword('');
+                        setError('');
+                      }}
+                      className="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-transparent px-4 py-3.5 font-semibold text-white transition-all hover:bg-white/5"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
               </div>
-              <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-                Welcome back
-              </h2>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Sign in to continue to DevPath.
-              </p>
-            </div>
+            ) : (
+              <>
+                <div className="mb-8 text-center lg:text-left">
+                  <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-medium text-cyan-200">
+                    <LogIn size={14} />
+                    Sign In
+                  </div>
+                  <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
+                    Welcome back
+                  </h2>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                    Sign in to continue to DevPath.
+                  </p>
+                </div>
 
             {isMaintenanceMode && (
               <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-amber-200">
@@ -476,6 +606,8 @@ export default function LoginPage() {
                 Secure session management enabled
               </p>
             </div>
+          </>
+          )}
           </div>
         </div>
       </motion.div>
