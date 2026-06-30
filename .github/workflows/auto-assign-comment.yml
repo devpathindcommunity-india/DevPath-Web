@@ -16,7 +16,7 @@ jobs:
         with:
           script: |
             const assignee = context.payload.assignee.login;
-            const message = `Hi @${assignee}! We have officially assigned this issue to you. Please start working on it, and good luck with your PR!\n\n**ETA: 3 days**\nIssue will be assigned to another contributor if failed to do so!\n\n---\n**Join our Discord channel for GSSoC'26 doubts:** https://discord.gg/5aJjhYHZ`;
+            const message = `Hi @${assignee}! We have officially assigned this issue to you. Please start working on it, and good luck with your PR!\n\n**ETA: 3 days**\nIssue will be assigned to another contributor if failed to do so!\n\n---\n**Join our Discord channel for GSSoC'26 doubts:** https://discord.gg/GGdauNAqWn`;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,
