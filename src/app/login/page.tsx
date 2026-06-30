@@ -51,7 +51,8 @@ export default function LoginPage() {
 
   // Account linking states
   const [linkingEmail, setLinkingEmail] = useState('');
-  const [pendingCredential, setPendingCredential] = useState<AuthCredential | null>(null);
+  const [pendingCredential, setPendingCredential] =
+    useState<AuthCredential | null>(null);
   const [linkingPassword, setLinkingPassword] = useState('');
 
   const { login, user, isLoading, logout, isAdminVerified } = useAuth();
@@ -159,24 +160,30 @@ export default function LoginPage() {
   const handleLinkAccount = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!pendingCredential || !linkingEmail || !linkingPassword) return;
-    
+
     setError('');
     setIsSubmitting(true);
     try {
       // First sign in with existing password
-      const result = await signInWithEmailAndPassword(auth, linkingEmail, linkingPassword);
+      const result = await signInWithEmailAndPassword(
+        auth,
+        linkingEmail,
+        linkingPassword
+      );
       // Then link the pending credential
       await linkWithCredential(result.user, pendingCredential);
-      
+
       showSuccess('Accounts linked successfully! Signed in.');
       setPendingCredential(null);
       setLinkingEmail('');
       setLinkingPassword('');
     } catch (err: any) {
       console.error('Linking error:', err);
-      const msg = err?.code === 'auth/wrong-password' || err?.code === 'auth/invalid-credential' 
-        ? 'Incorrect password. Please try again.' 
-        : 'Failed to link accounts.';
+      const msg =
+        err?.code === 'auth/wrong-password' ||
+        err?.code === 'auth/invalid-credential'
+          ? 'Incorrect password. Please try again.'
+          : 'Failed to link accounts.';
       setError(msg);
       showError(msg);
     } finally {
@@ -228,7 +235,9 @@ export default function LoginPage() {
         if (email && credential) {
           setLinkingEmail(email);
           setPendingCredential(credential);
-          setError(`An account already exists for ${email}. Please enter your password to link your accounts.`);
+          setError(
+            `An account already exists for ${email}. Please enter your password to link your accounts.`
+          );
           showError(`Account exists for ${email}. Please enter your password.`);
           setIsCheckingAdmin(false);
           setActiveProvider(null);
@@ -325,7 +334,9 @@ export default function LoginPage() {
                   Link Your Accounts
                 </h2>
                 <p className="text-sm text-muted-foreground mt-2 mb-6">
-                  An account already exists with <strong className="text-white">{linkingEmail}</strong>. Please enter your password to securely link your credentials.
+                  An account already exists with{' '}
+                  <strong className="text-white">{linkingEmail}</strong>. Please
+                  enter your password to securely link your credentials.
                 </p>
 
                 <form onSubmit={handleLinkAccount} className="space-y-4">
@@ -334,7 +345,10 @@ export default function LoginPage() {
                       Password
                     </label>
                     <div className="relative">
-                      <Lock className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+                      <Lock
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        size={18}
+                      />
                       <input
                         type={showPassword ? 'text' : 'password'}
                         value={linkingPassword}
@@ -349,11 +363,15 @@ export default function LoginPage() {
                         onClick={() => setShowPassword((current) => !current)}
                         className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
                       >
-                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
                       </button>
                     </div>
                   </div>
-                  
+
                   <AnimatePresence>
                     {error && (
                       <motion.div
@@ -362,7 +380,10 @@ export default function LoginPage() {
                         exit={{ opacity: 0, y: -6 }}
                         className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100"
                       >
-                        <AlertCircle className="mt-0.5 shrink-0 text-red-300" size={18} />
+                        <AlertCircle
+                          className="mt-0.5 shrink-0 text-red-300"
+                          size={18}
+                        />
                         <p>{error}</p>
                       </motion.div>
                     )}
@@ -374,7 +395,11 @@ export default function LoginPage() {
                       disabled={isSubmitting}
                       className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3.5 font-semibold text-slate-950 transition-all hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {isSubmitting ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
+                      {isSubmitting ? (
+                        <Loader2 size={18} className="animate-spin" />
+                      ) : (
+                        <ShieldCheck size={18} />
+                      )}
                       {isSubmitting ? 'Linking Accounts...' : 'Link Accounts'}
                     </button>
                     <button
@@ -406,208 +431,212 @@ export default function LoginPage() {
                   </p>
                 </div>
 
-            {isMaintenanceMode && (
-              <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-amber-200">
-                <AlertTriangle className="mt-0.5 shrink-0" size={18} />
-                <div className="text-sm">
-                  <p className="mb-1 font-semibold">
-                    Login temporarily disabled
-                  </p>
-                  <p className="text-amber-100/80">{maintenanceMessage}</p>
-                </div>
-              </div>
-            )}
-
-            <div className="mb-6 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => handleProviderLogin('google')}
-                disabled={
-                  isMaintenanceMode ||
-                  isSubmitting ||
-                  providerBusy ||
-                  cooldownSeconds > 0
-                }
-                className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {activeProvider === 'google' ? (
-                  <Loader2 className="animate-spin" size={18} />
-                ) : (
-                  <Chrome size={18} />
+                {isMaintenanceMode && (
+                  <div className="mb-6 flex items-start gap-3 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-amber-200">
+                    <AlertTriangle className="mt-0.5 shrink-0" size={18} />
+                    <div className="text-sm">
+                      <p className="mb-1 font-semibold">
+                        Login temporarily disabled
+                      </p>
+                      <p className="text-amber-100/80">{maintenanceMessage}</p>
+                    </div>
+                  </div>
                 )}
-                Continue with Google
-              </button>
-              <button
-                type="button"
-                onClick={() => handleProviderLogin('github')}
-                disabled={
-                  isMaintenanceMode ||
-                  isSubmitting ||
-                  providerBusy ||
-                  cooldownSeconds > 0
-                }
-                className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {activeProvider === 'github' ? (
-                  <Loader2 className="animate-spin" size={18} />
-                ) : (
-                  <Github size={18} />
-                )}
-                Continue with GitHub
-              </button>
-            </div>
 
-            <div className="mb-6 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground/70">
-              <span className="h-px flex-1 bg-white/10" />
-              or use email
-              <span className="h-px flex-1 bg-white/10" />
-            </div>
-
-            <form onSubmit={handleLogin} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="login-email"
-                  className="mb-2 block text-sm font-medium text-foreground"
-                >
-                  Email
-                </label>
-                <div className="relative">
-                  <Mail
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                    size={18}
-                  />
-                  <input
-                    id="login-email"
-                    name="email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="name@example.com"
-                    autoComplete="email"
-                    aria-invalid={!!error}
-                    required
-                    disabled={isMaintenanceMode}
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label
-                  htmlFor="login-password"
-                  className="mb-2 block text-sm font-medium text-foreground"
-                >
-                  Password
-                </label>
-                <div className="relative">
-                  <Lock
-                    className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                    size={18}
-                  />
-                  <input
-                    id="login-password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="••••••••"
-                    autoComplete="current-password"
-                    aria-invalid={!!error}
-                    required
-                    disabled={isMaintenanceMode}
-                  />
+                <div className="mb-6 grid gap-3 sm:grid-cols-2">
                   <button
                     type="button"
-                    onClick={() => setShowPassword((current) => !current)}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
-                    aria-label={
-                      showPassword ? 'Hide password' : 'Show password'
+                    onClick={() => handleProviderLogin('google')}
+                    disabled={
+                      isMaintenanceMode ||
+                      isSubmitting ||
+                      providerBusy ||
+                      cooldownSeconds > 0
                     }
+                    className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
                   >
-                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    {activeProvider === 'google' ? (
+                      <Loader2 className="animate-spin" size={18} />
+                    ) : (
+                      <Chrome size={18} />
+                    )}
+                    Continue with Google
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleProviderLogin('github')}
+                    disabled={
+                      isMaintenanceMode ||
+                      isSubmitting ||
+                      providerBusy ||
+                      cooldownSeconds > 0
+                    }
+                    className="inline-flex items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-medium text-white/90 transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/40 hover:bg-white/12 disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {activeProvider === 'github' ? (
+                      <Loader2 className="animate-spin" size={18} />
+                    ) : (
+                      <Github size={18} />
+                    )}
+                    Continue with GitHub
                   </button>
                 </div>
-              </div>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    checked={rememberMe}
-                    onChange={(e) => setRememberMe(e.target.checked)}
-                    className="h-4 w-4 rounded border-border text-cyan-400 focus:ring-cyan-400/60"
-                    disabled={isMaintenanceMode}
-                  />
-                  Remember me on this device
-                </label>
-
-                <Link
-                  href="/forgot-password"
-                  className="text-sm font-medium text-cyan-300 transition-colors hover:text-cyan-200"
-                >
-                  Forgot password?
-                </Link>
-              </div>
-
-              <AnimatePresence>
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -6 }}
-                    role="alert"
-                    className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100"
-                  >
-                    <AlertCircle
-                      className="mt-0.5 shrink-0 text-red-300"
-                      size={18}
-                    />
-                    <p>{error}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {cooldownSeconds > 0 && (
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
-                  Rate limiting is active. Try again in {cooldownSeconds}{' '}
-                  seconds.
+                <div className="mb-6 flex items-center gap-3 text-xs uppercase tracking-[0.3em] text-muted-foreground/70">
+                  <span className="h-px flex-1 bg-white/10" />
+                  or use email
+                  <span className="h-px flex-1 bg-white/10" />
                 </div>
-              )}
 
-              <button
-                type="submit"
-                className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3.5 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={
-                  isMaintenanceMode || isSubmitting || cooldownSeconds > 0
-                }
-              >
-                {isSubmitting ? (
-                  <Loader2 size={18} className="animate-spin" />
-                ) : (
-                  <LogIn size={18} />
-                )}
-                {isSubmitting ? 'Signing in...' : 'Login'}
-              </button>
-            </form>
+                <form onSubmit={handleLogin} className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor="login-email"
+                      className="mb-2 block text-sm font-medium text-foreground"
+                    >
+                      Email
+                    </label>
+                    <div className="relative">
+                      <Mail
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        size={18}
+                      />
+                      <input
+                        id="login-email"
+                        name="email"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-4 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="name@example.com"
+                        autoComplete="email"
+                        aria-invalid={!!error}
+                        required
+                        disabled={isMaintenanceMode}
+                      />
+                    </div>
+                  </div>
 
-            <div className="mt-6 flex flex-col gap-4 text-center text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-left">
-              <p>
-                Don't have an account?{' '}
-                <Link
-                  href="/signup"
-                  className="font-medium text-cyan-300 transition-colors hover:text-cyan-200"
-                >
-                  Sign up
-                </Link>
-              </p>
-              <p className="inline-flex items-center justify-center gap-2 text-xs text-muted-foreground/80 sm:justify-start">
-                <ShieldCheck size={14} />
-                Secure session management enabled
-              </p>
-            </div>
-          </>
-          )}
+                  <div>
+                    <label
+                      htmlFor="login-password"
+                      className="mb-2 block text-sm font-medium text-foreground"
+                    >
+                      Password
+                    </label>
+                    <div className="relative">
+                      <Lock
+                        className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                        size={18}
+                      />
+                      <input
+                        id="login-password"
+                        name="password"
+                        type={showPassword ? 'text' : 'password'}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full rounded-2xl border border-white/10 bg-black/20 py-3 pl-10 pr-12 text-sm text-foreground outline-none transition-all duration-200 placeholder:text-muted-foreground/70 focus:border-cyan-300/60 focus:bg-black/30 focus:ring-4 focus:ring-cyan-400/10 disabled:cursor-not-allowed disabled:opacity-50"
+                        placeholder="••••••••"
+                        autoComplete="current-password"
+                        aria-invalid={!!error}
+                        required
+                        disabled={isMaintenanceMode}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((current) => !current)}
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded-xl p-2 text-muted-foreground transition-colors hover:bg-white/10 hover:text-foreground"
+                        aria-label={
+                          showPassword ? 'Hide password' : 'Show password'
+                        }
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <label className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                        className="h-4 w-4 rounded border-border text-cyan-400 focus:ring-cyan-400/60"
+                        disabled={isMaintenanceMode}
+                      />
+                      Remember me on this device
+                    </label>
+
+                    <Link
+                      href="/forgot-password"
+                      className="text-sm font-medium text-cyan-300 transition-colors hover:text-cyan-200"
+                    >
+                      Forgot password?
+                    </Link>
+                  </div>
+
+                  <AnimatePresence>
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -6 }}
+                        role="alert"
+                        className="flex items-start gap-3 rounded-2xl border border-red-400/20 bg-red-500/10 p-4 text-sm text-red-100"
+                      >
+                        <AlertCircle
+                          className="mt-0.5 shrink-0 text-red-300"
+                          size={18}
+                        />
+                        <p>{error}</p>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+
+                  {cooldownSeconds > 0 && (
+                    <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
+                      Rate limiting is active. Try again in {cooldownSeconds}{' '}
+                      seconds.
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-3.5 font-semibold text-slate-950 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-cyan-500/20 disabled:cursor-not-allowed disabled:opacity-60"
+                    disabled={
+                      isMaintenanceMode || isSubmitting || cooldownSeconds > 0
+                    }
+                  >
+                    {isSubmitting ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <LogIn size={18} />
+                    )}
+                    {isSubmitting ? 'Signing in...' : 'Login'}
+                  </button>
+                </form>
+
+                <div className="mt-6 flex flex-col gap-4 text-center text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:text-left">
+                  <p>
+                    Don't have an account?{' '}
+                    <Link
+                      href="/signup"
+                      className="font-medium text-cyan-300 transition-colors hover:text-cyan-200"
+                    >
+                      Sign up
+                    </Link>
+                  </p>
+                  <p className="inline-flex items-center justify-center gap-2 text-xs text-muted-foreground/80 sm:justify-start">
+                    <ShieldCheck size={14} />
+                    Secure session management enabled
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </motion.div>

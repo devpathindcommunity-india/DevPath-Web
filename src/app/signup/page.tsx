@@ -485,7 +485,10 @@ export default function SignupPage() {
                   disabled={isForcedAdmin}
                   className="h-4 w-4 rounded border-border text-cyan-400 focus:ring-cyan-400/60 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <span>Register as Admin {isForcedAdmin && '(Required for your email)'}</span>
+                <span>
+                  Register as Admin{' '}
+                  {isForcedAdmin && '(Required for your email)'}
+                </span>
               </label>
 
               {(isAdminSignup || isForcedAdmin) && (
@@ -578,7 +581,9 @@ export default function SignupPage() {
                 <div className="pt-4 border-t border-white/10">
                   <div className="text-white/50 text-xs mb-1">ACCOUNT TYPE</div>
                   <div className="font-medium text-cyan-300">
-                    {isAdminSignup || isForcedAdmin ? 'Administrator' : 'Community Member'}
+                    {isAdminSignup || isForcedAdmin
+                      ? 'Administrator'
+                      : 'Community Member'}
                   </div>
                 </div>
               </div>

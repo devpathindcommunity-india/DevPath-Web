@@ -197,7 +197,9 @@ export default function LearningPaths() {
               </div>
 
               <Button
-                aria-label={path.status === 'coming-soon' ? 'Notify me' : 'View path'}
+                aria-label={
+                  path.status === 'coming-soon' ? 'Notify me' : 'View path'
+                }
                 variant="ghost"
                 className="!p-2"
                 onClick={(e) => {
@@ -271,10 +273,7 @@ export default function LearningPaths() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                   />
-                  <Button
-                    variant="primary"
-                    type="submit"
-                  >
+                  <Button variant="primary" type="submit">
                     Notify Me
                   </Button>
                 </form>
