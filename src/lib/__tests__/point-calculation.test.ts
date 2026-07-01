@@ -52,4 +52,21 @@ describe('point calculation', () => {
     expect(result.achievements).toContain('streak-7');
     expect(result.points).toBeNull();
   });
+
+  it('preserves existing badges even if criteria is no longer met', () => {
+    const userWithPastAchievements = {
+      uid: 'member-1',
+      // User deleted their bio and role, so they normally wouldn't get profile-perfect
+      name: 'DevPath Member',
+      photoURL: '/avatar.png',
+      // But they already earned it in the past
+      achievements: ['profile-perfect', 'storyteller'],
+    };
+
+    const badges = determineBadges(userWithPastAchievements, []);
+    expect(badges).toContain('profile-perfect');
+    expect(badges).toContain('storyteller');
+    // Sanity check: they shouldn't randomly get a badge they didn't earn
+    expect(badges).not.toContain('local-hero');
+  });
 });
