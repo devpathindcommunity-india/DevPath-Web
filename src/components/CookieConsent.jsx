@@ -8,20 +8,32 @@ export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(COOKIE_KEY);
-
-    if (!saved) {
-      setVisible(true);
+    try {
+      const saved = localStorage.getItem(COOKIE_KEY);
+      if (!saved) {
+        setVisible(true);
+      }
+    } catch (e) {
+      // If localStorage is blocked, assume they reject or don't show the banner
+      setVisible(false);
     }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem(COOKIE_KEY, 'accepted');
+    try {
+      localStorage.setItem(COOKIE_KEY, 'accepted');
+    } catch (e) {
+      // Ignore if localStorage is disabled
+    }
     setVisible(false);
   };
 
   const handleReject = () => {
-    localStorage.setItem(COOKIE_KEY, 'rejected');
+    try {
+      localStorage.setItem(COOKIE_KEY, 'rejected');
+    } catch (e) {
+      // Ignore if localStorage is disabled
+    }
     setVisible(false);
   };
 
