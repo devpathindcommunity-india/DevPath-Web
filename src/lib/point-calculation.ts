@@ -74,36 +74,38 @@ export function determineBadges(
   user: UserData,
   projects: ProjectData[]
 ): string[] {
-  const earned: string[] = [];
+  // Start with existing achievements to ensure permanent badges are not lost
+  const earned: string[] = user.achievements ? [...user.achievements] : [];
 
-  // Early Adopter is time-limited — preserve if already held
-  if (user.achievements?.includes('early-adopter')) {
-    earned.push('early-adopter');
-  }
+  // Helper to safely add badges without duplicating
+  const award = (badge: string) => {
+    if (!earned.includes(badge)) {
+      earned.push(badge);
+    }
+  };
 
   // Profile completeness
   if (user.name && user.bio && user.photoURL && user.role)
-    earned.push('profile-perfect');
-  if (user.bio && user.bio.length > 20) earned.push('storyteller');
-  if (user.photoURL) earned.push('face-of-community');
-  if (user.city || user.state) earned.push('local-hero');
+    award('profile-perfect');
+  if (user.bio && user.bio.length > 20) award('storyteller');
+  if (user.photoURL) award('face-of-community');
+  if (user.city || user.state) award('local-hero');
 
   // Social links
-  if (user.github && user.linkedin && user.instagram)
-    earned.push('connector-social');
-  if (user.github) earned.push('social-github');
-  if (user.linkedin) earned.push('social-linkedin');
-  if (user.instagram) earned.push('social-instagram');
+  if (user.github && user.linkedin && user.instagram) award('connector-social');
+  if (user.github) award('social-github');
+  if (user.linkedin) award('social-linkedin');
+  if (user.instagram) award('social-instagram');
 
   // Projects
   const projectCount = projects.length;
-  if (projectCount >= 1) earned.push('builder-1');
-  if (projectCount >= 3) earned.push('builder-3');
-  if (projectCount >= 5) earned.push('builder-5');
-  if (projectCount >= 10) earned.push('builder-10');
+  if (projectCount >= 1) award('builder-1');
+  if (projectCount >= 3) award('builder-3');
+  if (projectCount >= 5) award('builder-5');
+  if (projectCount >= 10) award('builder-10');
 
   // Streak
-  if ((user.streak || 0) >= 7) earned.push('streak-7');
+  if ((user.streak || 0) >= 7) award('streak-7');
 
   return earned;
 }
