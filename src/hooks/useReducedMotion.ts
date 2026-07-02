@@ -13,16 +13,16 @@ import { useEffect, useState } from 'react';
  *   const shouldReduceMotion = useReducedMotion();
  */
 export function useReducedMotion(): boolean {
-  const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
-    // SSR-safe: default to false on server
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  });
+  // Always initialize to false to match the server render and avoid hydration mismatch
+  const [reducedMotion, setReducedMotion] = useState<boolean>(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    // Set initial value once mounted on client
+    setReducedMotion(mediaQuery.matches);
 
     const handleChange = (event: MediaQueryListEvent) => {
       setReducedMotion(event.matches);
