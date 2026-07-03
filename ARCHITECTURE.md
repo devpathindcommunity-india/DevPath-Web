@@ -1,6 +1,6 @@
 # DevPath Architecture Documentation
 
-Welcome to the DevPath architecture documentation. This document outlines the system architecture, folder structures, component dependencies, and design patterns utilized in the DevPath India Community Platform.
+Welcome to the DevPath architecture documentation. This document outlines the system architecture, folder structures, component dependencies, and design patterns utilized in the DevPath Bharat Community Platform.
 
 ---
 

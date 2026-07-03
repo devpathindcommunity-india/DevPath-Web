@@ -27,4 +27,4 @@ Fixes # (issue)
 - [ ] I have commented my code, particularly in hard-to-understand areas
 - [ ] I have made corresponding changes to the documentation
 - [ ] My changes generate no new warnings or errors
-- [ ] I have checked that the "DevPath India" branding remains intact
+- [ ] I have checked that the "DevPath Bharat" branding remains intact

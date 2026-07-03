@@ -27,11 +27,11 @@ export default function AdminKeyModal({
     setIsLoading(true);
 
     try {
-      // Fetch the key securely on the client side since API routes are disabled in static export
-      const docRef = doc(db, 'admin_keys', 'config');
+      // Verify the key securely by attempting to read a document with the key as the ID
+      const docRef = doc(db, 'admin_keys', key);
       const docSnap = await getDoc(docRef);
 
-      if (docSnap.exists() && docSnap.data().value === key) {
+      if (docSnap.exists()) {
         verifyAdmin();
         onVerified();
       } else {

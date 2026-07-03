@@ -152,17 +152,12 @@ export default function SignupPage() {
       }
 
       if (effectiveIsAdmin) {
-        const keyDoc = await getDoc(doc(db, 'admin_keys', 'config'));
-        if (!keyDoc.exists()) {
-          throw new Error('System Configuration Error: Admin Key not found.');
-        }
-        const currentAdminKey = keyDoc.data().value;
-
         if (!adminKey.trim()) {
           throw new Error('Admin key is required for admin registration.');
         }
 
-        if (adminKey !== currentAdminKey) {
+        const keyDoc = await getDoc(doc(db, 'admin_keys', adminKey));
+        if (!keyDoc.exists()) {
           throw new Error('Invalid Admin Key. Please contact the Super Admin.');
         }
       }

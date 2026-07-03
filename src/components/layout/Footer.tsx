@@ -103,17 +103,23 @@ export default function Footer() {
               />
             </div>
             <div className={styles.links}>
-              <Link href="/terms" className={styles.link}>
-                <Book size={16} /> Terms & Conditions
+              <Link href="/copyright" className={styles.link}>
+                <Shield size={16} /> Copyright Notice
               </Link>
-
+              <Link href="/terms" className={styles.link}>
+                <Book size={16} /> Terms of Use
+              </Link>
               <Link href="/privacy" className={styles.link}>
                 <Shield size={16} /> Privacy Policy
               </Link>
-
-              {/* Cookies Policy */}
-              <Link href="/cookies" className={styles.link}>
-                <Shield size={16} /> Cookies Policy
+              <Link href="/guidelines" className={styles.link}>
+                <Users size={16} /> Community Guidelines
+              </Link>
+              <Link href="/license" className={styles.link}>
+                <Code size={16} /> License
+              </Link>
+              <Link href="/conduct" className={styles.link}>
+                <Flag size={16} /> Code of Conduct
               </Link>
             </div>
           </div>
@@ -148,13 +154,25 @@ export default function Footer() {
         </div>
 
         {/* Copyright bar */}
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <p className="font-semibold text-gray-900 dark:text-gray-300">
+            &copy; 2026 DevPath Bharat Community. All Rights Reserved.
+          </p>
+          <p>
+            DevPath&reg; is the official developer growth community dedicated to empowering developers across Bharat through learning, collaboration, innovation, and open knowledge.
+          </p>
+          <p>
+            The DevPath name, logo, branding, website design, documentation, and original content are protected intellectual property of the DevPath Bharat Community.
+          </p>
+          <p>
+            Unauthorized use of the DevPath branding, logos, visual identity, or impersonation of the official community is prohibited.
+          </p>
+          <p className="font-medium text-gray-900 dark:text-gray-300">
+            Built with ❤️ by the DevPath Community.
+          </p>
+        </div>
         <div className={styles.bottom}>
-          <div className={styles.copyright}>
-            <p>
-              &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
-              reserved.
-            </p>
-          </div>
+          <div className={styles.copyright}></div>
 
           <div className={styles.socials}>
             {/* GitHub */}

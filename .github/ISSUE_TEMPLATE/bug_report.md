@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Create a report to help us improve DevPath India
+about: Create a report to help us improve DevPath Bharat
 title: '[BUG] '
 labels: bug
 assignees: ''

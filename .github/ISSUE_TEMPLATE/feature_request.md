@@ -1,6 +1,6 @@
 ---
 name: Feature request
-about: Suggest an idea for DevPath India
+about: Suggest an idea for DevPath Bharat
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''

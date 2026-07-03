@@ -9,7 +9,7 @@ const KNOWLEDGE_BASE = {
     tagline:
       'Empowering Devs to master their craft through structured learning, real-world projects, and a supportive community.',
     description:
-      'DevPath India is an ecosystem and community platform designed to foster developer growth, collaboration, event management, resource sharing, and professional connections.',
+      'DevPath Bharat is an ecosystem and community platform designed to foster developer growth, collaboration, event management, resource sharing, and professional connections.',
     techStack: {
       frontend:
         'Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS, Framer Motion, GSAP',
@@ -18,12 +18,12 @@ const KNOWLEDGE_BASE = {
       hosting: 'Vercel',
     },
     brandProtection:
-      'DevPath India Source-Available License. Users can clone, run locally, modify, and submit PRs. Commercial use, hosting public clones, competing services, or redistributing under the DevPath India brand is prohibited. The DevPath India name, logo, branding assets, and visual identity are protected.',
+      'DevPath Bharat Source-Available License. Users can clone, run locally, modify, and submit PRs. Commercial use, hosting public clones, competing services, or redistributing under the DevPath Bharat brand is prohibited. The DevPath Bharat name, logo, branding assets, and visual identity are protected.',
     coreMaintainer: 'Aditya948351 (Core Maintainer & Lead Developer)',
   },
   features: {
     communityHub:
-      'Connect with developers, mentors, and contributors within the DevPath India community.',
+      'Connect with developers, mentors, and contributors within the DevPath Bharat community.',
     eventManagement:
       "Discover hackathons, workshops, and community events. Highlights include the annual flagship hackathon 'HackFiesta'.",
     resourceLibrary:
