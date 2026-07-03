@@ -335,10 +335,7 @@ export default function ContributorsPage() {
       <div className={styles.cta}>
         <h2 className={styles.ctaTitle}>Want to see your name here?</h2>
         <div className={styles.ctaButtons}>
-          <Button
-            variant="primary"
-            icon={<Github size={20} />}
-          >
+          <Button variant="primary" icon={<Github size={20} />}>
             View Open Issues
           </Button>
           <Button

@@ -11,7 +11,7 @@ Currently, the following versions of the DevPath Bharat platform are supported w
 
 ## Responsible Disclosure
 
-We take the security of the DevPath Bharat platform seriously. If you believe you have found a security vulnerability in any DevPath Bharat repository, please report it to us directly. 
+We take the security of the DevPath Bharat platform seriously. If you believe you have found a security vulnerability in any DevPath Bharat repository, please report it to us directly.
 
 **Please do not report security vulnerabilities through public GitHub issues.**
 
@@ -23,6 +23,7 @@ You can reach the security team at:
 **Email:** security@devpath.org (or devpathind.community@gmail.com)
 
 When reporting a vulnerability, please include:
+
 - A description of the vulnerability.
 - Steps to reproduce the issue.
 - Any relevant screenshots or code snippets.

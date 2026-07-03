@@ -20,7 +20,7 @@ export default function ConductPage() {
   return (
     <main className="container mx-auto max-w-4xl px-6 py-16">
       <h1 className="mb-8 text-4xl font-bold">Code of Conduct</h1>
-      
+
       <div className="prose prose-slate dark:prose-invert max-w-none">
         <ReactMarkdown>{content}</ReactMarkdown>
       </div>

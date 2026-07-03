@@ -9,7 +9,10 @@ const mockOnAuthStateChanged = jest.fn(() => jest.fn());
 const mockOnSnapshot = jest.fn(
   (
     _ref: unknown,
-    cb: (snapshot: { exists: () => boolean; data?: () => Record<string, unknown> }) => void
+    cb: (snapshot: {
+      exists: () => boolean;
+      data?: () => Record<string, unknown>;
+    }) => void
   ) => {
     cb({ exists: () => false });
     return jest.fn();
@@ -53,7 +56,10 @@ jest.mock('firebase/firestore', () => ({
   setDoc: jest.fn(() => Promise.resolve()),
   onSnapshot: (
     ref: unknown,
-    cb: (snapshot: { exists: () => boolean; data?: () => Record<string, unknown> }) => void,
+    cb: (snapshot: {
+      exists: () => boolean;
+      data?: () => Record<string, unknown>;
+    }) => void,
     errorCb?: (error: Error) => void
   ) => mockOnSnapshot(ref, cb, errorCb),
   writeBatch: jest.fn(() => ({
@@ -124,7 +130,10 @@ beforeEach(() => {
   mockOnSnapshot.mockImplementation(
     (
       _ref: unknown,
-      cb: (snapshot: { exists: () => boolean; data?: () => Record<string, unknown> }) => void
+      cb: (snapshot: {
+        exists: () => boolean;
+        data?: () => Record<string, unknown>;
+      }) => void
     ) => {
       cb({ exists: () => false });
       return jest.fn();
@@ -230,15 +239,33 @@ describe('AuthContext', () => {
 
   describe('Firestore onSnapshot loading state', () => {
     it('sets isLoading to false when Firestore sync succeeds', async () => {
-      mockOnAuthStateChanged.mockImplementation((_auth: unknown, callback: (user: { uid: string; email: string | null; displayName: string | null } | null) => void) => {
-        callback({ uid: 'test-uid', email: 'test@example.com', displayName: 'Test User' });
-        return jest.fn();
-      });
+      mockOnAuthStateChanged.mockImplementation(
+        (
+          _auth: unknown,
+          callback: (
+            user: {
+              uid: string;
+              email: string | null;
+              displayName: string | null;
+            } | null
+          ) => void
+        ) => {
+          callback({
+            uid: 'test-uid',
+            email: 'test@example.com',
+            displayName: 'Test User',
+          });
+          return jest.fn();
+        }
+      );
 
       mockOnSnapshot.mockImplementation(
         (
           _ref: unknown,
-          cb: (snapshot: { exists: () => boolean; data?: () => Record<string, unknown> }) => void
+          cb: (snapshot: {
+            exists: () => boolean;
+            data?: () => Record<string, unknown>;
+          }) => void
         ) => {
           cb({
             exists: () => true,
@@ -256,19 +283,39 @@ describe('AuthContext', () => {
       await waitFor(() => {
         expect(screen.getByTestId('loading-status')).toHaveTextContent('done');
       });
-      expect(screen.getByTestId('user-email')).toHaveTextContent('test@example.com');
+      expect(screen.getByTestId('user-email')).toHaveTextContent(
+        'test@example.com'
+      );
     });
 
     it('sets isLoading to false and does not hang when Firestore sync fails', async () => {
-      mockOnAuthStateChanged.mockImplementation((_auth: unknown, callback: (user: { uid: string; email: string | null; displayName: string | null } | null) => void) => {
-        callback({ uid: 'test-uid-error', email: 'test-error@example.com', displayName: 'Test User Error' });
-        return jest.fn();
-      });
+      mockOnAuthStateChanged.mockImplementation(
+        (
+          _auth: unknown,
+          callback: (
+            user: {
+              uid: string;
+              email: string | null;
+              displayName: string | null;
+            } | null
+          ) => void
+        ) => {
+          callback({
+            uid: 'test-uid-error',
+            email: 'test-error@example.com',
+            displayName: 'Test User Error',
+          });
+          return jest.fn();
+        }
+      );
 
       mockOnSnapshot.mockImplementation(
         (
           _ref: unknown,
-          _cb: (snapshot: { exists: () => boolean; data?: () => Record<string, unknown> }) => void,
+          _cb: (snapshot: {
+            exists: () => boolean;
+            data?: () => Record<string, unknown>;
+          }) => void,
           errorCb?: (error: Error) => void
         ) => {
           if (errorCb) {
