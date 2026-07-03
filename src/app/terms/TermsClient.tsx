@@ -4,9 +4,15 @@ import { useState, useEffect } from 'react';
 
 const SECTIONS = [
   { id: 'eligibility', title: '1. Eligibility' },
-  { id: 'responsibilities', title: '2. User Responsibilities & Acceptable Use' },
+  {
+    id: 'responsibilities',
+    title: '2. User Responsibilities & Acceptable Use',
+  },
   { id: 'accounts', title: '3. Accounts & Service Usage' },
-  { id: 'intellectual-property', title: '4. Intellectual Property & Content Ownership' },
+  {
+    id: 'intellectual-property',
+    title: '4. Intellectual Property & Content Ownership',
+  },
   { id: 'third-party', title: '5. Third-Party Services & Links' },
   { id: 'disclaimer', title: '6. Disclaimer of Warranties' },
   { id: 'liability', title: '7. Limitation of Liability' },
@@ -75,7 +81,9 @@ export default function TermsClient() {
               className="flex items-center gap-2 px-3.5 py-1.5 text-xs font-semibold bg-secondary text-secondary-foreground rounded-md border border-border/50 hover:bg-secondary/80 transition-colors"
             >
               <span>
-                {SECTIONS.find((s) => s.id === activeSection)?.title.split('. ')[1] || 'Select Section'}
+                {SECTIONS.find((s) => s.id === activeSection)?.title.split(
+                  '. '
+                )[1] || 'Select Section'}
               </span>
               <svg
                 className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-200 ${
@@ -85,13 +93,21 @@ export default function TermsClient() {
                 viewBox="0 0 24 24"
                 stroke="currentColor"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
               </svg>
             </button>
 
             {isDropdownOpen && (
               <>
-                <div className="fixed inset-0 z-40 bg-black/10" onClick={() => setIsDropdownOpen(false)} />
+                <div
+                  className="fixed inset-0 z-40 bg-black/10"
+                  onClick={() => setIsDropdownOpen(false)}
+                />
                 <div className="absolute right-0 mt-2 w-72 max-h-80 overflow-y-auto rounded-lg border border-border bg-popover p-1.5 shadow-xl z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {SECTIONS.map((section) => (
                     <button
@@ -124,7 +140,9 @@ export default function TermsClient() {
               Community Agreement
             </span>
             <span className="text-muted-foreground text-xs">•</span>
-            <span className="text-muted-foreground text-xs font-medium">8 min read</span>
+            <span className="text-muted-foreground text-xs font-medium">
+              8 min read
+            </span>
           </div>
 
           <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-foreground mb-5">
@@ -174,23 +192,29 @@ export default function TermsClient() {
           {/* Main Legal Content */}
           <div className="flex-1 max-w-3xl space-y-6">
             {/* Eligibility */}
-            <section id="eligibility" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="eligibility"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 1. Eligibility
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  You must be legally capable of entering into a binding agreement
-                  under applicable law to use the Platform. If you are using the
-                  Platform on behalf of an organization, company, or institution, you
-                  represent and warrant that you have the authority to bind that
-                  entity to these Terms.
+                  You must be legally capable of entering into a binding
+                  agreement under applicable law to use the Platform. If you are
+                  using the Platform on behalf of an organization, company, or
+                  institution, you represent and warrant that you have the
+                  authority to bind that entity to these Terms.
                 </p>
               </div>
             </section>
 
             {/* User Responsibilities */}
-            <section id="responsibilities" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="responsibilities"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 2. User Responsibilities & Acceptable Use
               </h2>
@@ -199,50 +223,53 @@ export default function TermsClient() {
                   You agree to use the Platform responsibly, ethically, and in
                   compliance with all applicable laws and regulations.
                 </p>
-                <p>
-                  You agree that you will not:
-                </p>
+                <p>You agree that you will not:</p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground leading-relaxed">
                   <li>Violate any local, national, or international law.</li>
                   <li>
-                    Upload, distribute, or transmit unlawful, abusive, defamatory,
-                    threatening, hateful, fraudulent, or harmful content.
+                    Upload, distribute, or transmit unlawful, abusive,
+                    defamatory, threatening, hateful, fraudulent, or harmful
+                    content.
                   </li>
                   <li>
                     Introduce malware, viruses, ransomware, or other malicious
                     software.
                   </li>
                   <li>
-                    Attempt unauthorized access to accounts, systems, servers, or
-                    networks.
+                    Attempt unauthorized access to accounts, systems, servers,
+                    or networks.
                   </li>
                   <li>
-                    Interfere with or disrupt platform functionality, security, or
-                    performance.
+                    Interfere with or disrupt platform functionality, security,
+                    or performance.
                   </li>
                   <li>Impersonate another person, organization, or entity.</li>
                   <li>
-                    Use automated systems to scrape, harvest, or extract data without
-                    authorization.
+                    Use automated systems to scrape, harvest, or extract data
+                    without authorization.
                   </li>
                   <li>
                     Circumvent security measures, licensing controls, or access
                     restrictions.
                   </li>
                   <li>
-                    Use the Platform for illegal, deceptive, or fraudulent purposes.
+                    Use the Platform for illegal, deceptive, or fraudulent
+                    purposes.
                   </li>
                 </ul>
                 <p>
-                  We reserve the right to investigate violations and take appropriate
-                  action, including content removal, account suspension, or legal
-                  proceedings.
+                  We reserve the right to investigate violations and take
+                  appropriate action, including content removal, account
+                  suspension, or legal proceedings.
                 </p>
               </div>
             </section>
 
             {/* Accounts */}
-            <section id="accounts" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="accounts"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 3. Accounts & Service Usage
               </h2>
@@ -250,96 +277,109 @@ export default function TermsClient() {
                 <p>
                   Certain features may require registration or account creation.
                 </p>
-                <p>
-                  When creating an account, you agree to:
-                </p>
+                <p>When creating an account, you agree to:</p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground leading-relaxed">
                   <li>Provide accurate and current information.</li>
-                  <li>Maintain the confidentiality of your login credentials.</li>
+                  <li>
+                    Maintain the confidentiality of your login credentials.
+                  </li>
                   <li>Immediately notify us of unauthorized account access.</li>
                   <li>
-                    Accept responsibility for activities conducted under your account.
+                    Accept responsibility for activities conducted under your
+                    account.
                   </li>
                 </ul>
                 <p>
-                  We may impose usage limits, storage restrictions, rate limits, or
-                  feature limitations to ensure service reliability and security.
+                  We may impose usage limits, storage restrictions, rate limits,
+                  or feature limitations to ensure service reliability and
+                  security.
                 </p>
               </div>
             </section>
 
             {/* Intellectual Property */}
-            <section id="intellectual-property" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="intellectual-property"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 4. Intellectual Property & Content Ownership
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  The Platform and all associated content, including but not limited
-                  to software, source code, documentation, designs, logos, graphics,
-                  branding, text, and functionality, are owned by DevPath or its
-                  licensors and are protected under applicable intellectual property
-                  laws.
+                  The Platform and all associated content, including but not
+                  limited to software, source code, documentation, designs,
+                  logos, graphics, branding, text, and functionality, are owned
+                  by DevPath or its licensors and are protected under applicable
+                  intellectual property laws.
                 </p>
                 <p>
-                  Subject to these Terms, DevPath grants you a limited, non-exclusive,
-                  revocable, non-transferable license to access and use the Platform
-                  for its intended purposes.
+                  Subject to these Terms, DevPath grants you a limited,
+                  non-exclusive, revocable, non-transferable license to access
+                  and use the Platform for its intended purposes.
                 </p>
-                <p>
-                  You may not:
-                </p>
+                <p>You may not:</p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground leading-relaxed">
                   <li>
-                    Copy, reproduce, distribute, or modify protected materials without
-                    authorization.
+                    Copy, reproduce, distribute, or modify protected materials
+                    without authorization.
                   </li>
                   <li>
-                    Remove copyright notices, trademarks, or proprietary markings.
+                    Remove copyright notices, trademarks, or proprietary
+                    markings.
                   </li>
                   <li>
-                    Reverse engineer or attempt to derive source code where prohibited
-                    by law.
+                    Reverse engineer or attempt to derive source code where
+                    prohibited by law.
                   </li>
                   <li>
-                    Commercially exploit platform content without written permission.
+                    Commercially exploit platform content without written
+                    permission.
                   </li>
                 </ul>
                 <p>
                   You retain ownership of content you submit, upload, or publish
-                  ("User Content"). By submitting User Content, you grant DevPath a
-                  worldwide, non-exclusive, royalty-free license to host, store,
-                  display, process, and distribute such content solely for operating
-                  and improving the Platform.
+                  ("User Content"). By submitting User Content, you grant
+                  DevPath a worldwide, non-exclusive, royalty-free license to
+                  host, store, display, process, and distribute such content
+                  solely for operating and improving the Platform.
                 </p>
               </div>
             </section>
 
             {/* Third Party */}
-            <section id="third-party" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="third-party"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 5. Third-Party Services & Links
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  The Platform may contain links to third-party websites, services,
-                  repositories, advertisements, or resources.
+                  The Platform may contain links to third-party websites,
+                  services, repositories, advertisements, or resources.
                 </p>
                 <p>
-                  DevPath does not control and is not responsible for the content,
-                  policies, practices, or availability of any third-party service.
+                  DevPath does not control and is not responsible for the
+                  content, policies, practices, or availability of any
+                  third-party service.
                 </p>
               </div>
             </section>
 
             {/* Disclaimer */}
-            <section id="disclaimer" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="disclaimer"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 6. Disclaimer of Warranties
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  THE PLATFORM IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS.
+                  THE PLATFORM IS PROVIDED ON AN "AS IS" AND "AS AVAILABLE"
+                  BASIS.
                 </p>
                 <p>
                   TO THE MAXIMUM EXTENT PERMITTED BY LAW, DEVPATH DISCLAIMS ALL
@@ -355,14 +395,17 @@ export default function TermsClient() {
                   <li>Security and reliability of the Platform.</li>
                 </ul>
                 <p>
-                  We do not guarantee that the Platform will always be available,
-                  secure, error-free, or free of harmful components.
+                  We do not guarantee that the Platform will always be
+                  available, secure, error-free, or free of harmful components.
                 </p>
               </div>
             </section>
 
             {/* Liability */}
-            <section id="liability" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="liability"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 7. Limitation of Liability
               </h2>
@@ -384,15 +427,18 @@ export default function TermsClient() {
                   <li>Service interruptions.</li>
                 </ul>
                 <p>
-                  This limitation applies regardless of the legal theory under which
-                  liability is asserted and even if DevPath has been advised of the
-                  possibility of such damages.
+                  This limitation applies regardless of the legal theory under
+                  which liability is asserted and even if DevPath has been
+                  advised of the possibility of such damages.
                 </p>
               </div>
             </section>
 
             {/* Indemnification */}
-            <section id="indemnification" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="indemnification"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 8. Indemnification
               </h2>
@@ -400,7 +446,8 @@ export default function TermsClient() {
                 <p>
                   You agree to indemnify, defend, and hold harmless DevPath, its
                   affiliates, contributors, employees, and partners from claims,
-                  liabilities, damages, losses, costs, and expenses arising from:
+                  liabilities, damages, losses, costs, and expenses arising
+                  from:
                 </p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground leading-relaxed">
                   <li>Your use of the Platform.</li>
@@ -412,20 +459,26 @@ export default function TermsClient() {
             </section>
 
             {/* Suspension */}
-            <section id="suspension" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="suspension"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 9. Suspension & Termination
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  We reserve the right to suspend, restrict, or terminate access to
-                  the Platform at any time, with or without notice, if:
+                  We reserve the right to suspend, restrict, or terminate access
+                  to the Platform at any time, with or without notice, if:
                 </p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground leading-relaxed">
                   <li>You violate these Terms.</li>
-                  <li>We detect suspicious, abusive, or fraudulent activity.</li>
                   <li>
-                    Security, legal, or operational concerns require such action.
+                    We detect suspicious, abusive, or fraudulent activity.
+                  </li>
+                  <li>
+                    Security, legal, or operational concerns require such
+                    action.
                   </li>
                   <li>Required by applicable law.</li>
                 </ul>
@@ -437,24 +490,30 @@ export default function TermsClient() {
             </section>
 
             {/* Service Changes */}
-            <section id="service-changes" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="service-changes"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 10. Changes to the Service
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  We may modify, discontinue, replace, remove, or update any aspect of
-                  the Platform at any time without prior notice.
+                  We may modify, discontinue, replace, remove, or update any
+                  aspect of the Platform at any time without prior notice.
                 </p>
                 <p>
-                  We are not obligated to maintain any specific feature, integration,
-                  API, functionality, or service level.
+                  We are not obligated to maintain any specific feature,
+                  integration, API, functionality, or service level.
                 </p>
               </div>
             </section>
 
             {/* Changes to Terms */}
-            <section id="terms-changes" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="terms-changes"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 11. Changes to These Terms
               </h2>
@@ -464,8 +523,8 @@ export default function TermsClient() {
                   technical, operational, or business changes.
                 </p>
                 <p>
-                  Updated versions will be posted on this page with a revised "Last
-                  Updated" date.
+                  Updated versions will be posted on this page with a revised
+                  "Last Updated" date.
                 </p>
                 <p>
                   Continued use of the Platform after changes become effective
@@ -475,15 +534,18 @@ export default function TermsClient() {
             </section>
 
             {/* Governing Law */}
-            <section id="governing-law" className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4">
+            <section
+              id="governing-law"
+              className="scroll-mt-28 py-6 border-b border-border/20 last:border-0 space-y-4"
+            >
               <h2 className="text-2xl font-bold text-foreground tracking-tight border-l-2 border-primary/50 pl-4">
                 12. Governing Law
               </h2>
               <div className="pl-4 text-muted-foreground leading-relaxed text-base space-y-4">
                 <p>
-                  These Terms shall be governed by and construed in accordance with
-                  the applicable laws of the jurisdiction in which DevPath operates,
-                  without regard to conflict of law principles.
+                  These Terms shall be governed by and construed in accordance
+                  with the applicable laws of the jurisdiction in which DevPath
+                  operates, without regard to conflict of law principles.
                 </p>
               </div>
             </section>

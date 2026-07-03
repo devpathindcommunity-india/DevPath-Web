@@ -18,8 +18,8 @@ const eslintConfig = defineConfig([
       'react-hooks/purity': 'off',
       'react/display-name': 'off',
       '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off'
-    }
+      '@typescript-eslint/ban-ts-comment': 'off',
+    },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([

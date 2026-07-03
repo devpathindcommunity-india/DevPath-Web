@@ -7,7 +7,6 @@ import Button from '../ui/Button';
 import InteractiveBackground from '../ui/InteractiveBackground';
 import styles from './Hero.module.css';
 
-
 const LatestEventsHighlight = dynamic(() => import('./LatestEventsHighlight'));
 import { useEffect, useState, useRef } from 'react';
 

@@ -252,8 +252,6 @@ export default function OpportunityDashboard() {
               className={`p-1.5 rounded-lg transition-colors ${viewMode === 'list' ? 'bg-primary text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
               title="List View"
               aria-label="Switch to list view"
-
-
             >
               <List size={15} />
             </button>
@@ -285,7 +283,6 @@ export default function OpportunityDashboard() {
             activeTab === 'bookmarked'
               ? 'text-foreground'
               : 'text-muted-foreground hover:text-foreground'
-
           }`}
         >
           My Bookmarks
@@ -340,7 +337,8 @@ export default function OpportunityDashboard() {
                 : null;
 
               // Deadline badge styling configuration
-              let badgeColor = 'bg-muted dark:bg-slate-900 text-muted-foreground border-border dark:border-slate-800';
+              let badgeColor =
+                'bg-muted dark:bg-slate-900 text-muted-foreground border-border dark:border-slate-800';
 
               if (status) {
                 if (status.status === 'expired') {
