@@ -1,4 +1,4 @@
-import { db, storage } from '@/lib/firebase';
+import { db } from '@/lib/firebase';
 import { 
   collection, 
   doc, 
@@ -6,31 +6,13 @@ import {
   getDoc, 
   getDocs, 
   query, 
-  where, 
   orderBy, 
   serverTimestamp, 
   updateDoc 
 } from 'firebase/firestore';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { CommunityApplication, ApplicationStatus } from '@/types/application';
 
 const COLLECTION_NAME = 'communityApplications';
-
-/**
- * Uploads a resume PDF to Firebase Storage and returns the download URL.
- */
-export const uploadResume = async (uid: string, file: File): Promise<string> => {
-  if (file.type !== 'application/pdf') {
-    throw new Error('Only PDF files are allowed.');
-  }
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error('File size exceeds the 5MB limit.');
-  }
-
-  const storageRef = ref(storage, `resumes/${uid}/${file.name}`);
-  await uploadBytes(storageRef, file);
-  return await getDownloadURL(storageRef);
-};
 
 /**
  * Submits a new community application or updates a draft.

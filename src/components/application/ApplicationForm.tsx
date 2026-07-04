@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { submitApplication, uploadResume, getUserApplication } from '@/lib/applicationService';
+import { submitApplication, getUserApplication } from '@/lib/applicationService';
 import { CommunityApplication } from '@/types/application';
 import { Country, State, City } from 'country-state-city';
-import { Loader2, UploadCloud, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
+import { Loader2, CheckCircle2, ChevronRight, ChevronLeft } from 'lucide-react';
 
 const TECH_INTERESTS = [
   'Android', 'Web Development', 'AI/ML', 'Cloud', 'Cyber Security',
@@ -44,8 +44,6 @@ export default function ApplicationForm() {
     cityLead: { whyCityLead: '', howHelpDevelopers: '' },
     whyJoinDevPath: '', anythingElse: ''
   });
-
-  const [resumeFile, setResumeFile] = useState<File | null>(null);
   
   // Dynamic Dropdown states
   const [countries, setCountries] = useState(Country.getAllCountries());
@@ -136,15 +134,10 @@ export default function ApplicationForm() {
     }
     setLoading(true);
     try {
-      let finalResumeUrl = formData.socialLinks.resumeUrl;
-      if (resumeFile) {
-        finalResumeUrl = await uploadResume(user.uid, resumeFile);
-      }
-
       const finalData: Omit<CommunityApplication, 'status' | 'submittedAt'> = {
         uid: user.uid,
         personalInfo: formData.personalInfo,
-        socialLinks: { ...formData.socialLinks, resumeUrl: finalResumeUrl },
+        socialLinks: formData.socialLinks,
         interests: formData.interests,
         communityRoles: formData.communityRoles,
         womenInTech: formData.womenInTech,
@@ -322,20 +315,9 @@ export default function ApplicationForm() {
                   value={formData.socialLinks.portfolio} onChange={(e) => updateNestedField('socialLinks', 'portfolio', e.target.value)} />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Resume (Optional, PDF up to 5MB)</label>
-                <div className="border-2 border-dashed border-border rounded-xl p-8 text-center hover:border-primary/50 transition-colors">
-                  <UploadCloud className="w-10 h-10 mx-auto text-gray-400 mb-2" />
-                  <input type="file" accept="application/pdf" className="hidden" id="resumeUpload" onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      if (file.size > 5 * 1024 * 1024) alert("File too large. Max 5MB.");
-                      else setResumeFile(file);
-                    }
-                  }} />
-                  <label htmlFor="resumeUpload" className="cursor-pointer text-primary font-medium hover:underline">
-                    {resumeFile ? resumeFile.name : "Click to browse"}
-                  </label>
-                </div>
+                <label className="block text-sm font-medium mb-1">Resume Link (Google Drive, etc.)</label>
+                <input type="url" placeholder="https://drive.google.com/..." className="w-full p-3 rounded-lg bg-background border border-border focus:border-primary outline-none" 
+                  value={formData.socialLinks.resumeUrl} onChange={(e) => updateNestedField('socialLinks', 'resumeUrl', e.target.value)} />
               </div>
             </div>
           </div>
