@@ -45,6 +45,7 @@ import DevCard from '@/components/profile/DevCard';
 import FollowButton from '@/components/profile/FollowButton';
 import LoginHeatmap from '@/components/profile/LoginHeatmap';
 import GithubStats from './GithubStats';
+import ApplicationStatusCard from './ApplicationStatusCard';
 import ReactMarkdown from 'react-markdown';
 import DOMPurify from 'dompurify';
 import rehypeRaw from 'rehype-raw';
@@ -764,6 +765,9 @@ export default function UserProfile() {
           <div className="space-y-6">
             <LoginHeatmap loginDates={user.loginDates} />
           </div>
+
+          {/* Application Status */}
+          <ApplicationStatusCard />
 
           {/* GitHub Stats Section */}
           {user.githubStats?.connected && <GithubStats user={user} />}

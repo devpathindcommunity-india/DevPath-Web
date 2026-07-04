@@ -29,6 +29,7 @@ import {
 import { db } from '@/lib/firebase';
 import Image from 'next/image';
 import { determineBadges, getBadgeXp } from '@/lib/point-calculation';
+import ApplicationsTab from './ApplicationsTab';
 
 const PAGE_SIZE = 50;
 
@@ -829,6 +830,10 @@ export default function AdminDashboard({
     <div className="min-h-screen bg-background text-foreground pt-24 px-4 md:px-8">
       <div className="max-w-7xl mx-auto">
         <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
+        
+        <div className="mb-8">
+          <ApplicationsTab />
+        </div>
 
         {/* Maintenance Section */}
         <div className="p-6 bg-card border border-border rounded-lg space-y-4">

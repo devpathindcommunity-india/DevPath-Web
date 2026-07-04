@@ -135,6 +135,13 @@ service cloud.firestore {
       );
     }
 
+    // ─── Community Applications ────────────────────────────────────────────────
+    match /communityApplications/{applicationId} {
+      allow read: if request.auth != null && (resource.data.uid == request.auth.uid || isSuperAdmin() || isAdmin());
+      allow create: if request.auth != null && request.resource.data.uid == request.auth.uid;
+      allow update, delete: if request.auth != null && (resource.data.uid == request.auth.uid || isSuperAdmin() || isAdmin());
+    }
+
     // ─── Superadmin / Admin Keys ──────────────────────────────────────────────
     match /superadmin_keys/{keyId} {
       allow read: if isSuperAdmin();

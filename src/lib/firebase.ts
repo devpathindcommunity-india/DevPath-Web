@@ -2,6 +2,7 @@ import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
 import { Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
+import { getStorage, FirebaseStorage } from 'firebase/storage';
 import { createFirestoreWithOfflineSupport } from '@/lib/firestore-offline';
 
 const isProduction = process.env.NODE_ENV === 'production';
@@ -70,6 +71,7 @@ const db: Firestore = app
   ? createFirestoreWithOfflineSupport(app)
   : (null as unknown as Firestore);
 const auth: Auth = app ? (getAuth(app) as Auth) : ({} as Auth);
+const storage: FirebaseStorage = app ? (getStorage(app) as FirebaseStorage) : ({} as FirebaseStorage);
 const firebaseAvailable = Boolean(app);
 
-export { db, auth, firebaseAvailable, firebaseConfig };
+export { db, auth, storage, firebaseAvailable, firebaseConfig };
