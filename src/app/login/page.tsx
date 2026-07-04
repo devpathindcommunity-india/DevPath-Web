@@ -28,7 +28,6 @@ import {
   linkWithCredential,
   AuthCredential,
 } from 'firebase/auth';
-import AdminKeyModal from '@/components/auth/AdminKeyModal';
 import { useAuth } from '@/context/AuthContext';
 import { useNotificationActions } from '@/stores/ui-store';
 import { useMaintenance } from '@/hooks/useMaintenance';
@@ -46,8 +45,6 @@ export default function LoginPage() {
   >(null);
   const [failedAttempts, setFailedAttempts] = useState(0);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
-  const [showAdminKeyModal, setShowAdminKeyModal] = useState(false);
-  const [isCheckingAdmin, setIsCheckingAdmin] = useState(false);
 
   // Account linking states
   const [linkingEmail, setLinkingEmail] = useState('');
@@ -55,7 +52,7 @@ export default function LoginPage() {
     useState<AuthCredential | null>(null);
   const [linkingPassword, setLinkingPassword] = useState('');
 
-  const { login, user, isLoading, logout, isAdminVerified } = useAuth();
+  const { login, user, isLoading, logout } = useAuth();
   const { showSuccess, showError, showInfo } = useNotificationActions();
   const router = useRouter();
   const { isMaintenanceMode, maintenanceMessage } = useMaintenance();
@@ -72,23 +69,12 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!isLoading && user) {
-      if (user.role === 'admin') {
-        if (!isAdminVerified && !showAdminKeyModal && !isCheckingAdmin) {
-          setShowAdminKeyModal(true);
-        } else if (isAdminVerified) {
-          router.push('/profile');
-        }
-      } else {
-        router.push('/profile');
-      }
+      router.push('/profile');
     }
   }, [
     user,
     isLoading,
     router,
-    isAdminVerified,
-    showAdminKeyModal,
-    isCheckingAdmin,
   ]);
 
   if (isLoading) {
@@ -119,15 +105,13 @@ export default function LoginPage() {
       return;
     }
 
-    setIsSubmitting(true);
-    setIsCheckingAdmin(true);
+    setIsSubmitting(false);
 
     try {
       await login(normalizedEmail, password);
 
       setFailedAttempts(0);
       showSuccess('Signed in successfully.');
-      setIsCheckingAdmin(false);
     } catch (err: any) {
       console.error(err);
 
@@ -150,8 +134,6 @@ export default function LoginPage() {
         setError(message);
         showError(message);
       }
-
-      setIsCheckingAdmin(false);
     } finally {
       setIsSubmitting(false);
     }
@@ -201,7 +183,6 @@ export default function LoginPage() {
       return;
     setError('');
     setActiveProvider(providerName);
-    setIsCheckingAdmin(true);
 
     try {
       const provider =
@@ -224,8 +205,6 @@ export default function LoginPage() {
       showSuccess(
         `Signed in with ${providerName === 'google' ? 'Google' : 'GitHub'}.`
       );
-
-      setIsCheckingAdmin(false);
     } catch (err: any) {
       console.error(err);
 
@@ -242,7 +221,6 @@ export default function LoginPage() {
             `An account already exists for ${email}. Please enter your password to link your accounts.`
           );
           showError(`Account exists for ${email}. Please enter your password.`);
-          setIsCheckingAdmin(false);
           setActiveProvider(null);
           return;
         }
@@ -254,22 +232,9 @@ export default function LoginPage() {
           : `Unable to sign in with ${providerName === 'google' ? 'Google' : 'GitHub'}.`;
       setError(message);
       showError(message);
-      setIsCheckingAdmin(false);
     } finally {
       setActiveProvider(null);
     }
-  };
-
-  const handleAdminVerified = () => {
-    setShowAdminKeyModal(false);
-    setIsCheckingAdmin(false);
-    router.push('/profile');
-  };
-
-  const handleAdminCancel = async () => {
-    setShowAdminKeyModal(false);
-    setIsCheckingAdmin(false);
-    await logout();
   };
 
   const providerBusy = !!activeProvider;
@@ -278,12 +243,6 @@ export default function LoginPage() {
     <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-background px-4 py-8 sm:px-6 lg:px-8">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(45,212,191,0.18),transparent_34%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.18),transparent_30%),linear-gradient(135deg,rgba(15,23,42,0.75),rgba(2,6,23,0.95))]" />
       <div className="pointer-events-none absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-cyan-400/10 to-transparent" />
-
-      <AdminKeyModal
-        isOpen={showAdminKeyModal}
-        onVerified={handleAdminVerified}
-        onCancel={handleAdminCancel}
-      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
