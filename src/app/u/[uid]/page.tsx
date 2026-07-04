@@ -13,7 +13,7 @@ import {
 export const dynamicParams = false;
 
 export async function generateStaticParams() {
-  return [{ uid: 'dummy' }];
+  return [{ uid: 'dummy' }, { uid: 'kew7p1pbj7WoX66uGH2ZMcg79RB3' }];
 }
 
 export async function generateMetadata({

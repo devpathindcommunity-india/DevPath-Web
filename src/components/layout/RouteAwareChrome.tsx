@@ -1,5 +1,6 @@
-"use client";
+'use client';
 
+import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 import MaintenanceBlocker from '@/components/layout/MaintenanceBlocker';
@@ -11,27 +12,43 @@ import PageWrapper from '@/components/layout/PageWrapper';
 import { FloatingAssistant } from '@/components/assistant/floating-assistant';
 import { ToastContainer } from '@/components/ui/ToastContainer';
 import SearchModal from '@/components/layout/SearchModal';
+import ShortcutLegend from '@/components/layout/ShortcutLegend';
+import { useKeyboardShortcuts } from '@/hooks/useKeyboardShortcuts';
+import BackToTop from '@/components/BackToTop';
 
-export default function RouteAwareChrome({ children }: { children: React.ReactNode }) {
-    const pathname = usePathname();
-    const isAuthRoute = pathname === '/login' || pathname === '/signup';
+export default function RouteAwareChrome({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const pathname = usePathname();
+  const isAuthRoute = pathname === '/login' || pathname === '/signup';
+  const [isLegendOpen, setLegendOpen] = useState(false);
 
-    return (
-        <>
-            <OfflineBanner />
-            {!isAuthRoute && <MaintenanceBanner />}
-            <Navbar />
+  useKeyboardShortcuts({
+    '?': () => setLegendOpen((prev) => !prev),
+    escape: () => setLegendOpen(false),
+  });
 
-            <MaintenanceBlocker>
-                <PageWrapper>
-                    {children}
-                </PageWrapper>
-            </MaintenanceBlocker>
+  return (
+    <>
+      <OfflineBanner />
+      {!isAuthRoute && <MaintenanceBanner />}
+      <Navbar />
 
-            {!isAuthRoute && <FooterWrapper />}
-            {!isAuthRoute && <FloatingAssistant />}
-            <ToastContainer />
-            <SearchModal />
-        </>
-    );
+      <MaintenanceBlocker>
+        <PageWrapper>{children}</PageWrapper>
+      </MaintenanceBlocker>
+
+      {!isAuthRoute && <FooterWrapper />}
+      {!isAuthRoute && <FloatingAssistant />}
+      {!isAuthRoute && <BackToTop />}
+      <ToastContainer />
+      <SearchModal />
+      <ShortcutLegend
+        isOpen={isLegendOpen}
+        onClose={() => setLegendOpen(false)}
+      />
+    </>
+  );
 }

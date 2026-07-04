@@ -72,10 +72,10 @@ export function rateLimit(
   options: RateLimitOptions = {}
 ): RateLimitResult | RateLimitBlocked {
   const {
-  limit = Number(process.env.RATE_LIMIT_MAX ?? 10),
-  windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000),
-  message = 'Too many requests. Please try again later.'
-} = options;
+    limit = Number(process.env.RATE_LIMIT_MAX ?? 10),
+    windowMs = Number(process.env.RATE_LIMIT_WINDOW_MS ?? 60000),
+    message = 'Too many requests. Please try again later.',
+  } = options;
 
   const ip = getIp(request);
   const now = Date.now();
@@ -99,19 +99,18 @@ export function rateLimit(
 
     return {
       success: false,
-      response: new Response(
-        JSON.stringify({ success: false, message }),
-        {
-          status: 429,
-          headers: {
-            'Content-Type': 'application/json',
-            'Retry-After': String(retryAfterSec),
-            'X-RateLimit-Limit': String(limit),
-            'X-RateLimit-Remaining': '0',
-            'X-RateLimit-Reset': String(Math.ceil((oldestInWindow + windowMs) / 1000)),
-          },
-        }
-      ),
+      response: new Response(JSON.stringify({ success: false, message }), {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'Retry-After': String(retryAfterSec),
+          'X-RateLimit-Limit': String(limit),
+          'X-RateLimit-Remaining': '0',
+          'X-RateLimit-Reset': String(
+            Math.ceil((oldestInWindow + windowMs) / 1000)
+          ),
+        },
+      }),
     };
   }
 

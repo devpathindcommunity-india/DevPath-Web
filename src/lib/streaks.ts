@@ -1,4 +1,4 @@
-import { Timestamp } from "firebase/firestore";
+import { Timestamp } from 'firebase/firestore';
 
 export function calculateStreak(activityDates: string[]): number {
   const sorted = [...new Set(activityDates)].sort().reverse();
@@ -9,12 +9,14 @@ export function calculateStreak(activityDates: string[]): number {
   for (const dateStr of sorted) {
     const d = new Date(dateStr);
     const diff = Math.floor((current.getTime() - d.getTime()) / 86400000);
-    if (diff === 0 || diff === 1) { streak++; current = d; }
-    else break;
+    if (diff === 0 || diff === 1) {
+      streak++;
+      current = d;
+    } else break;
   }
   return streak;
 }
 
 export function todayString() {
-  return new Date().toISOString().split("T")[0]; // "2026-06-01"
+  return new Date().toISOString().split('T')[0]; // "2026-06-01"
 }

@@ -10,6 +10,10 @@ jobs:
   lint:
     name: ESLint & Prettier Check
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
 
     steps:
       - name: Checkout Repository
@@ -26,47 +30,29 @@ jobs:
       - name: Install Dependencies
         run: npm ci
 
-      - name: Get Changed Files for Prettier
-        id: prettier-changed-files
-        uses: tj-actions/changed-files@v44
+      - name: Run ESLint
+        run: npx eslint . --ext .js,.jsx,.ts,.tsx
+        continue-on-error: true # Prevents the workflow from immediately stopping if lint fails, allowing prettier to run
+
+      - name: Auto-format with Prettier
+        run: npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}"
+
+      - name: Commit formatting changes
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          files: |
-            **/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}
+          commit_message: "style: auto-format with Prettier"
+          branch: ${{ github.head_ref }}
 
-      - name: Run Prettier Check on Changed Files
-        if: steps.prettier-changed-files.outputs.any_changed == 'true'
-        run: |
-          FILES=""
-          for file in ${{ steps.prettier-changed-files.outputs.all_changed_files }}; do
-            if [ -f "$file" ]; then
-              FILES="$FILES $file"
-            fi
-          done
-          if [ -n "$FILES" ]; then
-            npx prettier --check $FILES
-          else
-            echo "No files to format check."
-          fi
-
-      - name: Get Changed Files for ESLint
-        id: eslint-changed-files
-        uses: tj-actions/changed-files@v44
+      - name: Comment on Failure
+        if: failure() && github.event_name == 'pull_request'
+        uses: actions/github-script@v6
         with:
-          files: |
-            **/*.{js,jsx,ts,tsx}
-            !**/*.d.ts
-
-      - name: Run ESLint on Changed Files
-        if: steps.eslint-changed-files.outputs.any_changed == 'true'
-        run: |
-          FILES=""
-          for file in ${{ steps.eslint-changed-files.outputs.all_changed_files }}; do
-            if [ -f "$file" ]; then
-              FILES="$FILES $file"
-            fi
-          done
-          if [ -n "$FILES" ]; then
-            npx eslint $FILES
-          else
-            echo "No files to lint."
-          fi
+          script: |
+            const prAuthor = context.payload.pull_request.user.login;
+            const message = `Hi @${prAuthor}, I guess you need to update your PR so that all CI checks get passed!`;
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: message
+            });

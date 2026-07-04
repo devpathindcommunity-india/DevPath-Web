@@ -1,64 +1,64 @@
 .projects {
-    padding: 4rem 0;
-    overflow: hidden;
+  padding: 4rem 0;
+  overflow: hidden;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 3rem;
-    padding: 0 2rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  padding: 0 2rem;
 }
 
 .title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #fff, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    color: var(--muted-foreground);
-    font-size: 1.1rem;
+  color: var(--muted-foreground);
+  font-size: 1.1rem;
 }
 
 .scrollContainer {
-    width: 100%;
-    overflow-x: auto;
-    padding: 2rem 0;
-    perspective: 1000px;
-    /* Hide scrollbar */
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+  width: 100%;
+  overflow-x: auto;
+  padding: 2rem 0;
+  perspective: 1000px;
+  /* Hide scrollbar */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollContainer::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 
 .grid {
-    display: flex;
-    gap: 2rem;
-    padding: 0 4rem;
-    /* Add padding to sides so first/last items aren't cut off */
-    width: max-content;
+  display: flex;
+  gap: 2rem;
+  padding: 0 4rem;
+  /* Add padding to sides so first/last items aren't cut off */
+  width: max-content;
 }
 
 .projectWrapper {
-    width: 350px;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
+  width: 350px;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
 }
 
 @media (max-width: 768px) {
-    .projectWrapper {
-        width: 300px;
-    }
+  .projectWrapper {
+    width: 300px;
+  }
 
-    .grid {
-        padding: 0 2rem;
-    }
+  .grid {
+    padding: 0 2rem;
+  }
 }

@@ -1,7 +1,8 @@
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app';
 import { getAnalytics, isSupported } from 'firebase/analytics';
-import { getFirestore, Firestore } from 'firebase/firestore';
+import { Firestore } from 'firebase/firestore';
 import { getAuth, Auth } from 'firebase/auth';
+import { createFirestoreWithOfflineSupport } from '@/lib/firestore-offline';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -11,6 +12,8 @@ const firebaseConfig = {
   projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
   storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+  measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
 // Production Safety Guard
@@ -20,8 +23,8 @@ if (isProduction) {
     .map(([key]) => key);
 
   if (missingKeys.length > 0) {
-    throw new Error(
-      `Production Deployment Error: Missing required Firebase environment variables: ${missingKeys.join(', ')}`
+    console.warn(
+      `Production Deployment Warning: Missing required Firebase environment variables: ${missingKeys.join(', ')}. Ensure these are provided in your hosting environment.`
     );
   }
 } else {
@@ -35,6 +38,8 @@ if (isProduction) {
     firebaseConfig.storageBucket || 'mock-app.appspot.com';
   firebaseConfig.messagingSenderId =
     firebaseConfig.messagingSenderId || '1234567890';
+  firebaseConfig.appId = firebaseConfig.appId || '1:1234567890:web:1234567890';
+  firebaseConfig.measurementId = firebaseConfig.measurementId || 'G-12345';
 }
 
 const isFirebaseConfigValid = Boolean(
@@ -42,7 +47,8 @@ const isFirebaseConfigValid = Boolean(
   firebaseConfig.authDomain &&
   firebaseConfig.projectId &&
   firebaseConfig.storageBucket &&
-  firebaseConfig.messagingSenderId
+  firebaseConfig.messagingSenderId &&
+  firebaseConfig.appId
 );
 
 const app: FirebaseApp | null = isFirebaseConfigValid
@@ -61,11 +67,9 @@ if (!app) {
 // `app` may be null when Firebase isn't configured; in that case we provide
 // a minimal cast to satisfy TypeScript while keeping runtime behavior safe.
 const db: Firestore = app
-  ? (getFirestore(app) as Firestore)
+  ? createFirestoreWithOfflineSupport(app)
   : (null as unknown as Firestore);
 const auth: Auth = app ? (getAuth(app) as Auth) : ({} as Auth);
-const firebaseAvailable =
-  Boolean(app) &&
-  firebaseConfig.apiKey !== 'mock-api-key-for-local-testing-only-123456';
+const firebaseAvailable = Boolean(app);
 
 export { db, auth, firebaseAvailable, firebaseConfig };

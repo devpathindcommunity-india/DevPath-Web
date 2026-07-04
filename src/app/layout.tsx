@@ -1,39 +1,54 @@
-﻿const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://devpath-website.web.app';
-import type { Metadata } from "next";
-import { Inter, Space_Grotesk, Barlow_Condensed } from "next/font/google";
-import { AuthProvider } from "@/context/AuthContext";
-import { GamificationProvider } from "@/context/GamificationContext";
-import { RealTimeProvider } from "@/context/RealTimeContext";
+const APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL ?? 'https://devpath-website.web.app';
+import type { Metadata, Viewport } from 'next';
+import { Inter, Space_Grotesk, Barlow_Condensed } from 'next/font/google';
+import { AuthProvider } from '@/context/AuthContext';
+import { GamificationProvider } from '@/context/GamificationContext';
+import { RealTimeProvider } from '@/context/RealTimeContext';
 import { AnimatedBackground } from '@/components/AnimatedBackground';
-import BackgroundMesh from '@/components/layout/BackgroundMesh';
-import { ThemeProvider } from "@/components/providers/theme-provider";
-import { NotificationProvider } from "@/context/NotificationContext";
-import { SyncErrorListener } from "@/components/providers/sync-error-listener";
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { NotificationProvider } from '@/context/NotificationContext';
+import { SyncErrorListener } from '@/components/providers/sync-error-listener';
 import RouteAwareChrome from '@/components/layout/RouteAwareChrome';
 import 'github-markdown-css/github-markdown.css';
-import PageTrackerInit from '@/components/PageTrackerInit';
-import "./globals.css";
+import './globals.css';
+import '@/styles/resume-print.css';
+import { MotionConfig } from 'framer-motion';
 
-
-const inter = Inter({ subsets: ["latin"], variable: '--font-inter' });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: '--font-space' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-space',
+});
 const barlowCondensed = Barlow_Condensed({
   weight: ['900'],
   subsets: ['latin'],
-  variable: '--font-barlow'
+  variable: '--font-barlow',
 });
 
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
+  applicationName: 'DevPath Community',
+  manifest: '/manifest.json',
   title: {
-    default: "DevPath Community",
-    template: "%s | DevPath Community",
+    default: 'DevPath Community',
+    template: '%s | DevPath Community',
   },
-  description: "Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.",
-  keywords: ["DevPath", "Coding Community", "Developer Community", "Learn to Code", "Programming", "Software Engineering", "Web Development", "App Development"],
-  authors: [{ name: "DevPath Team" }],
-  creator: "DevPath Community",
-  publisher: "DevPath Community",
+  description:
+    'Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.',
+  keywords: [
+    'DevPath',
+    'Coding Community',
+    'Developer Community',
+    'Learn to Code',
+    'Programming',
+    'Software Engineering',
+    'Web Development',
+    'App Development',
+  ],
+  authors: [{ name: 'DevPath Team' }],
+  creator: 'DevPath Community',
+  publisher: 'DevPath Community',
   robots: {
     index: true,
     follow: true,
@@ -46,46 +61,61 @@ export const metadata: Metadata = {
     },
   },
   openGraph: {
-    type: "website",
-    locale: "en_US",
+    type: 'website',
+    locale: 'en_US',
     url: APP_URL,
-    title: "DevPath Community",
-    description: "Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.",
-    siteName: "DevPath Community",
+    title: 'DevPath Community',
+    description:
+      'Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.',
+    siteName: 'DevPath Community',
     images: [
       {
-        url: "/DevPath-logo.webp",
+        url: '/DevPath-logo.webp',
         width: 800,
         height: 600,
-        alt: "DevPath Community Logo",
+        alt: 'DevPath Community Logo',
       },
     ],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "DevPath Community",
-    description: "Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.",
-    images: ["/DevPath-logo.webp"],
-    creator: "@DevPath_Community", // Assuming handle
+    card: 'summary_large_image',
+    title: 'DevPath Community',
+    description:
+      'Join 50,000+ developers accelerating their coding skills through structured paths, real projects, and an active community.',
+    images: ['/DevPath-logo.webp'],
+    creator: '@DevPath_Community', // Assuming handle
   },
   icons: {
     icon: '/DevPath-logo.webp',
     apple: '/DevPath-logo.webp',
   },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'DevPath Community',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: '#0ea5e9',
 };
 
 const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "Organization",
-  "name": "DevPath Community",
-  "url": APP_URL,
-  "logo": `${APP_URL}/DevPath-logo.webp`,
-  "sameAs": [
-    "https://twitter.com/DevPath_Community",
-    "https://www.linkedin.com/company/devpath-community",
-    "https://github.com/devpathindcommunity-india/DevPath-Web"
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'DevPath Community',
+  url: APP_URL,
+  logo: `${APP_URL}/DevPath-logo.webp`,
+  sameAs: [
+    'https://twitter.com/DevPath_Community',
+    'https://www.linkedin.com/company/devpath-community',
+    'https://github.com/devpathindcommunity-india/DevPath-Web',
   ],
-  "description": "A community of 50,000+ developers accelerating their coding skills through structured paths and real projects."
+  description:
+    'A community of 50,000+ developers accelerating their coding skills through structured paths and real projects.',
 };
 
 export default function RootLayout({
@@ -101,34 +131,36 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5192400464044260"
           crossOrigin="anonymous"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${barlowCondensed.variable}`} suppressHydrationWarning>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <NotificationProvider>
-            <SyncErrorListener>
-              <script
-                 type="application/ld+json"
-                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-              />
-              <AuthProvider>
-                <GamificationProvider>
-                  <RealTimeProvider>
-                    <AnimatedBackground />
-                    {/* <BackgroundMesh /> */}
-                    <RouteAwareChrome>
-                      {children}
-                    </RouteAwareChrome>
-                  </RealTimeProvider>
-                </GamificationProvider>
-              </AuthProvider>
-            </SyncErrorListener>
-          </NotificationProvider>
-        </ThemeProvider>
+      <body
+        className={`${inter.variable} ${spaceGrotesk.variable} ${barlowCondensed.variable}`}
+        suppressHydrationWarning
+      >
+        <MotionConfig reducedMotion="user">
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <NotificationProvider>
+              <SyncErrorListener>
+                <AuthProvider>
+                  <GamificationProvider>
+                    <RealTimeProvider>
+                      <AnimatedBackground />
+                      <RouteAwareChrome>{children}</RouteAwareChrome>
+                    </RealTimeProvider>
+                  </GamificationProvider>
+                </AuthProvider>
+              </SyncErrorListener>
+            </NotificationProvider>
+          </ThemeProvider>
+        </MotionConfig>
       </body>
     </html>
   );

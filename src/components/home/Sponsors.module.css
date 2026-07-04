@@ -1,140 +1,155 @@
 .sponsors {
-    padding: 4rem 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+  padding: 4rem 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .header {
-    text-align: center;
-    margin-bottom: 3rem;
+  text-align: center;
+  margin-bottom: 3rem;
 }
 
 .title {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1rem;
-    background: linear-gradient(to right, #fff, #a5b4fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  background: linear-gradient(to right, #fff, #a5b4fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .subtitle {
-    color: var(--muted-foreground);
-    font-size: 1.1rem;
+  color: var(--muted-foreground);
+  font-size: 1.1rem;
 }
 
 .grid {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 4rem;
-    flex-wrap: wrap;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4rem;
+  flex-wrap: wrap;
 }
 
 .marqueeContainer {
-    width: 100%;
-    overflow: hidden;
-    position: relative;
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-    padding: 1rem 0;
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+  padding: 1rem 0;
 }
 
 .marqueeTrack {
-    display: flex;
-    width: max-content;
-    animation: scroll 30s linear infinite;
-    gap: 4rem;
-    padding-left: 4rem; /* This padding offsets the gap for seamless looping */
+  display: flex;
+  width: max-content;
+  animation: scroll 30s linear infinite;
+  gap: 4rem;
+  padding-left: 4rem; /* This padding offsets the gap for seamless looping */
 }
 
 .marqueeContainer:hover .marqueeTrack {
-    animation-play-state: paused;
+  animation-play-state: paused;
 }
 
 @keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
 
-
 .sponsorCard {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1rem;
-    padding: 2rem;
-    transition: all 0.3s ease;
-    width: 280px;
-    height: 160px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 2rem;
+  transition: all 0.3s ease;
+  width: 280px;
+  height: 160px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sponsorCard:hover {
-    transform: translateY(-5px);
-    background: rgba(255, 255, 255, 0.05);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+  transform: translateY(-5px);
+  background: rgba(255, 255, 255, 0.05);
+  border-color: var(--primary);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
 }
 
 .imageWrapper {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    filter: grayscale(100%) brightness(200%); /* Make logos white/monochrome */
-    transition: filter 0.3s ease;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: grayscale(100%) brightness(200%); /* Make logos white/monochrome */
+  transition: filter 0.3s ease;
 }
 
 .sponsorCard:hover .imageWrapper {
-    filter: grayscale(0%) brightness(100%); /* Restore color on hover */
+  filter: grayscale(0%) brightness(100%); /* Restore color on hover */
 }
 
 .logo {
-    max-width: 100%;
-    max-height: 100%;
+  max-width: 100%;
+  max-height: 100%;
 }
 
 @media (max-width: 768px) {
-    .grid {
-        gap: 2rem;
-    }
-    
-    .sponsorCard {
-        width: 100%;
-        max-width: 240px;
-    }
+  .grid {
+    gap: 2rem;
+  }
+
+  .sponsorCard {
+    width: 100%;
+    max-width: 240px;
+  }
 }
 
 /* Light Mode Overrides */
 :global(html:not(.dark)) .title {
-    background: linear-gradient(to right, #1e293b, #4f46e5);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  background: linear-gradient(to right, #1e293b, #4f46e5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 :global(html:not(.dark)) .subtitle {
-    color: var(--text-secondary);
+  color: var(--text-secondary);
 }
 
 :global(html:not(.dark)) .sponsorCard {
-    background: rgba(0, 0, 0, 0.03);
-    border-color: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.1);
 }
 
 :global(html:not(.dark)) .sponsorCard:hover {
-    background: rgba(0, 0, 0, 0.05);
-    border-color: var(--primary);
-    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.05);
+  border-color: var(--primary);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
 }
 
 :global(html:not(.dark)) .imageWrapper {
-    filter: grayscale(100%) brightness(0%); /* Make logos black */
+  filter: grayscale(100%) brightness(0%); /* Make logos black */
 }
 
 :global(html:not(.dark)) .sponsorCard:hover .imageWrapper {
-    filter: grayscale(0%) brightness(100%); /* Restore color on hover */
+  filter: grayscale(0%) brightness(100%); /* Restore color on hover */
 }

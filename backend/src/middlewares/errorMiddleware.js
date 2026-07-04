@@ -1,10 +1,10 @@
-const logger = require("../utils/logger");
+const logger = require('../utils/logger');
 
 const notFoundHandler = (req, res) => {
   return res.status(404).json({
     success: false,
     error: {
-      code: "NOT_FOUND",
+      code: 'NOT_FOUND',
       message: `Route not found: ${req.method} ${req.originalUrl}`,
     },
   });
@@ -12,7 +12,7 @@ const notFoundHandler = (req, res) => {
 
 const errorHandler = (err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const code = err.code || "INTERNAL_ERROR";
+  const code = err.code || 'INTERNAL_ERROR';
 
   logger.error({
     message: err.message,
@@ -27,7 +27,7 @@ const errorHandler = (err, req, res, next) => {
     success: false,
     error: {
       code,
-      message: err.message || "Unexpected server error",
+      message: err.message || 'Unexpected server error',
     },
   });
 };

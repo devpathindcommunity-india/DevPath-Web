@@ -1,7 +1,7 @@
-const admin = require("firebase-admin");
-const path = require("path");
-const fs = require("fs");
-const logger = require("../utils/logger");
+const admin = require('firebase-admin');
+const path = require('path');
+const fs = require('fs');
+const logger = require('../utils/logger');
 
 let initialized = false;
 
@@ -12,8 +12,8 @@ const resolveServiceAccountPath = (rawPath) => {
     candidatePaths.push(rawPath);
   } else {
     candidatePaths.push(path.resolve(process.cwd(), rawPath));
-    candidatePaths.push(path.resolve(__dirname, "../../../", rawPath));
-    candidatePaths.push(path.resolve(__dirname, "../../../../", rawPath));
+    candidatePaths.push(path.resolve(__dirname, '../../../', rawPath));
+    candidatePaths.push(path.resolve(__dirname, '../../../../', rawPath));
   }
 
   for (const candidatePath of candidatePaths) {
@@ -34,18 +34,19 @@ const initFirebaseAdmin = () => {
 
   const serviceAccountPath =
     process.env.FIREBASE_SERVICE_ACCOUNT_PATH ||
-    path.resolve(process.cwd(), "../service-account-key.json");
-  const resolvedServiceAccountPath = resolveServiceAccountPath(serviceAccountPath);
+    path.resolve(process.cwd(), '../service-account-key.json');
+  const resolvedServiceAccountPath =
+    resolveServiceAccountPath(serviceAccountPath);
 
   if (!admin.apps.length) {
     try {
       admin.initializeApp({
         credential: admin.credential.cert(require(resolvedServiceAccountPath)),
       });
-      logger.info("Firebase Admin SDK initialized successfully");
+      logger.info('Firebase Admin SDK initialized successfully');
     } catch (error) {
       logger.error({
-        message: "Firebase Admin SDK initialization failed",
+        message: 'Firebase Admin SDK initialization failed',
         error: error.message,
         serviceAccountPath: resolvedServiceAccountPath,
         stack: error.stack,

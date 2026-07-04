@@ -9,6 +9,8 @@ import {
   Code,
   MessageSquare,
   Shield,
+  HelpCircle,
+  Mail, // ← Added for Contact Us
 } from 'lucide-react';
 import logo from '@/assets/logo.webp';
 import styles from './Footer.module.css';
@@ -47,12 +49,15 @@ export default function Footer() {
               <MagneticText
                 text="RESOURCES"
                 hoverText="EXPLORE"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
               <Link href="/wiki" className={styles.link}>
-                <Book size={16} /> Wiki &amp; Docs
+                <Book size={16} /> Wiki & Docs
+              </Link>
+              <Link href="/faq" className={styles.link}>
+                <HelpCircle size={16} /> FAQ
               </Link>
               <Link href="/flags" className={styles.link}>
                 <Flag size={16} /> Feature Flags
@@ -69,10 +74,13 @@ export default function Footer() {
               <MagneticText
                 text="LINKS"
                 hoverText="VISIT"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
+              <Link href="/contactus" className={styles.link}>
+                <Mail size={16} /> Contact Us
+              </Link>
               <Link href="/complaints" className={styles.link}>
                 <MessageSquare size={16} /> Community Complaint
               </Link>
@@ -91,16 +99,27 @@ export default function Footer() {
               <MagneticText
                 text="LEGAL"
                 hoverText="POLICIES"
-                className="text-xl font-bold"
+                className="text-xl font-bold text-gray-900 dark:text-white"
               />
             </div>
             <div className={styles.links}>
-              <Link href="/terms" className={styles.link}>
-                <Book size={16} /> Terms & Conditions
+              <Link href="/copyright" className={styles.link}>
+                <Shield size={16} /> Copyright Notice
               </Link>
-
+              <Link href="/terms" className={styles.link}>
+                <Book size={16} /> Terms of Use
+              </Link>
               <Link href="/privacy" className={styles.link}>
                 <Shield size={16} /> Privacy Policy
+              </Link>
+              <Link href="/guidelines" className={styles.link}>
+                <Users size={16} /> Community Guidelines
+              </Link>
+              <Link href="/license" className={styles.link}>
+                <Code size={16} /> License
+              </Link>
+              <Link href="/conduct" className={styles.link}>
+                <Flag size={16} /> Code of Conduct
               </Link>
             </div>
           </div>
@@ -110,7 +129,9 @@ export default function Footer() {
 
           {/* Contact us */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter">CONTACT US</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">
+              CONTACT US
+            </p>
             <a
               aria-label="Link"
               href={`mailto:${siteConfig.contact.email}`}
@@ -122,7 +143,9 @@ export default function Footer() {
 
           {/* Get the app */}
           <div className="flex flex-col gap-3">
-            <p className="text-xl font-bold tracking-tighter">GET THE APP</p>
+            <p className="text-xl font-bold tracking-tighter text-gray-900 dark:text-white">
+              GET THE APP
+            </p>
             <AppStoreButtons
               variant="footer"
               className="flex-col !items-start"
@@ -131,13 +154,25 @@ export default function Footer() {
         </div>
 
         {/* Copyright bar */}
+        <div className="mt-12 pt-8 border-t border-gray-200 dark:border-gray-800 flex flex-col gap-4 text-sm text-gray-500 dark:text-gray-400">
+          <p className="font-semibold text-gray-900 dark:text-gray-300">
+            &copy; 2026 DevPath Bharat Community. All Rights Reserved.
+          </p>
+          <p>
+            DevPath&reg; is the official developer growth community dedicated to empowering developers across Bharat through learning, collaboration, innovation, and open knowledge.
+          </p>
+          <p>
+            The DevPath name, logo, branding, website design, documentation, and original content are protected intellectual property of the DevPath Bharat Community.
+          </p>
+          <p>
+            Unauthorized use of the DevPath branding, logos, visual identity, or impersonation of the official community is prohibited.
+          </p>
+          <p className="font-medium text-gray-900 dark:text-gray-300">
+            Built with ❤️ by the DevPath Community.
+          </p>
+        </div>
         <div className={styles.bottom}>
-          <div className={styles.copyright}>
-            <p>
-              &copy; {new Date().getFullYear()} {siteConfig.name}. All rights
-              reserved.
-            </p>
-          </div>
+          <div className={styles.copyright}></div>
 
           <div className={styles.socials}>
             {/* GitHub */}
