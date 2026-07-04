@@ -28,7 +28,7 @@ const suggestions: SuggestionCard[] = [
 ];
 
 interface SuggestionCardsProps {
-  onSelect?: (id: string) => void;
+  onSelect?: (id: string, title: string) => void;
 }
 
 export function SuggestionCards({ onSelect }: SuggestionCardsProps) {
@@ -41,7 +41,7 @@ export function SuggestionCards({ onSelect }: SuggestionCardsProps) {
           <motion.button
             key={card.id}
             type="button"
-            onClick={() => onSelect?.(card.id)}
+            onClick={() => onSelect?.(card.id, card.title)}
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 * idx, duration: 0.25 }}

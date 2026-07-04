@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { AnimatePresence } from 'framer-motion';
+import { useChat } from 'ai/react';
 import { FloatingAssistantButton } from './floating-assistant-button';
 import { AssistantPanel } from './assistant-panel';
 
 interface FloatingAssistantProps {
   onSend?: (message: string) => void;
-  onSuggestionSelect?: (id: string) => void;
+  onSuggestionSelect?: (id: string, title: string) => void;
   hasNotification?: boolean;
 }
 
@@ -17,6 +18,15 @@ export function FloatingAssistant({
   hasNotification = false,
 }: FloatingAssistantProps) {
   const [isOpen, setIsOpen] = useState(false);
+  
+  const { messages, input, handleInputChange, handleSubmit, isLoading, append } = useChat({
+    api: '/api/assistant/chat',
+  });
+
+  const handleSuggestion = (id: string, title: string) => {
+    onSuggestionSelect?.(id, title);
+    append({ role: 'user', content: title || id });
+  };
 
   return (
     <>
@@ -32,14 +42,12 @@ export function FloatingAssistant({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         onExpand={() => {}}
-        onSend={(message) => {
-          onSend?.(message);
-          setIsOpen(false);
-        }}
-        onSuggestionSelect={(id) => {
-          onSuggestionSelect?.(id);
-          setIsOpen(false);
-        }}
+        messages={messages}
+        input={input}
+        handleInputChange={handleInputChange}
+        handleSubmit={handleSubmit}
+        isLoading={isLoading}
+        onSuggestionSelect={handleSuggestion}
       />
     </>
   );
