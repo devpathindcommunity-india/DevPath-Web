@@ -1,11 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactElement } from 'react';
 
 const COOKIE_KEY = 'cookie_consent';
 
-export default function CookieConsent() {
-  const [visible, setVisible] = useState(false);
+type ConsentValue = 'accepted' | 'rejected';
+
+export default function CookieConsent(): ReactElement | null {
+  const [visible, setVisible] = useState<boolean>(false);
 
   useEffect(() => {
     try {
@@ -19,23 +21,17 @@ export default function CookieConsent() {
     }
   }, []);
 
-  const handleAccept = () => {
+  const setConsent = (value: ConsentValue): void => {
     try {
-      localStorage.setItem(COOKIE_KEY, 'accepted');
+      localStorage.setItem(COOKIE_KEY, value);
     } catch (e) {
       // Ignore if localStorage is disabled
     }
     setVisible(false);
   };
 
-  const handleReject = () => {
-    try {
-      localStorage.setItem(COOKIE_KEY, 'rejected');
-    } catch (e) {
-      // Ignore if localStorage is disabled
-    }
-    setVisible(false);
-  };
+  const handleAccept = (): void => setConsent('accepted');
+  const handleReject = (): void => setConsent('rejected');
 
   if (!visible) return null;
 
