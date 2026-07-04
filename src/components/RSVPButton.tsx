@@ -9,11 +9,17 @@ import { useAuth } from "@/context/AuthContext"
 interface RSVPButtonProps {
     /** Unique event identifier used as the Firestore document key */
     eventId: string
+    /** Optional event details used for calendar sync and emails */
+    eventDetails?: {
+        title: string;
+        description: string;
+        date?: string;
+    }
 }
 
 type RSVPState = "idle" | "loading" | "success" | "already_registered" | "error"
 
-export function RSVPButton({ eventId }: RSVPButtonProps) {
+export function RSVPButton({ eventId, eventDetails }: RSVPButtonProps) {
     const { user } = useAuth()
     const [state, setState] = useState<RSVPState>("idle")
     const [showConfetti, setShowConfetti] = useState(false)
@@ -85,6 +91,13 @@ export function RSVPButton({ eventId }: RSVPButtonProps) {
                 setState("success")
                 setShowConfetti(true)
                 setTimeout(() => setShowConfetti(false), 2000)
+
+                // Trigger confirmation email
+                fetch('/api/events/rsvp-email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: user.email, name: user.name, eventId, eventDetails })
+                }).catch(err => console.error("Failed to send RSVP email", err));
             }
         } catch (err) {
             console.error("[RSVPButton] Firestore write failed:", err)
@@ -109,6 +122,21 @@ export function RSVPButton({ eventId }: RSVPButtonProps) {
             ? "bg-gradient-to-r from-cyan-500/70 to-purple-500/70 text-white cursor-wait"
             : "bg-gradient-to-r from-cyan-500 to-purple-500 hover:from-cyan-400 hover:to-purple-400 text-white shadow-lg shadow-cyan-500/20",
     ].join(" ")
+
+    const handleDownloadIcs = () => {
+        const title = eventDetails?.title || "DevPath Event";
+        const desc = eventDetails?.description || "Event Details";
+        const icsContent = `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//DevPath//NONSGML v1.0//EN\nCALSCALE:GREGORIAN\nBEGIN:VEVENT\nSUMMARY:${title}\nDESCRIPTION:${desc}\nDTSTART:20261231T120000Z\nDTEND:20261231T130000Z\nEND:VEVENT\nEND:VCALENDAR`;
+        const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+        const link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.setAttribute('download', 'invite.ics');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    const googleCalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(eventDetails?.title || 'DevPath Event')}&details=${encodeURIComponent(eventDetails?.description || '')}&dates=20261231T120000Z/20261231T130000Z`;
 
     return (
         <div className="relative flex flex-col items-start gap-2">
@@ -149,6 +177,35 @@ export function RSVPButton({ eventId }: RSVPButtonProps) {
                     </>
                 )}
             </motion.button>
+
+            {/* Add to Calendar Sync UI */}
+            {(state === "success" || state === "already_registered") && (
+                <motion.div
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex flex-col gap-2 mt-2 w-full max-w-sm"
+                >
+                    <p className="text-xs text-muted-foreground ml-1">Add to your calendar:</p>
+                    <div className="flex flex-wrap gap-2">
+                        <a 
+                            href={googleCalUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-xs px-3 py-1.5 rounded-md bg-secondary/50 hover:bg-secondary border border-border transition-colors flex items-center gap-1.5"
+                        >
+                            <Calendar className="w-3 h-3" />
+                            Google Calendar
+                        </a>
+                        <button 
+                            onClick={handleDownloadIcs}
+                            className="text-xs px-3 py-1.5 rounded-md bg-secondary/50 hover:bg-secondary border border-border transition-colors flex items-center gap-1.5"
+                        >
+                            <Calendar className="w-3 h-3" />
+                            Download .ics
+                        </button>
+                    </div>
+                </motion.div>
+            )}
 
             {/* Inline error message */}
             <AnimatePresence>
