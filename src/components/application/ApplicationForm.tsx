@@ -128,14 +128,10 @@ export default function ApplicationForm() {
   const handleBack = () => setStep(prev => prev - 1);
 
   const handleSubmit = async () => {
-    if (!user) {
-      alert('Please log in to submit an application.');
-      return;
-    }
     setLoading(true);
     try {
       const finalData: Omit<CommunityApplication, 'status' | 'submittedAt'> = {
-        uid: user.uid,
+        uid: user?.uid || '',
         personalInfo: formData.personalInfo,
         socialLinks: formData.socialLinks,
         interests: formData.interests,
@@ -163,17 +159,7 @@ export default function ApplicationForm() {
     }
   };
 
-  if (!user) {
-    return (
-      <div className="text-center p-12 bg-secondary/30 rounded-xl border border-border">
-        <h2 className="text-2xl font-semibold mb-4">Authentication Required</h2>
-        <p className="text-gray-400 mb-6">You need to be logged in to access the community application form.</p>
-        <button onClick={() => router.push('/login')} className="px-6 py-2 bg-primary text-white rounded-lg font-medium">
-          Log In to Apply
-        </button>
-      </div>
-    );
-  }
+
 
   if (checkingExisting) {
     return <div className="flex justify-center p-12"><Loader2 className="animate-spin text-primary w-8 h-8" /></div>;
@@ -185,13 +171,15 @@ export default function ApplicationForm() {
         <CheckCircle2 className="w-16 h-16 text-green-500 mx-auto mb-4" />
         <h2 className="text-3xl font-bold mb-2">Application Submitted!</h2>
         <p className="text-gray-400 text-lg mb-6">
-          Your current application status is: <span className="font-semibold text-primary">{existingStatus}</span>
+          Your current application status is: <span className="font-semibold text-primary">{existingStatus || 'Pending'}</span>
         </p>
         <p className="text-gray-400 mb-8 max-w-md mx-auto">
-          You can track your application status anytime from your profile dashboard under the "My Application" section.
+          {user 
+            ? 'You can track your application status anytime from your profile dashboard under the "My Application" section.' 
+            : 'We have received your application. We will contact you via email regarding the next steps!'}
         </p>
-        <button onClick={() => router.push('/profile')} className="px-6 py-2 bg-primary text-white rounded-lg font-medium">
-          Go to Dashboard
+        <button onClick={() => router.push(user ? '/profile' : '/')} className="px-6 py-2 bg-primary text-white rounded-lg font-medium">
+          {user ? 'Go to Dashboard' : 'Return Home'}
         </button>
       </div>
     );

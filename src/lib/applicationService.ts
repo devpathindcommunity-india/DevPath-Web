@@ -8,7 +8,8 @@ import {
   query, 
   orderBy, 
   serverTimestamp, 
-  updateDoc 
+  updateDoc,
+  addDoc
 } from 'firebase/firestore';
 import { CommunityApplication, ApplicationStatus } from '@/types/application';
 
@@ -18,13 +19,18 @@ const COLLECTION_NAME = 'communityApplications';
  * Submits a new community application or updates a draft.
  */
 export const submitApplication = async (applicationData: Omit<CommunityApplication, 'status' | 'submittedAt'>): Promise<void> => {
-  const applicationRef = doc(db, COLLECTION_NAME, applicationData.uid);
-  
-  await setDoc(applicationRef, {
+  const finalData = {
     ...applicationData,
     status: 'Pending',
     submittedAt: serverTimestamp(),
-  }, { merge: true }); // Use merge in case we update existing instead of creating anew
+  };
+
+  if (applicationData.uid) {
+    const applicationRef = doc(db, COLLECTION_NAME, applicationData.uid);
+    await setDoc(applicationRef, finalData, { merge: true });
+  } else {
+    await addDoc(collection(db, COLLECTION_NAME), finalData);
+  }
 };
 
 /**
