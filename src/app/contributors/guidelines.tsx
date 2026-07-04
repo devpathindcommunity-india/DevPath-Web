@@ -121,6 +121,7 @@ export default function GuidelinesPage() {
               <a
                 href="https://github.com/devpathindcommunity-india/DevPath-Web"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="border border-white/30 hover:bg-white/10 px-8 py-4 rounded-2xl font-medium transition-all flex items-center gap-3"
               >
                 View Repository
@@ -175,6 +176,7 @@ export default function GuidelinesPage() {
                 <a
                   href="https://github.com/devpathindcommunity-india/DevPath-Web/issues"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="block hover:text-white transition-colors flex items-center gap-2"
                 >
                   <Bug className="w-4 h-4" /> Report an Issue
@@ -182,6 +184,7 @@ export default function GuidelinesPage() {
                 <a
                   href="https://github.com/devpathindcommunity-india/DevPath-Web/pulls"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="block hover:text-white transition-colors flex items-center gap-2"
                 >
                   <Star className="w-4 h-4" /> Open PRs
