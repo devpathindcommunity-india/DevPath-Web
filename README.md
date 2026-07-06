@@ -182,3 +182,4 @@ This project is licensed under a custom **DevPath India Source-Available License
 ## 🌟 Major Contributors
 
 - **Aditya948351** - Core Maintainer & Lead Developer
+# TODO: security: firebase config values in next_public_ env expose project to direct api calls (#770)
