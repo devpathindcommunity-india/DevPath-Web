@@ -182,3 +182,4 @@ This project is licensed under a custom **DevPath India Source-Available License
 ## 🌟 Major Contributors
 
 - **Aditya948351** - Core Maintainer & Lead Developer
+# TODO: [refactor] centralize standard static strings into a constants file (#750)
