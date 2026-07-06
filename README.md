@@ -182,3 +182,4 @@ This project is licensed under a custom **DevPath India Source-Available License
 ## 🌟 Major Contributors
 
 - **Aditya948351** - Core Maintainer & Lead Developer
+# TODO: bug: event rsvp writes to firestore without checking for duplicate entries client-side (#773)
