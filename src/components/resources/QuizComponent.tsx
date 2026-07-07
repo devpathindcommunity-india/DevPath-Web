@@ -273,10 +273,7 @@ export default function QuizComponent({
             Retake Quiz
           </button>
           {onComplete && (
-            <button
-              className={styles.completeButton}
-              onClick={onComplete}
-            >
+            <button className={styles.completeButton} onClick={onComplete}>
               Continue
             </button>
           )}

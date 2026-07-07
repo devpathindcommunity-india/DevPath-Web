@@ -159,13 +159,18 @@ export default function Footer() {
             &copy; 2026 DevPath Bharat Community. All Rights Reserved.
           </p>
           <p>
-            DevPath&reg; is the official developer growth community dedicated to empowering developers across Bharat through learning, collaboration, innovation, and open knowledge.
+            DevPath&reg; is the official developer growth community dedicated to
+            empowering developers across Bharat through learning, collaboration,
+            innovation, and open knowledge.
           </p>
           <p>
-            The DevPath name, logo, branding, website design, documentation, and original content are protected intellectual property of the DevPath Bharat Community.
+            The DevPath name, logo, branding, website design, documentation, and
+            original content are protected intellectual property of the DevPath
+            Bharat Community.
           </p>
           <p>
-            Unauthorized use of the DevPath branding, logos, visual identity, or impersonation of the official community is prohibited.
+            Unauthorized use of the DevPath branding, logos, visual identity, or
+            impersonation of the official community is prohibited.
           </p>
           <p className="font-medium text-gray-900 dark:text-gray-300">
             Built with ❤️ by the DevPath Community.

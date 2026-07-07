@@ -12,7 +12,8 @@ export default function CopyrightPage() {
 
       <div className="space-y-6">
         <p className="font-semibold text-lg">
-          &copy; 2026 DevPath Bharat Community.<br />
+          &copy; 2026 DevPath Bharat Community.
+          <br />
           All Rights Reserved.
         </p>
 
@@ -36,11 +37,13 @@ export default function CopyrightPage() {
         </p>
 
         <p className="leading-7 text-gray-700 dark:text-gray-300">
-          Community members may view and contribute according to the repository license.
+          Community members may view and contribute according to the repository
+          license.
         </p>
 
         <p className="leading-7 text-gray-700 dark:text-gray-300 font-medium">
-          The DevPath name, logo and branding may not be reused without permission.
+          The DevPath name, logo and branding may not be reused without
+          permission.
         </p>
       </div>
     </main>

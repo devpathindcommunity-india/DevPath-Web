@@ -35,16 +35,18 @@ jobs:
         continue-on-error: true # Prevents the workflow from immediately stopping if lint fails, allowing prettier to run
 
       - name: Auto-format with Prettier
+        if: github.event.pull_request.head.repo.full_name == github.repository
         run: npx prettier --write "**/*.{js,jsx,ts,tsx,json,css,md,yml,yaml}"
 
       - name: Commit formatting changes
+        if: github.event.pull_request.head.repo.full_name == github.repository
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style: auto-format with Prettier"
           branch: ${{ github.head_ref }}
 
-      - name: Comment on Failure
-        if: failure() && github.event_name == 'pull_request'
+      - name: Comment on Failure 
+        if: failure() && github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
         uses: actions/github-script@v6
         with:
           script: |

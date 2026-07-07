@@ -18,8 +18,8 @@ const eslintConfig = defineConfig([
       'react-hooks/purity': 'off',
       'react/display-name': 'off',
       '@typescript-eslint/no-require-imports': 'off',
-      '@typescript-eslint/ban-ts-comment': 'off'
-    }
+      '@typescript-eslint/ban-ts-comment': 'off',
+    },
   },
   // Override default ignores of eslint-config-next.
   globalIgnores([
@@ -29,6 +29,8 @@ const eslintConfig = defineConfig([
     'build/**',
     'next-env.d.ts',
     'public/**',
+    // Migrated from the legacy .eslintignore file (flat config no longer reads it):
+    'backend/**',
   ]),
 ]);
 
