@@ -59,10 +59,13 @@ async function setupProject() {
         createdAt: new Date().toISOString(),
         createdBy: 'setup-script',
       });
-      await setDoc(doc(db, 'admin_keys', process.env.ADMIN_REGISTRATION_KEY as string), {
-        updatedAt: new Date().toISOString(),
-        description: 'Standard admin registration key'
-      });
+      await setDoc(
+        doc(db, 'admin_keys', process.env.ADMIN_REGISTRATION_KEY as string),
+        {
+          updatedAt: new Date().toISOString(),
+          description: 'Standard admin registration key',
+        }
+      );
       console.log(`✅ Added ${email} as Super Admin.`);
     } catch (error: any) {
       console.error('❌ Error adding Super Admin:', error.message);

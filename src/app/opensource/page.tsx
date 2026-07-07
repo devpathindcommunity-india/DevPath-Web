@@ -491,6 +491,7 @@ export default function OpenSourcePage() {
               <Link
                 href="https://github.com"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-primary text-sm font-medium flex items-center gap-1 hover:underline"
               >
                 Visit Platform <ExternalLink size={14} />
@@ -510,6 +511,7 @@ export default function OpenSourcePage() {
               <Link
                 href="https://gitlab.com"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-orange-500 text-sm font-medium flex items-center gap-1 hover:underline"
               >
                 Visit Platform <ExternalLink size={14} />
@@ -529,6 +531,7 @@ export default function OpenSourcePage() {
               <Link
                 href="https://bitbucket.org"
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-blue-500 text-sm font-medium flex items-center gap-1 hover:underline"
               >
                 Visit Platform <ExternalLink size={14} />
@@ -590,6 +593,7 @@ export default function OpenSourcePage() {
                 <Link
                   href="https://opensource.guide/how-to-contribute/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-card rounded-lg hover:border-primary border border-transparent transition-colors group"
                 >
                   <span className="font-medium">
@@ -605,6 +609,7 @@ export default function OpenSourcePage() {
                 <Link
                   href="https://goodfirstissue.dev/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-card rounded-lg hover:border-primary border border-transparent transition-colors group"
                 >
                   <span className="font-medium">Good First Issues</span>
@@ -618,6 +623,7 @@ export default function OpenSourcePage() {
                 <Link
                   href="https://firstcontributions.github.io/"
                   target="_blank"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-between p-3 bg-card rounded-lg hover:border-primary border border-transparent transition-colors group"
                 >
                   <span className="font-medium">First Contributions Guide</span>

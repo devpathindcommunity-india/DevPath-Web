@@ -33,7 +33,8 @@ Welcome to the official repository for the **DevPath Bharat Community Website**.
 
 ## 📸 Screenshots
 
-*(Add screenshots of your application here)*
+_(Add screenshots of your application here)_
+
 - Dashboard Overview
 - Learning Paths
 - User Profile Page
@@ -41,6 +42,7 @@ Welcome to the official repository for the **DevPath Bharat Community Website**.
 ## 🏗 Architecture
 
 DevPath Bharat is built using a decoupled architecture, ensuring scalability and performance:
+
 - **Frontend**: Next.js 16 (App Router), deployed on Vercel/Firebase Hosting.
 - **Backend**: Lightweight Express.js server for API orchestration.
 - **Database**: Firebase Firestore.
@@ -65,6 +67,7 @@ DevPath Bharat is an ecosystem and community platform designed to foster develop
 ### Prerequisites
 
 Ensure you have the following installed on your machine:
+
 - Node.js (v18 or higher)
 - npm or yarn
 - Git
@@ -72,20 +75,24 @@ Ensure you have the following installed on your machine:
 ## 💻 Local Development
 
 1. **Fork and Clone the Repository**
+
    ```bash
    git clone https://github.com/your-username/DevPath-Web.git
    cd DevPath-Web
    ```
 
 2. **Install Dependencies**
+
    ```bash
    npm install
    ```
 
 3. **Set Up Environment Variables**
+
    ```bash
    cp .env.example .env.local
    ```
+
    Add your Firebase and other required keys to `.env.local`.
 
 4. **Run the Development Server**
@@ -110,7 +117,7 @@ This project is distributed under the **DevPath Bharat Source-Available License*
 
 ## 🔗 Community Links
 
-- **Website**: [devpath.org](#) *(replace with actual link)*
+- **Website**: [devpath.org](#) _(replace with actual link)_
 - **Discord / WhatsApp**: [Join Community](https://chat.whatsapp.com/D2PRfQy4HYgC4XURhY2X8C)
 - **LinkedIn**: [DevPath Community](https://www.linkedin.com/company/devpath-community/)
 - **Instagram**: [@devpath_community](https://www.instagram.com/devpath_community/)

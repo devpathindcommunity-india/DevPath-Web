@@ -30,7 +30,7 @@ const BackToTop = (): React.ReactElement | null => {
   return (
     <AnimatePresence>
       {isVisible && (
-        <div className="fixed bottom-28 right-11 z-50">
+        <div className="fixed right-4 bottom-40 sm:right-6 sm:bottom-36 md:right-11 md:bottom-28 z-50">
           <motion.button
             onClick={scrollToTop}
             initial={{ opacity: 0, y: 50 }}

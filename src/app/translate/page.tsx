@@ -88,10 +88,7 @@ export default function TranslatePage() {
             Join our translation community and make DevPath accessible to
             developers worldwide.
           </p>
-          <Button
-            variant="primary"
-            icon={<Languages size={20} />}
-          >
+          <Button variant="primary" icon={<Languages size={20} />}>
             Start Translating
           </Button>
         </div>
@@ -134,10 +131,7 @@ export default function TranslatePage() {
                 </div>
               </div>
 
-              <Button
-                variant="secondary"
-                className="w-full"
-              >
+              <Button variant="secondary" className="w-full">
                 Contribute
               </Button>
             </div>
@@ -188,10 +182,7 @@ export default function TranslatePage() {
               placeholder="Language Name (e.g. Italian)"
               className={styles.input}
             />
-            <Button
-              variant="primary"
-              icon={<Plus size={20} />}
-            >
+            <Button variant="primary" icon={<Plus size={20} />}>
               Request Language
             </Button>
           </div>

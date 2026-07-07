@@ -84,7 +84,9 @@ test.describe('Login page', () => {
     // Wait for either the error alert or a redirect (whichever Firebase returns)
     // In CI without real Firebase, the login will fail with a network/auth error
     // and the error alert (role=alert) should become visible.
-    const errorAlert = page.getByRole('alert').filter({ hasText: /login failed/i });
+    const errorAlert = page
+      .getByRole('alert')
+      .filter({ hasText: /login failed/i });
     await expect(errorAlert).toBeVisible({ timeout: 10000 });
     // Error message should contain meaningful text
     await expect(errorAlert).not.toBeEmpty();

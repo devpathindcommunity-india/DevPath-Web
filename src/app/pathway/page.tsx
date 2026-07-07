@@ -616,9 +616,7 @@ export default function PathwayPage() {
                     <span className="font-mono font-bold text-primary">
                       {reward.cost.toLocaleString()} pts
                     </span>
-                    <button
-                      className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
-                    >
+                    <button className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                       Redeem
                     </button>
                   </div>
@@ -680,9 +678,7 @@ export default function PathwayPage() {
                     <span className="font-mono font-bold text-primary">
                       {reward.cost.toLocaleString()} pts
                     </span>
-                    <button
-                      className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
-                    >
+                    <button className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                       Redeem
                     </button>
                   </div>
@@ -750,9 +746,7 @@ export default function PathwayPage() {
                     <span className="font-mono font-bold text-primary">
                       {reward.cost.toLocaleString()} pts
                     </span>
-                    <button
-                      className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
-                    >
+                    <button className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                       Redeem
                     </button>
                   </div>
@@ -802,9 +796,7 @@ export default function PathwayPage() {
                     <span className="font-mono font-bold text-primary">
                       {reward.cost.toLocaleString()} pts
                     </span>
-                    <button
-                      className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors"
-                    >
+                    <button className="px-3 py-1 text-xs bg-muted hover:bg-primary hover:text-primary-foreground rounded-full transition-colors">
                       Redeem
                     </button>
                   </div>

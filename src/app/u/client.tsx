@@ -841,6 +841,7 @@ function ProfileContent({ uid }: { uid?: string }) {
                                 aria-label="Link"
                                 href={event.repo.url}
                                 target="_blank"
+                                rel="noopener noreferrer"
                                 className="text-primary hover:underline font-medium"
                               >
                                 {event.repo.name}
@@ -1050,7 +1051,12 @@ function ProfileContent({ uid }: { uid?: string }) {
                     <div className="flex items-center justify-between pt-3 border-t border-border">
                       <div className="flex items-center gap-4">
                         <button
-                          aria-label={currentUser && project.likes.includes(currentUser.uid) ? "Unlike project" : "Like project"}
+                          aria-label={
+                            currentUser &&
+                            project.likes.includes(currentUser.uid)
+                              ? 'Unlike project'
+                              : 'Like project'
+                          }
                           onClick={() =>
                             handleLikeProject(project.id, project.likes)
                           }

@@ -159,13 +159,18 @@ export default function Footer() {
             &copy; 2026 DevPath Bharat Community. All Rights Reserved.
           </p>
           <p>
-            DevPath&reg; is the official developer growth community dedicated to empowering developers across Bharat through learning, collaboration, innovation, and open knowledge.
+            DevPath&reg; is the official developer growth community dedicated to
+            empowering developers across Bharat through learning, collaboration,
+            innovation, and open knowledge.
           </p>
           <p>
-            The DevPath name, logo, branding, website design, documentation, and original content are protected intellectual property of the DevPath Bharat Community.
+            The DevPath name, logo, branding, website design, documentation, and
+            original content are protected intellectual property of the DevPath
+            Bharat Community.
           </p>
           <p>
-            Unauthorized use of the DevPath branding, logos, visual identity, or impersonation of the official community is prohibited.
+            Unauthorized use of the DevPath branding, logos, visual identity, or
+            impersonation of the official community is prohibited.
           </p>
           <p className="font-medium text-gray-900 dark:text-gray-300">
             Built with ❤️ by the DevPath Community.
@@ -181,7 +186,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-cyan-400 transition-all`}
-              aria-label="GitHub"
+              aria-label="Visit our GitHub"
             >
               <Github size={20} />
             </a>
@@ -192,7 +197,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-pink-500 transition-all`}
-              aria-label="Instagram"
+              aria-label="Visit our Instagram"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -217,7 +222,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-blue-500 transition-all`}
-              aria-label="LinkedIn"
+              aria-label="Visit our LinkedIn"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

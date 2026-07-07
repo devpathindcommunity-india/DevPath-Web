@@ -1092,7 +1092,10 @@ export default function UserProfile() {
           >
             <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
               <h3 className="text-xl font-bold">Followers</h3>
-              <button aria-label="Close followers list" onClick={closeFollowersModal}>
+              <button
+                aria-label="Close followers list"
+                onClick={closeFollowersModal}
+              >
                 <X size={24} />
               </button>
             </div>
@@ -1171,7 +1174,10 @@ export default function UserProfile() {
           >
             <div className="flex justify-between items-center mb-4 border-b border-border pb-4">
               <h3 className="text-xl font-bold">Following</h3>
-              <button aria-label="Close following list" onClick={closeFollowingModal}>
+              <button
+                aria-label="Close following list"
+                onClick={closeFollowingModal}
+              >
                 <X size={24} />
               </button>
             </div>
