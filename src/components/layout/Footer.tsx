@@ -186,7 +186,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-cyan-400 transition-all`}
-              aria-label="GitHub"
+              aria-label="Visit our GitHub"
             >
               <Github size={20} />
             </a>
@@ -197,7 +197,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-pink-500 transition-all`}
-              aria-label="Instagram"
+              aria-label="Visit our Instagram"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -222,7 +222,7 @@ export default function Footer() {
               target="_blank"
               rel="noopener noreferrer"
               className={`${styles.socialIcon} hover:scale-110 hover:text-blue-500 transition-all`}
-              aria-label="LinkedIn"
+              aria-label="Visit our LinkedIn"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
