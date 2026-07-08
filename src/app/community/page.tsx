@@ -27,6 +27,7 @@ import { getEmbedUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import CreateDiscussionModal from '@/components/community/CreateDiscussionModal';
 import ProjectCard from '@/components/projects/ProjectCard';
+import ProjectCardSkeleton from '@/components/projects/ProjectCardSkeleton';
 import DOMPurify from 'dompurify';
 
 export default function CommunityPage() {
@@ -208,9 +209,17 @@ export default function CommunityPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-          </div>
+          activeTab === 'showcase' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProjectCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          )
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {activeTab === 'discussions' ? (
