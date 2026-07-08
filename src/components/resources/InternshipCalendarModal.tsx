@@ -1,6 +1,5 @@
 'use client';
 
-import { AUTH_MESSAGES } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -85,7 +84,7 @@ export function InternshipCalendarModal({
 
   const handleStar = async () => {
     if (!user) {
-      alert(AUTH_MESSAGES.LOGIN_TO_STAR_RESOURCES);
+      alert('Please login to star resources!');
       return;
     }
 

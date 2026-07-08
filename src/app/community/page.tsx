@@ -1,6 +1,5 @@
 'use client';
 
-import { AUTH_MESSAGES } from '@/lib/constants';
 import Fuse from 'fuse.js';
 import ReviewsSection from './ReviewsSection';
 import { useState, useEffect, useMemo } from 'react';
@@ -12,10 +11,7 @@ import {
   orderBy,
   getDocs,
   limit,
-  startAfter,
   collectionGroup,
-  type QueryDocumentSnapshot,
-  type DocumentData,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import {
@@ -31,10 +27,7 @@ import { getEmbedUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import CreateDiscussionModal from '@/components/community/CreateDiscussionModal';
 import ProjectCard from '@/components/projects/ProjectCard';
-import Pagination from '@/components/common/Pagination';
 import DOMPurify from 'dompurify';
-
-const PROJECTS_PAGE_SIZE = 20;
 
 export default function CommunityPage() {
   const { user } = useAuth();
@@ -49,15 +42,8 @@ export default function CommunityPage() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
-  // Cursor-based pagination state for the Projects showcase
-  const [pageCursors, setPageCursors] = useState<
-    QueryDocumentSnapshot<DocumentData>[]
-  >([]);
-  const [lastDocInPage, setLastDocInPage] =
-    useState<QueryDocumentSnapshot<DocumentData> | null>(null);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [hasNextPage, setHasNextPage] = useState(false);
-  const fetchData = async (cursor?: QueryDocumentSnapshot<DocumentData>) => {
+
+  const fetchData = async () => {
     setLoading(true);
     try {
       if (activeTab === 'discussions') {
@@ -72,27 +58,28 @@ export default function CommunityPage() {
           snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
         );
       } else {
-        // Fetch Projects for Showcase, one page at a time.
-        // We ask for PAGE_SIZE + 1 so we can tell whether a next page
-        // exists without firing a second query.
-        const orderField = sortOption === 'popular' ? 'starCount' : 'createdAt';
-        const projectsRef = collection(db, 'projects');
-        const constraints = cursor
-          ? [
-              orderBy(orderField, 'desc'),
-              startAfter(cursor),
-              limit(PROJECTS_PAGE_SIZE + 1),
-            ]
-          : [orderBy(orderField, 'desc'), limit(PROJECTS_PAGE_SIZE + 1)];
+        // Fetch Projects for Showcase
+        let q;
+        if (sortOption === 'popular') {
+          // Sort by starCount descending
+          q = query(
+            collection(db, 'projects'),
+            orderBy('starCount', 'desc'),
+            limit(20)
+          );
+        } else {
+          // Sort by createdAt descending (default)
+          q = query(
+            collection(db, 'projects'),
+            orderBy('createdAt', 'desc'),
+            limit(20)
+          );
+        }
 
-        const q = query(projectsRef, ...constraints);
         const snapshot = await getDocs(q);
-        const docs = snapshot.docs;
-        const pageDocs = docs.slice(0, PROJECTS_PAGE_SIZE);
-
-        setProjects(pageDocs.map((doc) => ({ id: doc.id, ...doc.data() })));
-        setHasNextPage(docs.length > PROJECTS_PAGE_SIZE);
-        setLastDocInPage(pageDocs[pageDocs.length - 1] ?? null);
+        setProjects(
+          snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))
+        );
       }
     } catch (error: any) {
       console.error('Error fetching data:', error);
@@ -106,29 +93,8 @@ export default function CommunityPage() {
     }
   };
 
-  const handleNextPage = () => {
-    if (!hasNextPage || !lastDocInPage) return;
-    setPageCursors((prev) => [...prev, lastDocInPage]);
-    setCurrentPage((page) => page + 1);
-    fetchData(lastDocInPage);
-  };
-
-  const handlePreviousPage = () => {
-    if (pageCursors.length === 0) return;
-    const remainingCursors = pageCursors.slice(0, -1);
-    const previousCursor = remainingCursors[remainingCursors.length - 1];
-    setPageCursors(remainingCursors);
-    setCurrentPage((page) => Math.max(1, page - 1));
-    fetchData(previousCursor);
-  };
-
   useEffect(() => {
-    // Any time the tab or sort option changes, pagination resets to page 1.
-    setPageCursors([]);
-    setLastDocInPage(null);
-    setCurrentPage(1);
     fetchData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab, sortOption]);
 
   const fuse = useMemo(
@@ -171,7 +137,7 @@ export default function CommunityPage() {
               <button
                 onClick={() => {
                   if (!user) {
-                    alert(AUTH_MESSAGES.LOGIN_TO_START_DISCUSSION);
+                    alert('Please login to start a discussion.');
                     return;
                   }
                   setShowCreateModal(true);
@@ -242,17 +208,9 @@ export default function CommunityPage() {
 
         {/* Content */}
         {loading ? (
-          activeTab === 'showcase' ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <ProjectCardSkeleton key={i} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-            </div>
-          )
+          <div className="flex justify-center py-12">
+            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+          </div>
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {activeTab === 'discussions' ? (
@@ -318,22 +276,6 @@ export default function CommunityPage() {
             )}
           </div>
         )}
-
-        {/* Pagination only applies to the showcase tab, and only when
-            no client-side search is active (search only covers the
-            currently loaded page of projects). */}
-        {activeTab === 'showcase' &&
-          !searchQuery.trim() &&
-          projects.length > 0 && (
-            <Pagination
-              currentPage={currentPage}
-              hasNextPage={hasNextPage}
-              hasPreviousPage={currentPage > 1}
-              loading={loading}
-              onNext={handleNextPage}
-              onPrevious={handlePreviousPage}
-            />
-          )}
       </div>
 
       {user && (

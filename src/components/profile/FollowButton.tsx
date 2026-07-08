@@ -1,6 +1,5 @@
 'use client';
 
-import { AUTH_MESSAGES } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { UserPlus, UserCheck, Loader2 } from 'lucide-react';
@@ -32,7 +31,7 @@ export default function FollowButton({
 
   const handleFollowToggle = async () => {
     if (!user) {
-      alert(AUTH_MESSAGES.LOGIN_TO_FOLLOW_USERS);
+      alert('Please login to follow users.');
       return;
     }
     if (user.uid === targetUserId) return;
