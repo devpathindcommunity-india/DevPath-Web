@@ -148,6 +148,40 @@ export default function SkillTreeVisualizer({
     return () =>
       window.removeEventListener('close-all-overlays', handleCloseAll);
   }, []);
+
+  // Bind local arrow key shortcuts for node selection cycling
+  useKeyboardShortcuts({
+    arrowright: () => {
+      if (nodes.length === 0) return;
+      const currentIndex = selectedNode
+        ? nodes.findIndex((n) => n.id === selectedNode.id)
+        : -1;
+      const nextIndex =
+        currentIndex === -1 ? 0 : (currentIndex + 1) % nodes.length;
+      setSelectedNode(nodes[nextIndex]);
+    },
+    arrowleft: () => {
+      if (nodes.length === 0) return;
+      const currentIndex = selectedNode
+        ? nodes.findIndex((n) => n.id === selectedNode.id)
+        : -1;
+      const prevIndex =
+        currentIndex === -1
+          ? nodes.length - 1
+          : (currentIndex - 1 + nodes.length) % nodes.length;
+      setSelectedNode(nodes[prevIndex]);
+    },
+  });
+
+  // Listen for the escape close-all-overlays event to close the side drawer
+  useEffect(() => {
+    const handleCloseAll = () => {
+      setSelectedNode(null);
+    };
+    window.addEventListener('close-all-overlays', handleCloseAll);
+    return () =>
+      window.removeEventListener('close-all-overlays', handleCloseAll);
+  }, []);
   if (loading) {
     return (
       <div
@@ -210,7 +244,7 @@ export default function SkillTreeVisualizer({
             <p className="text-xs text-slate-400">
               {user
                 ? 'Your learning progress is synced automatically to your account in real-time.'
-                : 'Progress saved locally in your browser. Sign in to sync across devices.'}
+                : 'Sign in to save and sync your learning progress.'}
             </p>
           </div>
           <div className="text-left sm:text-right flex flex-col sm:items-end gap-1">
@@ -314,20 +348,22 @@ export default function SkillTreeVisualizer({
               onClick={() => setSelectedNode(node)}
             >
               <div className="flex flex-col items-center justify-center w-full h-full p-1 select-none">
-                <button
-                  aria-label={`Mark ${node.label} as ${isCompleted ? 'incomplete' : 'complete'}`}
-                  className="mb-1 hover:scale-110 active:scale-95 transition-transform"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    toggleNode(activePath, node.id);
-                  }}
-                >
-                  {isCompleted ? (
-                    <CheckSquare size={15} className="text-emerald-500" />
-                  ) : (
-                    <Square size={15} className="text-slate-500" />
-                  )}
-                </button>
+                {user && (
+                  <button
+                    aria-label="Toggle node complete status"
+                    className="mb-1 hover:scale-110 active:scale-95 transition-transform"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleNode(activePath, node.id);
+                    }}
+                  >
+                    {isCompleted ? (
+                      <CheckSquare size={15} className="text-emerald-500" />
+                    ) : (
+                      <Square size={15} className="text-slate-500" />
+                    )}
+                  </button>
+                )}
                 <span className="text-[9px] leading-tight font-semibold text-center tracking-wide">
                   {node.label}
                 </span>

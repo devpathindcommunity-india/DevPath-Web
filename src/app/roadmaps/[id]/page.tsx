@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import SkillTreeVisualizer from '@/components/features/SkillTreeVisualizer';
 import ComingSoonRoadmap from '@/components/features/ComingSoonRoadmap';
-import RoadmapChecklist from '@/components/features/RoadmapChecklist';
 import React from 'react';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
@@ -66,24 +65,6 @@ const ROADMAPS_CONFIG: Record<string, RoadmapConfig> = {
     techDetails: 'Solidity Smart Contracts, Ethers.js, DApp Architecture',
     isAvailable: false,
   },
-};
-
-// ── Checklist nodes data (mirrors pathsData in SkillTreeVisualizer) ────────
-type ChecklistNodeEntry = { id: string; label: string; desc: string };
-
-const ROADMAP_CHECKLIST_NODES: Partial<Record<string, ChecklistNodeEntry[]>> = {
-  frontend: [
-    { id: '1', label: 'HTML/CSS', desc: 'Master the building blocks of the web — semantic HTML5 elements and modern CSS layouts with Flexbox and Grid.' },
-    { id: '2', label: 'JavaScript', desc: 'Learn core programming concepts, DOM manipulation, events, async/await, and the Fetch API.' },
-    { id: '3', label: 'Version Control (Git)', desc: 'Understand Git fundamentals — commits, branches, merges, pull requests, and working with GitHub.' },
-    { id: '4', label: 'React', desc: 'Build interactive UIs with React components, hooks (useState, useEffect), and the component lifecycle.' },
-    { id: '5', label: 'Next.js', desc: 'Ship production-ready React apps with file-based routing, SSR, SSG, Server Actions, and API routes.' },
-  ],
-  backend: [
-    { id: '1', label: 'Databases', desc: 'Understand relational (SQL) vs non-relational (NoSQL) databases, schema design, indexing, and queries.' },
-    { id: '2', label: 'Node.js', desc: 'Learn server-side JavaScript — the event loop, modules, npm, streams, and building HTTP servers.' },
-    { id: '3', label: 'APIs', desc: 'Design and build REST and GraphQL APIs, handle authentication, and follow best practices for API security.' },
-  ],
 };
 
 export async function generateStaticParams() {
@@ -184,24 +165,6 @@ export default async function RoadmapPage({ params }: Props) {
         </div>
 
         <SkillTreeVisualizer initialPath={config.visualizerPath} />
-
-        {/* Roadmap Checklist Tracker — available to all users (localStorage for guests) */}
-        {ROADMAP_CHECKLIST_NODES[resolvedParams.id] && (
-          <div className="flex flex-col items-center gap-3 pt-4">
-            <div className="w-full max-w-[800px] flex items-center gap-3">
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-700/60 to-transparent" />
-              <span className="text-xs font-semibold uppercase tracking-widest text-slate-600">
-                Topic Checklist
-              </span>
-              <div className="flex-1 h-px bg-gradient-to-r from-transparent via-slate-700/60 to-transparent" />
-            </div>
-            <RoadmapChecklist
-              pathId={config.visualizerPath ?? resolvedParams.id}
-              title={config.title}
-              nodes={ROADMAP_CHECKLIST_NODES[resolvedParams.id]!}
-            />
-          </div>
-        )}
       </div>
     </main>
   );

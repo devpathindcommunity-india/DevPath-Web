@@ -27,13 +27,8 @@ jest.mock('framer-motion', () => {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  jest.useFakeTimers();
   const { useUIStore } = require('@/stores/ui-store');
   useUIStore.setState({ isSearchOpen: false });
-});
-
-afterEach(() => {
-  jest.useRealTimers();
 });
 
 describe('SearchModal', () => {
@@ -44,9 +39,7 @@ describe('SearchModal', () => {
 
   it('renders and focuses input when opened via Ctrl+K', () => {
     render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
     expect(
       screen.getByPlaceholderText(/Search wiki articles/)
     ).toBeInTheDocument();
@@ -54,9 +47,7 @@ describe('SearchModal', () => {
 
   it('renders and focuses input when opened via Cmd+K', () => {
     render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { metaKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { metaKey: true, key: 'k' });
     expect(
       screen.getByPlaceholderText(/Search wiki articles/)
     ).toBeInTheDocument();
@@ -64,16 +55,12 @@ describe('SearchModal', () => {
 
   it('closes when pressing Escape', () => {
     render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
     expect(
       screen.getByPlaceholderText(/Search wiki articles/)
     ).toBeInTheDocument();
 
-    act(() => {
-      fireEvent.keyDown(window, { key: 'Escape' });
-    });
+    fireEvent.keyDown(window, { key: 'Escape' });
     expect(
       screen.queryByPlaceholderText(/Search wiki articles/)
     ).not.toBeInTheDocument();
@@ -81,14 +68,10 @@ describe('SearchModal', () => {
 
   it('closes when clicking backdrop', () => {
     const { container } = render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
     const backdrop = container.querySelector('.backdrop');
     if (backdrop) {
-      act(() => {
-        fireEvent.click(backdrop);
-      });
+      fireEvent.click(backdrop);
     }
     expect(
       screen.queryByPlaceholderText(/Search wiki articles/)
@@ -97,38 +80,26 @@ describe('SearchModal', () => {
 
   it('filters results based on query', () => {
     render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
 
     const input = screen.getByPlaceholderText(/Search wiki articles/);
-    act(() => {
-      fireEvent.change(input, { target: { value: 'react' } });
-      jest.advanceTimersByTime(300); // Advance debounce timer
-    });
+    fireEvent.change(input, { target: { value: 'react' } });
 
     expect(screen.getByText('Full Stack React Guide')).toBeInTheDocument();
   });
 
   it('navigates and closes modal when result is clicked', () => {
     render(<SearchModal />);
-    act(() => {
-      fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
-    });
+    fireEvent.keyDown(window, { ctrlKey: true, key: 'k' });
 
     const input = screen.getByPlaceholderText(/Search wiki articles/);
-    act(() => {
-      fireEvent.change(input, { target: { value: 'react' } });
-      jest.advanceTimersByTime(300); // Advance debounce timer
-    });
+    fireEvent.change(input, { target: { value: 'react' } });
 
     const resultButton = screen
       .getByText('Full Stack React Guide')
       .closest('button');
     if (resultButton) {
-      act(() => {
-        fireEvent.click(resultButton);
-      });
+      fireEvent.click(resultButton);
     }
 
     expect(mockPush).toHaveBeenCalledWith('/wiki?article=react');
