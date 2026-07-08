@@ -1,5 +1,6 @@
 'use client';
 
+import { AUTH_MESSAGES } from '@/lib/constants';
 import Fuse from 'fuse.js';
 import ReviewsSection from './ReviewsSection';
 import { useState, useEffect, useMemo } from 'react';
@@ -170,7 +171,7 @@ export default function CommunityPage() {
               <button
                 onClick={() => {
                   if (!user) {
-                    alert('Please login to start a discussion.');
+                    alert(AUTH_MESSAGES.LOGIN_TO_START_DISCUSSION);
                     return;
                   }
                   setShowCreateModal(true);
@@ -241,9 +242,17 @@ export default function CommunityPage() {
 
         {/* Content */}
         {loading ? (
-          <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
-          </div>
+          activeTab === 'showcase' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <ProjectCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : (
+            <div className="flex justify-center py-12">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-primary"></div>
+            </div>
+          )
         ) : (
           <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
             {activeTab === 'discussions' ? (

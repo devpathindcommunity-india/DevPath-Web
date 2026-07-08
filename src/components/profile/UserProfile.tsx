@@ -1,4 +1,5 @@
 'use client';
+import { AUTH_MESSAGES } from '@/lib/constants';
 const AVATAR_FALLBACK =
   process.env.NEXT_PUBLIC_AVATAR_FALLBACK_URL ?? 'https://ui-avatars.com/api';
 import { useState, useEffect, useRef } from 'react';
@@ -39,6 +40,7 @@ import styles from './Profile.module.css';
 import 'github-markdown-css/github-markdown.css';
 import ProjectUploadModal from '@/components/projects/ProjectUploadModal';
 import ProjectCard from '@/components/projects/ProjectCard';
+import ProjectCardSkeleton from '@/components/projects/ProjectCardSkeleton';
 import Achievements from '@/components/profile/Achievements';
 import Rewards from '@/components/profile/Rewards';
 import DevCard from '@/components/profile/DevCard';
@@ -407,7 +409,7 @@ export default function UserProfile() {
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p>Please login to view your profile.</p>
+        <p>{AUTH_MESSAGES.LOGIN_TO_VIEW_PROFILE}</p>
       </div>
     );
   }
@@ -971,19 +973,7 @@ export default function UserProfile() {
                 aria-label="Loading projects"
               >
                 {Array.from({ length: 4 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="rounded-xl border border-border/50 bg-muted/20 p-5 animate-pulse"
-                  >
-                    <div className="h-40 w-full rounded-lg bg-muted/40 mb-4" />
-                    <div className="h-5 w-3/4 rounded bg-muted/40 mb-2" />
-                    <div className="h-3 w-full rounded bg-muted/30 mb-1" />
-                    <div className="h-3 w-5/6 rounded bg-muted/30 mb-4" />
-                    <div className="flex gap-2">
-                      <div className="h-5 w-16 rounded-full bg-muted/30" />
-                      <div className="h-5 w-16 rounded-full bg-muted/30" />
-                    </div>
-                  </div>
+                  <ProjectCardSkeleton key={i} />
                 ))}
               </div>
             ) : projects.length === 0 ? (

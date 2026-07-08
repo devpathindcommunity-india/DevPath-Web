@@ -1,5 +1,6 @@
 'use client';
 
+import { AUTH_MESSAGES } from '@/lib/constants';
 import { useState, type ReactNode } from 'react';
 import { Target, ExternalLink, Edit3, Star, Bookmark } from 'lucide-react';
 import Image from 'next/image';
@@ -118,7 +119,7 @@ export default function ProjectCard({
   const handleToggleStar = async (e: React.MouseEvent) => {
     e.stopPropagation();
     if (!user) {
-      alert('Please login to star projects.');
+      alert(AUTH_MESSAGES.LOGIN_TO_STAR_PROJECTS);
       return;
     }
     if (isStarring) return;

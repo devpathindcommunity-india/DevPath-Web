@@ -1,5 +1,6 @@
 'use client';
 
+import { AUTH_MESSAGES } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import {
   Github,
@@ -152,7 +153,7 @@ export default function OpenSourcePage() {
 
   const handleConnectGitHub = async () => {
     if (!user) {
-      alert('Please login to connect your GitHub account.');
+      alert(AUTH_MESSAGES.LOGIN_TO_CONNECT_GITHUB);
       return;
     }
 

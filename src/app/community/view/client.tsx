@@ -1,5 +1,6 @@
 'use client';
 
+import { AUTH_MESSAGES } from '@/lib/constants';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -208,7 +209,7 @@ export default function DiscussionViewClient() {
 
   const handleReaction = async (emoji: string) => {
     if (!user || !discussionId) {
-      alert('Please login to react.');
+      alert(AUTH_MESSAGES.LOGIN_TO_REACT);
       return;
     }
 
@@ -479,7 +480,7 @@ export default function DiscussionViewClient() {
           ) : (
             <div className="text-center p-8 bg-muted/20 rounded-xl border border-border/50 border-dashed">
               <p className="text-muted-foreground">
-                Please login to reply to this discussion.
+                {AUTH_MESSAGES.LOGIN_TO_REPLY_TO_DISCUSSION}
               </p>
             </div>
           )}

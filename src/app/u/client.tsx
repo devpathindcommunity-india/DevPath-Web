@@ -1,4 +1,5 @@
 'use client';
+import { AUTH_MESSAGES } from '@/lib/constants';
 const STATS_URL =
   process.env.NEXT_PUBLIC_GITHUB_STATS_URL ??
   'https://github-readme-stats-salesp07.vercel.app';
@@ -420,7 +421,7 @@ function ProfileContent({ uid }: { uid?: string }) {
     currentLikes: string[]
   ) => {
     if (!currentUser) {
-      alert('Please login to like projects.');
+      alert(AUTH_MESSAGES.LOGIN_TO_LIKE_PROJECTS);
       return;
     }
 
