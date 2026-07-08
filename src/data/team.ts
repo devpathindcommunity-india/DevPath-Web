@@ -30,7 +30,8 @@ export const teamMembers: TeamMember[] = [
     id: 1,
     name: 'Aditya Amol Patil',
     role: 'Founder',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696323/aigt0lwwyqjlaso6bw7m.jpg',
+    image:
+      'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696323/aigt0lwwyqjlaso6bw7m.jpg',
     category: 'Founder',
     socials: {
       github: 'https://github.com/aditya948351',
@@ -44,14 +45,16 @@ export const teamMembers: TeamMember[] = [
     id: 2,
     name: 'Deb Mukherjee',
     role: 'Partnerships Lead',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
+    image:
+      'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
     category: 'Core Leadership',
   },
   {
     id: 3,
     name: 'Pranav Khaire',
     role: 'Creative Lead',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696375/eh9qepgconelmzwmdjpc.jpg',
+    image:
+      'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696375/eh9qepgconelmzwmdjpc.jpg',
     category: 'Core Leadership',
   },
   {
@@ -127,7 +130,8 @@ export const teamMembers: TeamMember[] = [
     name: 'Aditya Patil',
     role: 'City Lead',
     subRole: 'Pune',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696323/aigt0lwwyqjlaso6bw7m.jpg',
+    image:
+      'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696323/aigt0lwwyqjlaso6bw7m.jpg',
     category: 'City Lead',
     socials: {
       linkedin: 'https://www.linkedin.com/in/aditya-patil-a7743a292/',
@@ -147,7 +151,8 @@ export const teamMembers: TeamMember[] = [
     name: 'Deb Mukherjee',
     role: 'City Lead',
     subRole: 'Kolkata',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
+    image:
+      'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
     category: 'City Lead',
   },
   {

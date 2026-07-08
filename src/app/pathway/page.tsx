@@ -18,7 +18,9 @@ interface TeamMember {
 
 const getInitials = (name: string) => {
   const parts = name.split(' ');
-  return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}`.toUpperCase() : name.slice(0, 2).toUpperCase();
+  return parts.length > 1
+    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    : name.slice(0, 2).toUpperCase();
 };
 
 export default function PathwayPage() {
@@ -31,18 +33,22 @@ export default function PathwayPage() {
       setLoading(true);
       try {
         const snap = await getDocs(collection(db, 'team_members'));
-        const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }) as TeamMember);
-        
+        const data = snap.docs.map(
+          (doc) => ({ id: doc.id, ...doc.data() }) as TeamMember
+        );
+
         // Filter out placeholders
-        const validMembers = data.filter(m => m.name !== 'Application Pending' && m.name.trim() !== '');
+        const validMembers = data.filter(
+          (m) => m.name !== 'Application Pending' && m.name.trim() !== ''
+        );
 
         // We sort by monthlyPoints descending
         const tech = validMembers
-          .filter(m => m.role === 'Technical Contributor')
+          .filter((m) => m.role === 'Technical Contributor')
           .sort((a, b) => (b.monthlyPoints || 0) - (a.monthlyPoints || 0));
 
         const city = validMembers
-          .filter(m => m.role === 'City Lead')
+          .filter((m) => m.role === 'City Lead')
           .sort((a, b) => (b.monthlyPoints || 0) - (a.monthlyPoints || 0));
 
         setTechContributors(tech);
@@ -68,19 +74,20 @@ export default function PathwayPage() {
 
       <div className="relative z-10 pt-32 px-4 md:px-8">
         <div className="w-full max-w-6xl mx-auto space-y-16">
-          
           <div className="text-center space-y-6">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
+              transition={{ duration: 0.8, ease: 'easeOut' }}
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md"
             >
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span className="text-sm font-medium text-slate-300">Monthly Leaderboards</span>
+              <span className="text-sm font-medium text-slate-300">
+                Monthly Leaderboards
+              </span>
             </motion.div>
-            
-            <motion.h1 
+
+            <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
@@ -91,14 +98,16 @@ export default function PathwayPage() {
                 Top Contributors
               </span>
             </motion.h1>
-            
-            <motion.p 
+
+            <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
               className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto"
             >
-              Celebrating the exceptional efforts of Technical Contributors and City Leads driving the DevPath Bharat community forward this month.
+              Celebrating the exceptional efforts of Technical Contributors and
+              City Leads driving the DevPath Bharat community forward this
+              month.
             </motion.p>
           </div>
 
@@ -109,30 +118,39 @@ export default function PathwayPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-              <LeaderboardPanel 
-                title="Technical Contributors" 
-                icon={Code} 
+              <LeaderboardPanel
+                title="Technical Contributors"
+                icon={Code}
                 iconColor="text-emerald-400"
-                members={techContributors} 
+                members={techContributors}
               />
-              <LeaderboardPanel 
-                title="City Leads" 
-                icon={MapPin} 
+              <LeaderboardPanel
+                title="City Leads"
+                icon={MapPin}
                 iconColor="text-sky-400"
-                members={cityLeads} 
+                members={cityLeads}
               />
             </div>
           )}
-
         </div>
       </div>
     </div>
   );
 }
 
-function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: string; icon: any; iconColor: string; members: TeamMember[] }) {
+function LeaderboardPanel({
+  title,
+  icon: Icon,
+  iconColor,
+  members,
+}: {
+  title: string;
+  icon: any;
+  iconColor: string;
+  members: TeamMember[];
+}) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
@@ -140,10 +158,14 @@ function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: st
       className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col"
     >
       <div className="flex items-center gap-3 mb-8">
-        <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${iconColor}`}>
+        <div
+          className={`p-3 rounded-xl bg-white/5 border border-white/10 ${iconColor}`}
+        >
           <Icon className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
+        <h2 className="text-2xl font-bold text-white tracking-tight">
+          {title}
+        </h2>
       </div>
 
       {members.length === 0 ? (
@@ -158,33 +180,43 @@ function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: st
             <div>Contributor</div>
             <div className="text-right">Monthly Pts</div>
           </div>
-          
+
           <div className="space-y-3">
             {members.map((member, index) => (
-              <motion.div 
+              <motion.div
                 key={member.id}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
                 className="group flex items-center gap-4 px-4 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-white/10 transition-colors"
               >
-                <div className={`w-8 text-center font-bold text-lg ${index === 0 ? 'text-amber-400' : index === 1 ? 'text-slate-300' : index === 2 ? 'text-amber-700' : 'text-slate-600'}`}>
+                <div
+                  className={`w-8 text-center font-bold text-lg ${index === 0 ? 'text-amber-400' : index === 1 ? 'text-slate-300' : index === 2 ? 'text-amber-700' : 'text-slate-600'}`}
+                >
                   {index + 1}
                 </div>
-                
+
                 <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-sm font-bold text-indigo-200">
                     {getInitials(member.name)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-white truncate">{member.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{member.subRole}</p>
+                    <p className="font-semibold text-white truncate">
+                      {member.name}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">
+                      {member.subRole}
+                    </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className="font-mono text-xl font-bold text-indigo-300">{member.monthlyPoints || 0}</p>
-                  <p className="text-[10px] text-slate-500 font-medium">Total: {member.points || 0}</p>
+                  <p className="font-mono text-xl font-bold text-indigo-300">
+                    {member.monthlyPoints || 0}
+                  </p>
+                  <p className="text-[10px] text-slate-500 font-medium">
+                    Total: {member.points || 0}
+                  </p>
                 </div>
               </motion.div>
             ))}

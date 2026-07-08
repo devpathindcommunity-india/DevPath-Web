@@ -3,14 +3,25 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { Github, Linkedin, Instagram, Code, MapPin, Star, Shield, Users } from 'lucide-react';
+import {
+  Github,
+  Linkedin,
+  Instagram,
+  Code,
+  MapPin,
+  Star,
+  Shield,
+  Users,
+} from 'lucide-react';
 import { teamMembers, TeamMember, TeamCategory } from '@/data/team';
 
 // Utility for creating initials
 const getInitials = (name: string) => {
   if (name === 'Application Pending') return '?';
   const parts = name.split(' ');
-  return parts.length > 1 ? `${parts[0][0]}${parts[1][0]}`.toUpperCase() : name.slice(0, 2).toUpperCase();
+  return parts.length > 1
+    ? `${parts[0][0]}${parts[1][0]}`.toUpperCase()
+    : name.slice(0, 2).toUpperCase();
 };
 
 const RoleIcon = ({ category }: { category: TeamCategory }) => {
@@ -39,7 +50,13 @@ const SocialLink = ({ href, icon: Icon }: { href: string; icon: any }) => (
   </a>
 );
 
-const MemberCard = ({ member, index }: { member: TeamMember; index: number }) => {
+const MemberCard = ({
+  member,
+  index,
+}: {
+  member: TeamMember;
+  index: number;
+}) => {
   const isPending = member.name === 'Application Pending';
   const delay = (index % 10) * 0.05;
 
@@ -78,10 +95,14 @@ const MemberCard = ({ member, index }: { member: TeamMember; index: number }) =>
 
       {/* Details */}
       <div className="text-center z-10 w-full">
-        <h3 className={`text-lg font-semibold tracking-tight ${isPending ? 'text-slate-400 italic' : 'text-white'}`}>
+        <h3
+          className={`text-lg font-semibold tracking-tight ${isPending ? 'text-slate-400 italic' : 'text-white'}`}
+        >
           {member.name}
         </h3>
-        <p className="text-indigo-300 font-medium text-sm mt-1">{member.role}</p>
+        <p className="text-indigo-300 font-medium text-sm mt-1">
+          {member.role}
+        </p>
         {member.subRole && (
           <span className="inline-block mt-3 px-3 py-1 bg-white/5 border border-white/10 rounded-full text-xs text-slate-300 font-medium tracking-wide">
             {member.subRole}
@@ -92,23 +113,37 @@ const MemberCard = ({ member, index }: { member: TeamMember; index: number }) =>
       {/* Socials */}
       {!isPending && member.socials && (
         <div className="flex items-center gap-3 mt-6 z-10">
-          {member.socials.github && <SocialLink href={member.socials.github} icon={Github} />}
-          {member.socials.linkedin && <SocialLink href={member.socials.linkedin} icon={Linkedin} />}
-          {member.socials.instagram && <SocialLink href={member.socials.instagram} icon={Instagram} />}
+          {member.socials.github && (
+            <SocialLink href={member.socials.github} icon={Github} />
+          )}
+          {member.socials.linkedin && (
+            <SocialLink href={member.socials.linkedin} icon={Linkedin} />
+          )}
+          {member.socials.instagram && (
+            <SocialLink href={member.socials.instagram} icon={Instagram} />
+          )}
         </div>
       )}
     </motion.div>
   );
 };
 
-const Section = ({ title, description, members }: { title: string; description?: string; members: TeamMember[] }) => {
+const Section = ({
+  title,
+  description,
+  members,
+}: {
+  title: string;
+  description?: string;
+  members: TeamMember[];
+}) => {
   if (members.length === 0) return null;
 
   return (
     <div className="py-16 md:py-24 border-t border-white/5">
       <div className="container mx-auto px-4 max-w-7xl">
         <div className="max-w-2xl mb-16">
-          <motion.h2 
+          <motion.h2
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -117,7 +152,7 @@ const Section = ({ title, description, members }: { title: string; description?:
             {title}
           </motion.h2>
           {description && (
-            <motion.p 
+            <motion.p
               initial={{ opacity: 0, x: -20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -128,7 +163,7 @@ const Section = ({ title, description, members }: { title: string; description?:
             </motion.p>
           )}
         </div>
-        
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-8">
           {members.map((member, i) => (
             <MemberCard key={member.id} member={member} index={i} />
@@ -147,8 +182,12 @@ export default function NewTeamPage() {
   }, []);
 
   const founder = teamMembers.filter((m) => m.category === 'Founder');
-  const coreLeadership = teamMembers.filter((m) => m.category === 'Core Leadership');
-  const technicalLeads = teamMembers.filter((m) => m.category === 'Technical Lead');
+  const coreLeadership = teamMembers.filter(
+    (m) => m.category === 'Core Leadership'
+  );
+  const technicalLeads = teamMembers.filter(
+    (m) => m.category === 'Technical Lead'
+  );
   const cityLeads = teamMembers.filter((m) => m.category === 'City Lead');
 
   if (!mounted) return null; // Avoid hydration mismatch on initial render
@@ -169,14 +208,16 @@ export default function NewTeamPage() {
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 mb-8 backdrop-blur-md"
           >
             <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse" />
-            <span className="text-sm font-medium text-slate-300">DevPath Bharat</span>
+            <span className="text-sm font-medium text-slate-300">
+              DevPath Bharat
+            </span>
           </motion.div>
-          
-          <motion.h1 
+
+          <motion.h1
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.1 }}
@@ -187,39 +228,41 @@ export default function NewTeamPage() {
               behind the mission
             </span>
           </motion.h1>
-          
-          <motion.p 
+
+          <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
             className="mt-8 text-lg md:text-xl text-slate-400 leading-relaxed max-w-2xl mx-auto"
           >
-            A collective of passionate developers, leaders, and innovators dedicated to empowering the next generation of tech talent across Bharat.
+            A collective of passionate developers, leaders, and innovators
+            dedicated to empowering the next generation of tech talent across
+            Bharat.
           </motion.p>
         </div>
       </div>
 
       {/* Sections */}
       <div className="relative z-10">
-        <Section 
-          title="Founder" 
+        <Section
+          title="Founder"
           description="The visionary guiding DevPath Bharat towards an inclusive and sustainable future."
-          members={founder} 
+          members={founder}
         />
-        <Section 
-          title="Core Leadership" 
+        <Section
+          title="Core Leadership"
           description="Strategic drivers ensuring operational excellence and continuous growth across all domains."
-          members={coreLeadership} 
+          members={coreLeadership}
         />
-        <Section 
-          title="Technical Leads" 
+        <Section
+          title="Technical Leads"
           description="Architects and mentors driving our technological infrastructure and engineering standards."
-          members={technicalLeads} 
+          members={technicalLeads}
         />
-        <Section 
-          title="City Leads" 
+        <Section
+          title="City Leads"
           description="Regional leaders building thriving local developer communities across India."
-          members={cityLeads} 
+          members={cityLeads}
         />
       </div>
     </main>

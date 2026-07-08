@@ -17,6 +17,7 @@ DevPath Bharat is a community-driven project. We encourage members to help each 
 ## Discord / WhatsApp
 
 Join our active community to chat with other developers, find mentors, and get real-time help!
+
 - **WhatsApp Community**: [Join Here](https://chat.whatsapp.com/D2PRfQy4HYgC4XURhY2X8C)
 
 We are committed to providing a supportive and inclusive environment. Please ensure you follow our [Code of Conduct](CODE_OF_CONDUCT.md) when interacting with the community.
