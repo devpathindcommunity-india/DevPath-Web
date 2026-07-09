@@ -1,4 +1,4 @@
-﻿const STORAGE_KEY = 'devpath_activity';
+const STORAGE_KEY = 'devpath_activity';
 const MAX_HISTORY = 20;
 
 const PAGE_CATEGORIES: Record<string, string> = {
@@ -12,7 +12,7 @@ const PAGE_CATEGORIES: Record<string, string> = {
   '/internships': 'internships',
   '/events': 'events',
   '/resources': 'resources',
-  '/community': 'community',
+  '/apply': 'community',
   '/projects': 'projects',
 };
 

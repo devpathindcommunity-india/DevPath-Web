@@ -21,7 +21,8 @@ import {
   FileText,
   Check,
   X,
-  ExternalLink
+  ExternalLink,
+  Copy
 } from 'lucide-react';
 
 const ROLES = [
@@ -814,12 +815,31 @@ function ApplicationsPanel({ onRefresh }: { onRefresh: () => void }) {
                   <p className="text-sm text-slate-500 mb-3">{app.email}</p>
                   
                   <div className="flex gap-4 mb-4">
-                    <a href={app.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm text-indigo-600 flex items-center gap-1 hover:underline">
-                      <ExternalLink size={14} /> LinkedIn
-                    </a>
-                    <a href={app.githubUrl} target="_blank" rel="noreferrer" className="text-sm text-slate-700 flex items-center gap-1 hover:underline">
-                      <ExternalLink size={14} /> GitHub
-                    </a>
+                    <div className="flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">
+                      <a href={app.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm text-indigo-600 flex items-center gap-1 hover:underline">
+                        <ExternalLink size={14} /> LinkedIn
+                      </a>
+                      <button 
+                        onClick={() => { navigator.clipboard.writeText(app.linkedinUrl); alert('LinkedIn URL Copied!'); }}
+                        className="ml-2 text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+                        title="Copy LinkedIn URL"
+                      >
+                        <Copy size={14} />
+                      </button>
+                    </div>
+
+                    <div className="flex items-center gap-1 bg-white border border-slate-200 px-2 py-1 rounded-md shadow-sm">
+                      <a href={app.githubUrl} target="_blank" rel="noreferrer" className="text-sm text-slate-700 flex items-center gap-1 hover:underline">
+                        <ExternalLink size={14} /> GitHub
+                      </a>
+                      <button 
+                        onClick={() => { navigator.clipboard.writeText(app.githubUrl); alert('GitHub URL Copied!'); }}
+                        className="ml-2 text-slate-400 hover:text-slate-600 p-1 rounded hover:bg-slate-100 transition-colors"
+                        title="Copy GitHub URL"
+                      >
+                        <Copy size={14} />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

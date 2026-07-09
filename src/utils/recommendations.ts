@@ -90,7 +90,7 @@ const RULES: Recommendation[] = [
     description:
       'Drop a quick intro post and start connecting with fellow learners.',
     cta: 'Go to community',
-    href: '/community',
+    href: '/apply',
     icon: 'users',
     tag: 'Say hello',
     priority: 1,

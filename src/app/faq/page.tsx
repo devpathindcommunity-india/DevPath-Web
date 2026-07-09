@@ -199,7 +199,7 @@ export default function FAQPage() {
               Email Support
             </a>
             <a
-              href="/community"
+              href="/apply"
               className="inline-flex items-center justify-center gap-3 border border-gray-700 hover:border-white px-10 py-4 rounded-2xl font-medium transition-all"
             >
               <Users size={20} />

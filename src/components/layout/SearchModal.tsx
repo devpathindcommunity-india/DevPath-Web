@@ -15,7 +15,7 @@ const STATIC_PAGES = [
   { title: 'Home', href: '/', category: 'Navigation' },
   { title: 'Courses', href: '/courses', category: 'Navigation' },
   { title: 'Pathway', href: '/pathway', category: 'Navigation' },
-  { title: 'Community', href: '/community', category: 'Navigation' },
+  { title: 'Apply', href: '/apply', category: 'Navigation' },
   { title: 'Resources', href: '/resources', category: 'Navigation' },
   { title: 'Events', href: '/events', category: 'Navigation' },
   { title: 'Open Source', href: '/opensource', category: 'Navigation' },

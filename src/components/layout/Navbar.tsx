@@ -31,7 +31,7 @@ const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/courses', label: 'Courses' },
   { href: '/pathway', label: 'Pathway' },
-  { href: '/community', label: 'Community' },
+  { href: '/apply', label: 'Apply' },
   { href: '/resources', label: 'Resources' },
   { href: '/events', label: 'Events' },
   { href: '/opportunities', label: 'Opportunities' },
@@ -131,7 +131,7 @@ export default function Navbar() {
                       className={`${styles.navLink} opacity-50 cursor-not-allowed`}
                       title="Maintenance Mode Active"
                     >
-                      {link.label === 'Community' && (
+                      {link.label === 'Apply' && (
                         <Lock size={12} className="inline mr-1" />
                       )}
 
