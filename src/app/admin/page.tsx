@@ -17,7 +17,11 @@ import {
   Crown,
   CheckCircle2,
   XCircle,
-  AlertTriangle
+  AlertTriangle,
+  FileText,
+  Check,
+  X,
+  ExternalLink
 } from 'lucide-react';
 
 const ROLES = [
@@ -368,6 +372,12 @@ function AdminDashboard({ role, onLogout }: { role: string; onLogout: () => void
           {(canManageAll) && (
             <div className="w-full">
               <ManagementPanel members={members} onRefresh={fetchMembers} />
+            </div>
+          )}
+
+          {(canManageAll || role === 'Community & Inclusion Lead') && (
+            <div className="w-full">
+              <ApplicationsPanel onRefresh={fetchMembers} />
             </div>
           )}
 
@@ -722,3 +732,122 @@ function ManagementPanel({ members, onRefresh }: { members: TeamMember[], onRefr
     </div>
   );
 }
+
+function ApplicationsPanel({ onRefresh }: { onRefresh: () => void }) {
+  const [applications, setApplications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchApps = async () => {
+    setLoading(true);
+    try {
+      const snap = await getDocs(collection(db, 'technical_applications'));
+      const data = snap.docs.map(d => ({ id: d.id, ...d.data() })).filter((a: any) => a.status === 'pending');
+      setApplications(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchApps();
+  }, []);
+
+  const handleAction = async (app: any, action: 'accepted' | 'rejected') => {
+    if (!confirm(`Are you sure you want to ${action === 'accepted' ? 'APPROVE' : 'REJECT'} this application?`)) return;
+    try {
+      await updateDoc(doc(db, 'technical_applications', app.id), { status: action });
+      
+      if (action === 'accepted') {
+        const currentMonthStr = new Date().toISOString().slice(0, 7);
+        await addDoc(collection(db, 'team_members'), {
+          name: app.name,
+          role: 'Technical Contributor',
+          subRole: app.expertise,
+          points: 0,
+          monthlyPoints: 0,
+          qualityPointsEarned: 0,
+          qualityPointsPossible: 0,
+          resourcesSubmitted: 0,
+          resourcesApproved: 0,
+          resourcesRejected: 0,
+          monthsActive: 0,
+          lastUpdatedMonth: currentMonthStr,
+          lastContributionDate: ''
+        });
+        onRefresh();
+      }
+      fetchApps();
+    } catch (err) {
+      alert('Failed to process application.');
+    }
+  };
+
+  return (
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-bold text-slate-900 flex items-center gap-3 uppercase tracking-widest font-mono">
+          <FileText className="text-orange-500" size={24} /> Pending Applications
+        </h2>
+        <span className="bg-orange-100 text-orange-600 px-3 py-1 rounded-full text-xs font-bold font-mono">
+          {applications.length} PENDING
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="text-center py-10 text-slate-400">Loading...</div>
+      ) : applications.length === 0 ? (
+        <div className="text-center py-10 bg-slate-50 rounded-xl border border-dashed border-slate-200 text-slate-500">
+          No pending applications.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {applications.map(app => (
+            <div key={app.id} className="border border-slate-200 rounded-xl p-5 hover:border-orange-300 transition-colors bg-slate-50">
+              <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h3 className="text-lg font-bold text-slate-900">{app.name}</h3>
+                    <span className="text-xs bg-indigo-100 text-indigo-700 px-2 py-0.5 rounded font-semibold">{app.expertise}</span>
+                  </div>
+                  <p className="text-sm text-slate-500 mb-3">{app.email}</p>
+                  
+                  <div className="flex gap-4 mb-4">
+                    <a href={app.linkedinUrl} target="_blank" rel="noreferrer" className="text-sm text-indigo-600 flex items-center gap-1 hover:underline">
+                      <ExternalLink size={14} /> LinkedIn
+                    </a>
+                    <a href={app.githubUrl} target="_blank" rel="noreferrer" className="text-sm text-slate-700 flex items-center gap-1 hover:underline">
+                      <ExternalLink size={14} /> GitHub
+                    </a>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white p-3 rounded border border-slate-100">
+                      <p className="text-xs font-bold text-slate-400 uppercase mb-1">Motivation</p>
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{app.motivation}</p>
+                    </div>
+                    <div className="bg-white p-3 rounded border border-slate-100">
+                      <p className="text-xs font-bold text-slate-400 uppercase mb-1">Best Work</p>
+                      <p className="text-sm text-slate-700 whitespace-pre-wrap">{app.bestWork}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex md:flex-col gap-2 min-w-[120px]">
+                  <button onClick={() => handleAction(app, 'accepted')} className="flex-1 flex items-center justify-center gap-2 bg-emerald-50 text-emerald-600 border border-emerald-200 hover:bg-emerald-100 px-4 py-2 rounded-lg text-sm font-bold uppercase transition-colors">
+                    <Check size={16} /> Approve
+                  </button>
+                  <button onClick={() => handleAction(app, 'rejected')} className="flex-1 flex items-center justify-center gap-2 bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100 px-4 py-2 rounded-lg text-sm font-bold uppercase transition-colors">
+                    <X size={16} /> Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+

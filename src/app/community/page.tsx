@@ -26,6 +26,7 @@ import {
 import { getEmbedUrl } from '@/lib/utils';
 import { useRouter } from 'next/navigation';
 import CreateDiscussionModal from '@/components/community/CreateDiscussionModal';
+import ApplicationModal from '@/components/community/ApplicationModal';
 import ProjectCard from '@/components/projects/ProjectCard';
 import DOMPurify from 'dompurify';
 
@@ -40,6 +41,7 @@ export default function CommunityPage() {
   const [discussions, setDiscussions] = useState<any[]>([]);
   const [projects, setProjects] = useState<any[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [showApplicationModal, setShowApplicationModal] = useState(false);
   const [selectedProject, setSelectedProject] = useState<any>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -133,6 +135,12 @@ export default function CommunityPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowApplicationModal(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition-colors font-medium text-sm"
+            >
+              Become a Contributor
+            </button>
             {activeTab === 'discussions' && (
               <button
                 onClick={() => {
@@ -142,7 +150,7 @@ export default function CommunityPage() {
                   }
                   setShowCreateModal(true);
                 }}
-                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors text-sm"
               >
                 <Plus size={18} /> New Discussion
               </button>
@@ -290,6 +298,11 @@ export default function CommunityPage() {
           }}
         />
       )}
+
+      <ApplicationModal 
+        isOpen={showApplicationModal}
+        onClose={() => setShowApplicationModal(false)}
+      />
 
       {/* Project Details Modal */}
       {selectedProject && (

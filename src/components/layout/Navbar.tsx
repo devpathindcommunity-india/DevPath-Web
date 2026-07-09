@@ -249,15 +249,15 @@ export default function Navbar() {
             ) : (
               <Link
                 href={isMaintenanceMode ? '#' : '/admin'}
-                className={`${styles.profileButton} ${
+                className={`flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 bg-white hover:bg-slate-50 transition-colors ${
                   isMaintenanceMode
                     ? 'opacity-50 cursor-not-allowed pointer-events-none'
                     : ''
                 }`}
+                title="Admins Only"
               >
-                <LogIn size={16} />
-
-                <span className="hidden sm:inline">Login</span>
+                <Lock size={14} className="text-slate-400" />
+                <span className="hidden sm:inline text-[10px] uppercase tracking-widest text-slate-500 font-bold">Admins Only</span>
               </Link>
             )}
 
@@ -387,8 +387,8 @@ export default function Navbar() {
                     className={styles.mobileProfileButton}
                     onClick={closeMobileMenu}
                   >
-                    <LogIn size={20} />
-                    <span>Login</span>
+                    <Lock size={20} className="text-slate-400" />
+                    <span className="text-xs uppercase tracking-widest text-slate-500 font-bold">Admins Only</span>
                   </Link>
                 )}
               </div>
