@@ -29,7 +29,7 @@ export const teamMembers: TeamMember[] = [
   {
     id: 1,
     name: 'Aditya Amol Patil',
-    role: 'Founder',
+    role: 'Founder & Community Lead',
     image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696323/aigt0lwwyqjlaso6bw7m.jpg',
     category: 'Founder',
     socials: {
@@ -42,46 +42,46 @@ export const teamMembers: TeamMember[] = [
   // Core Leadership
   {
     id: 2,
-    name: 'Deb Mukherjee',
-    role: 'Partnerships Lead',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
+    name: 'Sakshi Rote',
+    role: 'Operations Lead (COO)',
     category: 'Core Leadership',
   },
   {
     id: 3,
-    name: 'Pranav Khaire',
-    role: 'Creative Lead',
-    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696375/eh9qepgconelmzwmdjpc.jpg',
+    name: 'Application Pending',
+    role: 'Community & Inclusion Lead',
     category: 'Core Leadership',
   },
   {
     id: 4,
-    name: 'Sakshi Rote',
-    role: 'Operations Lead',
+    name: 'Application Pending',
+    role: 'Women in Tech Lead',
     category: 'Core Leadership',
   },
   {
     id: 5,
     name: 'Application Pending',
-    role: 'Technology Lead',
+    role: 'Technology Lead (Discord Head)',
     category: 'Core Leadership',
   },
   {
     id: 6,
     name: 'Application Pending',
-    role: 'Community Lead',
+    role: 'Learning & Programs Lead',
     category: 'Core Leadership',
   },
   {
     id: 7,
-    name: 'Application Pending',
-    role: 'Learning Lead',
+    name: 'Pranav Khaire',
+    role: 'Marketing & Brand Lead',
+    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696375/eh9qepgconelmzwmdjpc.jpg',
     category: 'Core Leadership',
   },
   {
     id: 8,
-    name: 'Application Pending',
-    role: 'Marketing Lead',
+    name: 'Deb Mukherjee',
+    role: 'Partnerships & Outreach Lead',
+    image: 'https://res.cloudinary.com/dsj0vaews/image/upload/v1766696374/d1yvkivbdly4at9m2uxk.jpg',
     category: 'Core Leadership',
   },
   {
@@ -93,7 +93,7 @@ export const teamMembers: TeamMember[] = [
   {
     id: 10,
     name: 'Application Pending',
-    role: 'Women in Tech Lead',
+    role: 'City Leads (Network Head)',
     category: 'Core Leadership',
   },
 

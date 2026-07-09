@@ -248,7 +248,7 @@ export default function Navbar() {
               </Link>
             ) : (
               <Link
-                href={isMaintenanceMode ? '#' : '/login'}
+                href={isMaintenanceMode ? '#' : '/admin'}
                 className={`${styles.profileButton} ${
                   isMaintenanceMode
                     ? 'opacity-50 cursor-not-allowed pointer-events-none'
@@ -383,7 +383,7 @@ export default function Navbar() {
                   </>
                 ) : (
                   <Link
-                    href="/login"
+                    href="/admin"
                     className={styles.mobileProfileButton}
                     onClick={closeMobileMenu}
                   >

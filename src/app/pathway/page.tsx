@@ -58,12 +58,12 @@ export default function PathwayPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0A0A0B] text-slate-200 selection:bg-indigo-500/30 pb-24">
+    <div className="min-h-screen bg-slate-50 text-slate-800 selection:bg-indigo-500/30 pb-24">
       {/* Background Gradients */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/10 blur-[120px] rounded-full mix-blend-screen" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.03] mix-blend-overlay" />
+        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-100/50 blur-[120px] rounded-full " />
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-100/50 blur-[120px] rounded-full " />
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-[0.01] mix-blend-overlay" />
       </div>
 
       <div className="relative z-10 pt-32 px-4 md:px-8">
@@ -74,20 +74,20 @@ export default function PathwayPage() {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: "easeOut" }}
-              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 backdrop-blur-md"
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-slate-200 backdrop-blur-md"
             >
               <Trophy className="w-4 h-4 text-amber-400" />
-              <span className="text-sm font-medium text-slate-300">Monthly Leaderboards</span>
+              <span className="text-sm font-medium text-slate-600">Monthly Leaderboards</span>
             </motion.div>
             
             <motion.h1 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-4xl md:text-6xl lg:text-7xl font-bold text-white tracking-tighter leading-tight"
+              className="text-4xl md:text-6xl lg:text-7xl font-bold text-slate-900 tracking-tighter leading-tight"
             >
               Recognizing our <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 via-purple-400 to-emerald-400">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-purple-600 to-emerald-600">
                 Top Contributors
               </span>
             </motion.h1>
@@ -96,7 +96,7 @@ export default function PathwayPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto"
+              className="text-slate-500 text-lg md:text-xl max-w-2xl mx-auto"
             >
               Celebrating the exceptional efforts of Technical Contributors and City Leads driving the DevPath Bharat community forward this month.
             </motion.p>
@@ -112,7 +112,7 @@ export default function PathwayPage() {
               <LeaderboardPanel 
                 title="Technical Contributors" 
                 icon={Code} 
-                iconColor="text-emerald-400"
+                iconColor="text-emerald-600"
                 members={techContributors} 
               />
               <LeaderboardPanel 
@@ -140,10 +140,10 @@ function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: st
       className="bg-white/[0.02] backdrop-blur-xl border border-white/[0.05] rounded-3xl p-6 md:p-8 flex flex-col"
     >
       <div className="flex items-center gap-3 mb-8">
-        <div className={`p-3 rounded-xl bg-white/5 border border-white/10 ${iconColor}`}>
+        <div className={`p-3 rounded-xl bg-white border border-slate-200 ${iconColor}`}>
           <Icon className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight">{title}</h2>
+        <h2 className="text-2xl font-bold text-slate-900 tracking-tight">{title}</h2>
       </div>
 
       {members.length === 0 ? (
@@ -153,7 +153,7 @@ function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: st
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="grid grid-cols-[auto_1fr_auto] gap-4 px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-white/10">
+          <div className="grid grid-cols-[auto_1fr_auto] gap-4 px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider border-b border-slate-200">
             <div className="w-8 text-center">Rank</div>
             <div>Contributor</div>
             <div className="text-right">Monthly Pts</div>
@@ -166,19 +166,19 @@ function LeaderboardPanel({ title, icon: Icon, iconColor, members }: { title: st
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="group flex items-center gap-4 px-4 py-3 bg-white/5 border border-white/5 rounded-2xl hover:bg-white/10 hover:border-white/10 transition-colors"
+                className="group flex items-center gap-4 px-4 py-3 bg-white border border-slate-200 rounded-2xl hover:bg-slate-100 hover:border-slate-200 transition-colors"
               >
-                <div className={`w-8 text-center font-bold text-lg ${index === 0 ? 'text-amber-400' : index === 1 ? 'text-slate-300' : index === 2 ? 'text-amber-700' : 'text-slate-600'}`}>
+                <div className={`w-8 text-center font-bold text-lg ${index === 0 ? 'text-amber-400' : index === 1 ? 'text-slate-600' : index === 2 ? 'text-amber-700' : 'text-slate-600'}`}>
                   {index + 1}
                 </div>
                 
                 <div className="flex items-center gap-3 flex-1 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-white/10 flex items-center justify-center text-sm font-bold text-indigo-200">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-slate-200 flex items-center justify-center text-sm font-bold text-indigo-200">
                     {getInitials(member.name)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-white truncate">{member.name}</p>
-                    <p className="text-xs text-slate-400 truncate">{member.subRole}</p>
+                    <p className="font-semibold text-slate-900 truncate">{member.name}</p>
+                    <p className="text-xs text-slate-500 truncate">{member.subRole}</p>
                   </div>
                 </div>
 
