@@ -153,7 +153,6 @@ export default function RootLayout({
                 <AuthProvider>
                   <GamificationProvider>
                     <RealTimeProvider>
-                      <AnimatedBackground />
                       <RouteAwareChrome>{children}</RouteAwareChrome>
                     </RealTimeProvider>
                   </GamificationProvider>

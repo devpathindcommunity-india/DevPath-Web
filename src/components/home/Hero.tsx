@@ -4,16 +4,10 @@ import dynamic from 'next/dynamic';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import Button from '../ui/Button';
-import InteractiveBackground from '../ui/InteractiveBackground';
 import styles from './Hero.module.css';
-
-const LatestEventsHighlight = dynamic(() => import('./LatestEventsHighlight'));
 import { useEffect, useState, useRef } from 'react';
+const LatestEventsHighlight = dynamic(() => import('./LatestEventsHighlight'));
 
-const HeaderScene = dynamic(() => import('@/components/3d/HeaderScene'), {
-  ssr: false,
-  loading: () => null,
-});
 
 function AnimatedCounter({
   target,
@@ -80,36 +74,8 @@ export default function Hero() {
     }
   };
 
-  // Defer Three.js / HeaderScene until the hero section enters the viewport.
-  // This removes the ~1 MB Three.js chunk from the critical JS bundle.
-  const [showHeaderScene, setShowHeaderScene] = useState(false);
-  const heroRef = useRef<HTMLElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setShowHeaderScene(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (heroRef.current) {
-      observer.observe(heroRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   return (
-    <section className={styles.hero} ref={heroRef}>
-      <InteractiveBackground />
-      {/* Background 3D Model */}
-      <div className="absolute md:inset-0 bottom-0 left-0 right-0 top-[35%] md:top-0 h-[45vh] md:h-full z-0 opacity-30 md:opacity-80 pointer-events-none overflow-hidden">
-        {showHeaderScene ? <HeaderScene /> : null}
-      </div>
+    <section className={styles.hero}>
 
       <div className={`${styles.content} relative z-10`}>
         <div className="flex flex-col items-center gap-6 mb-8">
@@ -156,16 +122,7 @@ export default function Hero() {
         <div
           className={`${styles.ctas} flex flex-col sm:flex-row items-center gap-4 sm:gap-2`}
         >
-          <Link href="/signup" className="w-full sm:w-auto">
-            <Button
-              aria-label="Sign Up"
-              variant="primary"
-              icon={<ArrowRight size={20} />}
-              className="w-full sm:w-auto justify-center"
-            >
-              Sign Up
-            </Button>
-          </Link>
+
           <Link
             href="https://linkly.link/2WCTY"
             target="_blank"
