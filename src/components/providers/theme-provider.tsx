@@ -1,9 +1,18 @@
 'use client';
 
 import * as React from 'react';
-import { ThemeProvider as NextThemesProvider, useTheme } from 'next-themes';
 import { type ThemeProviderProps } from 'next-themes';
 import { useUIStore, type ThemePreference } from '@/stores/ui-store';
+
+// Mock context for next-themes to avoid script tag injection errors in React 19
+// Since the app is now forced to light mode only.
+const ThemeContext = React.createContext({
+  theme: 'light',
+  resolvedTheme: 'light',
+  setTheme: (_: string) => {},
+});
+
+export const useTheme = () => React.useContext(ThemeContext);
 
 function ThemeStoreBridge() {
   const { theme, resolvedTheme, setTheme } = useTheme();
@@ -21,11 +30,11 @@ function ThemeStoreBridge() {
   return null;
 }
 
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ children }: ThemeProviderProps) {
   return (
-    <NextThemesProvider {...props}>
+    <ThemeContext.Provider value={{ theme: 'light', resolvedTheme: 'light', setTheme: () => {} }}>
       <ThemeStoreBridge />
-      {children}
-    </NextThemesProvider>
+      <div className="light">{children}</div>
+    </ThemeContext.Provider>
   );
 }

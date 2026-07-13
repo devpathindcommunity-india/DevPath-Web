@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import CookieConsent from '@/components/CookieConsent';
 
-const Sponsors = dynamic(() => import('@/components/home/Sponsors'));
+
 const Mission = dynamic(() => import('@/components/home/Mission'));
 const CodingNews = dynamic(() => import('@/components/home/CodingNews'));
 const PastCollaborations = dynamic(
@@ -34,9 +34,7 @@ export default function Home() {
             <PastCollaborations />
           </SectionEntrance>
 
-          <SectionEntrance>
-            <Sponsors />
-          </SectionEntrance>
+
         </ErrorBoundary>
 
         {/* COOKIE CONSENT GLOBAL POPUP */}

@@ -143,7 +143,8 @@ export default function RootLayout({
         <MotionConfig reducedMotion="user">
           <ThemeProvider
             attribute="class"
-            defaultTheme="dark"
+            defaultTheme="light"
+            forcedTheme="light"
             enableSystem={false}
             disableTransitionOnChange
           >

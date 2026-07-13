@@ -20,7 +20,7 @@ import {
 import logo from '@/assets/logo.webp';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
+
 import BookmarkDrawer from '@/components/ui/BookmarkDrawer';
 import styles from './Navbar.module.css';
 import { calculateStreak } from '@/lib/streakUtils';
@@ -192,8 +192,6 @@ export default function Navbar() {
               <Search size={18} />
             </button>
 
-            {/* Theme */}
-            <ThemeToggle />
 
             {/* Bookmarks */}
             <button
