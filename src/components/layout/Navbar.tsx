@@ -89,7 +89,7 @@ export default function Navbar() {
       <div
         className={styles.navbarContainer}
         style={{
-          top: isMaintenanceMode ? '70px' : '20px',
+          top: isMaintenanceMode ? '48px' : '0px',
         }}
       >
         <nav
