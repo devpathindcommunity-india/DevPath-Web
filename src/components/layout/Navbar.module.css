@@ -3,11 +3,11 @@
 =========================== */
 
 .navbarContainer {
-  position: sticky;
+  position: fixed;
   top: 0;
   left: 0;
   right: 0;
-  z-index: 1000;
+  z-index: 50000;
   display: flex;
   justify-content: center;
   pointer-events: none;
@@ -31,7 +31,7 @@
   background: rgba(6, 11, 25, 0.72);
   backdrop-filter: blur(30px);
   -webkit-backdrop-filter: blur(30px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   overflow: hidden;
   box-shadow:
     0 20px 80px rgba(0, 0, 0, 0.45),
