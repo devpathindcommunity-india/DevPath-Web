@@ -348,10 +348,7 @@ export default function Navbar() {
                   <span>Search</span>
                 </button>
 
-                <div className={styles.mobileActionRow}>
-                  <ThemeToggle />
-                  <span>Toggle Theme</span>
-                </div>
+
 
                 {user ? (
                   <>
