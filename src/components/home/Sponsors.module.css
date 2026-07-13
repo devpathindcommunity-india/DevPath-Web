@@ -1,5 +1,5 @@
 .sponsors {
-  padding: 4rem 2rem;
+  padding: 1rem 2rem 4rem 2rem; /* Reduced top padding to lessen the gap with the previous section */
   max-width: 1200px;
   margin: 0 auto;
 }
@@ -101,12 +101,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  filter: grayscale(100%) brightness(200%); /* Make logos white/monochrome */
-  transition: filter 0.3s ease;
 }
 
 .sponsorCard:hover .imageWrapper {
-  filter: grayscale(0%) brightness(100%); /* Restore color on hover */
+  /* Restored default behavior */
 }
 
 .logo {
@@ -148,9 +146,9 @@
 }
 
 :global(html:not(.dark)) .imageWrapper {
-  filter: grayscale(100%) brightness(0%); /* Make logos black */
+  /* Removed grayscale for light mode */
 }
 
 :global(html:not(.dark)) .sponsorCard:hover .imageWrapper {
-  filter: grayscale(0%) brightness(100%); /* Restore color on hover */
+  /* Removed grayscale hover for light mode */
 }
