@@ -74,36 +74,33 @@ export default function Sponsors() {
         <h3 className="text-xl font-semibold text-center mb-8 text-muted-foreground">
           Trusted By
         </h3>
-        <div className={styles.marqueeContainer}>
-          <div className={styles.marqueeTrack}>
-            {[...communitySponsors, ...communitySponsors].map(
-              (sponsor, index) => (
-                <a
-                  aria-label="Link"
-                  key={index}
-                  href={sponsor.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.sponsorCard}
-                >
-                  <div className={styles.imageWrapper}>
-                    <Image
-                      src={sponsor.logo}
-                      alt={sponsor.name}
-                      width={200}
-                      height={100}
-                      className={styles.logo}
-                      style={{
-                        width: 'auto',
-                        height: 'auto',
-                        objectFit: 'contain',
-                      }}
-                    />
-                  </div>
-                </a>
-              )
-            )}
-          </div>
+        <div className={styles.grid}>
+          {communitySponsors.map((sponsor, index) => (
+            <a
+              aria-label="Link"
+              key={index}
+              href={sponsor.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.sponsorCard} group flex flex-col items-center justify-center`}
+            >
+              <div className={styles.imageWrapper}>
+                <Image
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  width={200}
+                  height={100}
+                  className={styles.logo}
+                  style={{
+                    width: 'auto',
+                    height: '60px',
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+              <span className="text-sm font-semibold mt-4 text-center group-hover:text-primary transition-colors text-foreground">{sponsor.name}</span>
+            </a>
+          ))}
         </div>
       </div>
 
@@ -112,34 +109,33 @@ export default function Sponsors() {
         <h3 className="text-xl font-semibold text-center mb-8 text-muted-foreground">
           Event Sponsors
         </h3>
-        <div className={styles.marqueeContainer}>
-          <div className={styles.marqueeTrack}>
-            {[...eventSponsors, ...eventSponsors].map((sponsor, index) => (
-              <a
-                aria-label="Link"
-                key={index}
-                href={sponsor.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.sponsorCard}
-              >
-                <div className={styles.imageWrapper}>
-                  <Image
-                    src={sponsor.logo}
-                    alt={sponsor.name}
-                    width={200}
-                    height={100}
-                    className={styles.logo}
-                    style={{
-                      width: 'auto',
-                      height: 'auto',
-                      objectFit: 'contain',
-                    }}
-                  />
-                </div>
-              </a>
-            ))}
-          </div>
+        <div className={styles.grid}>
+          {eventSponsors.map((sponsor, index) => (
+            <a
+              aria-label="Link"
+              key={index}
+              href={sponsor.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${styles.sponsorCard} group flex flex-col items-center justify-center`}
+            >
+              <div className={styles.imageWrapper}>
+                <Image
+                  src={sponsor.logo}
+                  alt={sponsor.name}
+                  width={200}
+                  height={100}
+                  className={styles.logo}
+                  style={{
+                    width: 'auto',
+                    height: '60px',
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+              <span className="text-sm font-semibold mt-4 text-center group-hover:text-primary transition-colors text-foreground">{sponsor.name}</span>
+            </a>
+          ))}
         </div>
       </div>
     </section>

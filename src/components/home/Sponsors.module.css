@@ -83,7 +83,8 @@
   height: 160px;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between; /* To fit the logo and text properly */
+  flex-direction: column;
 }
 
 .sponsorCard:hover {
@@ -136,8 +137,8 @@
 }
 
 :global(html:not(.dark)) .sponsorCard {
-  background: rgba(0, 0, 0, 0.03);
-  border-color: rgba(0, 0, 0, 0.1);
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
 }
 
 :global(html:not(.dark)) .sponsorCard:hover {

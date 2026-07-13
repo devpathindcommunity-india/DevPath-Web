@@ -82,24 +82,15 @@ export default function CodingNews() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const loopedNews = news.length > 0 ? [...news, ...news] : [];
-
-  // Scroll Logic Refs
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [isHovering, setIsHovering] = useState(false);
-  const mouseXRef = useRef<number>(0);
-
   const fetchNews = async () => {
     setLoading(true);
     setError(null);
     try {
       const apiUrl = process.env.NEXT_PUBLIC_NEWS_API_URL;
       if (!apiUrl) {
-        // If API URL is not configured, load fallback news gracefully
         setNews(FALLBACK_NEWS);
         return;
       }
-
       const response = await fetch(apiUrl);
       if (!response.ok) {
         throw new Error('Failed to fetch news');
@@ -108,7 +99,6 @@ export default function CodingNews() {
       setNews(data);
     } catch (err) {
       console.error('Error fetching news:', err);
-      // Fall back gracefully even if fetch fails
       setNews(FALLBACK_NEWS);
     } finally {
       setLoading(false);
@@ -118,68 +108,6 @@ export default function CodingNews() {
   useEffect(() => {
     fetchNews();
   }, []);
-
-  // Mouse-driven scroll effect
-  useEffect(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    let animationFrameId: number;
-    const AUTO_SCROLL_EDGE_THRESHOLD = 2;
-
-    const scroll = () => {
-      if (container) {
-        const loopBoundary = container.scrollWidth / 2;
-
-        if (isHovering) {
-          // Mouse movement scrolling logic
-          const rect = container.getBoundingClientRect();
-          const relativeX = mouseXRef.current - rect.left;
-          const width = rect.width;
-
-          // Define zones
-          const leftZone = width * 0.3;
-          const rightZone = width * 0.7;
-
-          if (relativeX < leftZone) {
-            // Scroll Left - speed increases as we get closer to edge
-            const speed = Math.max(1, (leftZone - relativeX) / 10); // Adjusted speed divisor
-            container.scrollLeft -= speed;
-          } else if (relativeX > rightZone) {
-            // Scroll Right - speed increases as we get closer to edge
-            const speed = Math.max(1, (relativeX - rightZone) / 10); // Adjusted speed divisor
-            container.scrollLeft += speed;
-          }
-
-          if (loopBoundary > 0 && container.scrollLeft >= loopBoundary) {
-            container.scrollLeft -= loopBoundary;
-          } else if (loopBoundary > 0 && container.scrollLeft < 0) {
-            container.scrollLeft += loopBoundary;
-          }
-        } else {
-          // Auto-scroll when not hovering using a seamless loop
-          if (loopBoundary <= 0) {
-            container.scrollLeft = 0;
-          } else if (
-            container.scrollLeft >=
-            loopBoundary - AUTO_SCROLL_EDGE_THRESHOLD
-          ) {
-            container.scrollLeft -= loopBoundary;
-          } else {
-            container.scrollLeft += 0.5; // Slow auto-scroll speed
-          }
-        }
-      }
-      animationFrameId = requestAnimationFrame(scroll);
-    };
-
-    animationFrameId = requestAnimationFrame(scroll);
-
-    return () => {
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, [isHovering]);
-
   return (
     <section className={styles.section}>
       <div className={styles.container}>
@@ -226,17 +154,9 @@ export default function CodingNews() {
             ))}
           </div>
         ) : (
-          <div
-            className={styles.scrollContainer}
-            ref={scrollContainerRef}
-            onMouseEnter={() => setIsHovering(true)}
-            onMouseLeave={() => setIsHovering(false)}
-            onMouseMove={(e) => {
-              mouseXRef.current = e.clientX;
-            }}
-          >
+          <div className={styles.scrollContainer}>
             <div className={styles.scrollTrack}>
-              {loopedNews.map((item, index) => (
+              {news.map((item, index) => (
                 <motion.a
                   key={`${index}-${item.url}`}
                   href={item.url}
