@@ -13,7 +13,6 @@ import {
   X,
   LogOut,
   Lock,
-  Bookmark,
   Search,
 } from 'lucide-react';
 
@@ -21,7 +20,7 @@ import logo from '@/assets/logo.webp';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationDropdown } from '@/components/NotificationDropdown';
 
-import BookmarkDrawer from '@/components/ui/BookmarkDrawer';
+
 import styles from './Navbar.module.css';
 import { calculateStreak } from '@/lib/streakUtils';
 import { useMaintenance } from '@/hooks/useMaintenance';
@@ -34,16 +33,13 @@ const navLinks = [
   { href: '/apply', label: 'Apply' },
   { href: '/resources', label: 'Resources' },
   { href: '/events', label: 'Events' },
-  { href: '/opportunities', label: 'Opportunities' },
   { href: '/opensource', label: 'Open Source' },
-  { href: '/team', label: 'Team' },
 ];
 
 export default function Navbar() {
   const { user, logout } = useAuth();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [bookmarkDrawerOpen, setBookmarkDrawerOpen] = useState(false);
 
   const { isMaintenanceMode } = useMaintenance();
   const setSearchOpen = useSetSearchOpen();
@@ -53,7 +49,6 @@ export default function Navbar() {
   useEffect(() => {
     const handleCloseAll = () => {
       setMobileMenuOpen(false);
-      setBookmarkDrawerOpen(false);
     };
     window.addEventListener('close-all-overlays', handleCloseAll);
     return () =>
@@ -193,16 +188,7 @@ export default function Navbar() {
             </button>
 
 
-            {/* Bookmarks */}
-            <button
-              type="button"
-              onClick={() => setBookmarkDrawerOpen(true)}
-              className={styles.iconButton}
-              aria-label="Open Saved Bookmarks"
-              title="Saved Bookmarks"
-            >
-              <Bookmark size={18} />
-            </button>
+
 
             {/* Github */}
             <a
@@ -392,10 +378,6 @@ export default function Navbar() {
         )}
       </AnimatePresence>
 
-      <BookmarkDrawer
-        isOpen={bookmarkDrawerOpen}
-        onClose={() => setBookmarkDrawerOpen(false)}
-      />
     </>
   );
 }

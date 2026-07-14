@@ -723,19 +723,6 @@ export default function ResourcesTabs() {
                   >
                     <PremiumCard
                       className={`${styles.resourceCard} h-full group flex flex-col relative overflow-hidden`}
-                      bookmarkItem={
-                        activeMainTab === 'roadmaps' &&
-                        resource.status !== 'coming_soon'
-                          ? {
-                              id: resource.title,
-                              title: resource.title,
-                              description: resource.description,
-                              type: 'roadmap',
-                              color: resource.color,
-                              path: `/resources?open=roadmap&title=${encodeURIComponent(resource.title)}`,
-                            }
-                          : undefined
-                      }
                     >
                       {/* Coming Soon Overlay */}
                       {resource.status === 'coming_soon' && (

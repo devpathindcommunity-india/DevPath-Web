@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, type ReactNode } from 'react';
-import { Target, ExternalLink, Edit3, Star, Bookmark } from 'lucide-react';
+import { Target, ExternalLink, Edit3, Star } from 'lucide-react';
 import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import {
@@ -12,7 +12,6 @@ import {
   increment,
 } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { useBookmarks } from '@/hooks/useBookmarks';
 
 interface FuseMatch {
   key?: string;
@@ -90,8 +89,6 @@ export default function ProjectCard({
   const { user } = useAuth();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isStarring, setIsStarring] = useState(false);
-  const { isBookmarked, toggleBookmark } = useBookmarks();
-  const isLocalBookmarked = isBookmarked(project.id);
 
   const stripHtml = (html: string) => {
     if (!html) return '';
@@ -189,37 +186,6 @@ export default function ProjectCard({
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm hover:shadow-lg hover:border-primary/20 hover:scale-[1.02] transition-all duration-300 flex flex-col h-full group/card">
       <div className="aspect-video bg-muted relative group">
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            e.preventDefault();
-            toggleBookmark({
-              id: project.id,
-              title: project.title,
-              description: project.description,
-              type: 'project',
-              color: '#3b82f6',
-              path: '/profile',
-            });
-          }}
-          className={`absolute top-2 left-2 p-2 rounded-full backdrop-blur-md transition-all shadow-md hover:scale-105 active:scale-95 z-10 ${
-            isLocalBookmarked
-              ? 'bg-yellow-500/20 dark:bg-yellow-500/30 border-yellow-500/50 text-yellow-500 hover:bg-yellow-500/30 border'
-              : 'bg-background/80 text-muted-foreground hover:text-foreground hover:bg-background border border-border'
-          }`}
-          title={
-            isLocalBookmarked ? 'Remove Bookmark' : 'Save Bookmark (Offline)'
-          }
-          aria-label={
-            isLocalBookmarked ? 'Remove Bookmark' : 'Save Bookmark (Offline)'
-          }
-        >
-          <Bookmark
-            size={14}
-            fill={isLocalBookmarked ? 'currentColor' : 'none'}
-          />
-        </button>
 
         {embedUrl ? (
           <iframe

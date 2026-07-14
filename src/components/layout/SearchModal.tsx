@@ -19,7 +19,6 @@ const STATIC_PAGES = [
   { title: 'Resources', href: '/resources', category: 'Navigation' },
   { title: 'Events', href: '/events', category: 'Navigation' },
   { title: 'Open Source', href: '/opensource', category: 'Navigation' },
-  { title: 'Team', href: '/team', category: 'Navigation' },
 ];
 
 export default function SearchModal() {
