@@ -18,7 +18,7 @@ def safe_float(val):
         if match:
             try:
                 return float(match.group(1))
-            except:
+            except ValueError:
                 pass
         return 0.0
 
@@ -96,7 +96,7 @@ def extract_rankings():
                 
                 try:
                     rank = int(rank_val)
-                except:
+                except ValueError:
                     continue
                 
                 if i == 0:
