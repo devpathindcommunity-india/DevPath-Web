@@ -64,7 +64,7 @@ def extract_rankings():
                 # Check if Rank is numeric, if not skip (it might be a comment row)
                 try:
                     rank = int(rank_val)
-                except:
+                except ValueError:
                     continue
                 
                 item = {
