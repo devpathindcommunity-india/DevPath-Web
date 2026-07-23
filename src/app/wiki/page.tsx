@@ -69,17 +69,17 @@ export default function WikiPage() {
 
             const button = document.createElement('button');
             button.className = 'absolute right-3 top-3 px-2 py-1 text-xs font-semibold bg-zinc-900/80 text-zinc-300 rounded border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-zinc-800 hover:text-white transition-all duration-200 shadow-md cursor-pointer backdrop-blur-sm';
-            button.innerHTML = 'Copy';
+            button.textContent = 'Copy';
             button.type = 'button';
 
             button.addEventListener('click', async () => {
                 const codeText = pre.textContent || '';
                 try {
                     await navigator.clipboard.writeText(codeText);
-                    button.innerHTML = 'Copied!';
+                    button.textContent = 'Copied!';
                     button.className = 'absolute right-3 top-3 px-2 py-1 text-xs font-semibold bg-emerald-600 text-white rounded border border-emerald-500 transition-all duration-200 shadow-md';
                     setTimeout(() => {
-                        button.innerHTML = 'Copy';
+                        button.textContent = 'Copy';
                         button.className = 'absolute right-3 top-3 px-2 py-1 text-xs font-semibold bg-zinc-900/80 text-zinc-300 rounded border border-white/10 opacity-0 group-hover:opacity-100 hover:bg-zinc-800 hover:text-white transition-all duration-200 shadow-md cursor-pointer backdrop-blur-sm';
                     }, 2000);
                 } catch (err) {

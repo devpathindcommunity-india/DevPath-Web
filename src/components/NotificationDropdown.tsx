@@ -50,7 +50,7 @@ export function NotificationDropdown() {
 
         const unsubscribe = onSnapshot(q,
             (snapshot) => {
-                setNotifications(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Notification)));
+                setNotifications(snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Notification)));
             },
             (error) => {
                 console.error("Notification subscription error:", error);
